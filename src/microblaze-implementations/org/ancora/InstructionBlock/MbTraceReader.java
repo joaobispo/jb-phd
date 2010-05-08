@@ -5,18 +5,12 @@
 
 package org.ancora.InstructionBlock;
 
-import org.ancora.InstructionBlock.InstructionBusReader;
-import org.ancora.InstructionBlock.GenericInstruction;
-import static org.ancora.MicroBlaze.Trace.TraceDefinitions.TRACE_PREFIX;
-
 import java.io.File;
 import java.util.logging.Logger;
+import org.ancora.DTool.TraceLine;
 import org.ancora.DTool.TraceReader;
 import org.ancora.MicroBlaze.InstructionName;
-import org.ancora.MicroBlaze.Trace.TraceProperties;
-import org.ancora.MicroBlaze.Trace.TraceUtils;
 import org.ancora.SharedLibrary.ParseUtils;
-import org.ancora.SharedLibrary.LineReader;
 
 /**
  * Reads MicroBlaze traces as if they where executing in an instruction bus.
@@ -30,10 +24,8 @@ public class MbTraceReader implements InstructionBusReader {
     *
     * @param reader
     */
-    private MbTraceReader(LineReader reader, long cycles, long instructions) {
+    private MbTraceReader(TraceReader reader) {
        this.reader = reader;
-       this.cycles = cycles;
-       this.instructions = instructions;
     }
 
    /**
@@ -50,42 +42,15 @@ public class MbTraceReader implements InstructionBusReader {
     */
    public static MbTraceReader createTraceReader(File traceFile) {
 
-      LineReader reader = LineReader.createLineReader(traceFile);
+      TraceReader reader = TraceReader.createTraceReader(traceFile);
       if(reader == null) {
          Logger.getLogger(MbTraceReader.class.getName()).
                     warning("Could not create MbTraceReader.");
+         return null;
       }
 
       // Extract information about number of instructions and cycles
-      TraceProperties props = TraceProperties.getTraceProperties(traceFile);
-
-      long cycles = props.getCycles();
-      long instructions = props.getInstructions();
-
-      return new MbTraceReader(reader, cycles, instructions);
-
-   }
-
-   public static MbInstruction createMicroBlazeInstruction(String line) {
-      /// Split the trace instruction in parts
-      int whiteSpaceIndex = ParseUtils.indexOfFirstWhiteSpace(line);
-
-      /// Get Address
-      String addressString = line.substring(0, whiteSpaceIndex);
-      // Remove prefix
-      addressString = addressString.substring(TRACE_PREFIX.length());
-      // Parse to integer
-      int instructionAddress = Integer.valueOf(addressString, 16);
-
-      /// Get Instruction
-      String instruction = line.substring(whiteSpaceIndex).trim();
-
-      /// Get InstructionName
-      whiteSpaceIndex = ParseUtils.indexOfFirstWhiteSpace(instruction);
-      String instNameString = instruction.substring(0, whiteSpaceIndex);
-      InstructionName instName = InstructionName.getEnum(instNameString);
-
-      return new MbInstruction(instructionAddress, instruction, instName);
+      return new MbTraceReader(reader);
    }
 
 
@@ -97,7 +62,7 @@ public class MbTraceReader implements InstructionBusReader {
    public GenericInstruction nextInstruction() {
 
       // While there are lines and a trace instruction was not found, loop.
-      String line = null;
+      TraceLine line = null;
       
       while (true) {
          line = reader.nextLine();
@@ -106,31 +71,32 @@ public class MbTraceReader implements InstructionBusReader {
             return null;
          }
 
-         // Check if current line is a trace instruction
-         if (line.startsWith(TRACE_PREFIX)) {
-            // Create MicroBlazeInstruction
-            MbInstruction instruction = createMicroBlazeInstruction(line);
-            return instruction;
-         } 
+         // Extract instruction name from instruction
+         InstructionName name = getInstructionName(line.getInstruction());
+
+         // Transform TraceLine into MbInstruction
+         return new MbInstruction(line.getAddress(), line.getInstruction(), name);
       }
    }
 
    public long getCycles() {
-      return cycles;
+      return reader.getCycles();
    }
 
    public long getInstructions() {
-      return instructions;
+      return reader.getNumberInstructions();
+   }
+
+   private InstructionName getInstructionName(String instruction) {
+      int whiteSpaceIndex = ParseUtils.indexOfFirstWhiteSpace(instruction);
+      String instNameString = instruction.substring(0, whiteSpaceIndex);
+      return InstructionName.getEnum(instNameString);
    }
 
    /**
     * INSTANCE VARIABLES
     */
-    //private final LineReader reader;
     private final TraceReader reader;
-    private long cycles;
-    private long instructions;
-
 
 
 }
