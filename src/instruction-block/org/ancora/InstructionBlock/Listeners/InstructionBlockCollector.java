@@ -19,6 +19,7 @@ package org.ancora.InstructionBlock.Listeners;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.InstructionBlock.InstructionBlockListener;
 
@@ -44,6 +45,37 @@ public class InstructionBlockCollector implements InstructionBlockListener {
 
    public List<InstructionBlock> getBlocks() {
       return blocks;
+   }
+
+   /*
+   public InstructionBlock popBlock() {
+      if(blocks.isEmpty()) {
+         return null;
+      }
+
+      if(blocks.size() == 1) {
+         InstructionBlock block = blocks.get(0);
+         blocks = new ArrayList<InstructionBlock>();
+         return block;
+      }
+
+      Logger.getLogger(InstructionBlockCollector.class.getName()).
+              warning("InstructionBlock list greater than 1 ("+blocks.size()+")");
+
+      return blocks.remove(0);
+   }
+    *
+    */
+   
+   public List<InstructionBlock> popBlocks() {
+      if(blocks.isEmpty()) {
+         return blocks;
+      }
+
+      List<InstructionBlock> tempBlocks = blocks;
+      blocks = new ArrayList<InstructionBlock>();
+      return tempBlocks;
+      
    }
 
    /**

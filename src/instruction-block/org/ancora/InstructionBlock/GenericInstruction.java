@@ -17,7 +17,6 @@
 
 package org.ancora.InstructionBlock;
 
-import org.ancora.SharedLibrary.ParseUtils;
 
 /**
  * Represents a generic instruction
@@ -26,7 +25,7 @@ import org.ancora.SharedLibrary.ParseUtils;
  */
 public class GenericInstruction {
 
-   public GenericInstruction(String instruction, int address) {
+   public GenericInstruction(int address, String instruction) {
       this.instruction = instruction;
       this.address = address;
    }
@@ -64,7 +63,7 @@ public class GenericInstruction {
       /// Get Instruction
       String instruction = line.substring(whiteSpaceIndex).trim();
 
-      return new GenericInstruction(instruction, instructionAddress);
+      return new GenericInstruction(instructionAddress, instruction);
    }
 
    @Override
