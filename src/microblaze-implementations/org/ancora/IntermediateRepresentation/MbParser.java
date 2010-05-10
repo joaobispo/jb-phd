@@ -21,12 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.ancora.InstructionBlock.GenericInstruction;
-import org.ancora.InstructionBlock.MbInstruction;
+import org.ancora.InstructionBlock.MbBlockUtils;
 import org.ancora.IntermediateRepresentation.Operands.MbImm;
 import org.ancora.IntermediateRepresentation.Operands.MbRegister;
 import org.ancora.IntermediateRepresentation.Operations.MbOperation;
 import org.ancora.MicroBlaze.ArgumentsProperties;
 import org.ancora.MicroBlaze.ArgumentsProperties.ArgumentProperty;
+import org.ancora.MicroBlaze.InstructionName;
 import org.ancora.SharedLibrary.ParseUtils;
 
 /**
@@ -38,7 +39,7 @@ public class MbParser {
       List<Operation> operations = new ArrayList(instructions.size());
       
       for(GenericInstruction instruction : instructions) {
-         Operation op = parseMbInstruction((MbInstruction) instruction);
+         Operation op = parseMbInstruction(instruction);
          if(op != null) {
             operations.add(op);
          }
@@ -47,19 +48,20 @@ public class MbParser {
       return operations;
    }
 
-   public static Operation parseMbInstruction(MbInstruction mbInstruction) {
+   public static Operation parseMbInstruction(GenericInstruction instruction) {
       // Parse arguments
-      String[] arguments = parseArguments(mbInstruction.getInstruction());
+      String[] arguments = parseArguments(instruction.getInstruction());
 
       // Get arguments properties
-      ArgumentProperty[] argProps = ArgumentsProperties.getProperties(mbInstruction.getInstructionName());
+      InstructionName instructionName = MbBlockUtils.getInstructionName(instruction);
+      ArgumentProperty[] argProps = ArgumentsProperties.getProperties(instructionName);
 
       // Check arguments properties have the same size as the arguments
       if(arguments.length != argProps.length) {
          Logger.getLogger(MbParser.class.getName()).
                  warning("Number of arguments ("+arguments.length+") different from " +
                  "the number of properties ("+argProps.length+") for instruction '"+
-                 mbInstruction.getInstructionName()+"'. Returning null.");
+                 instructionName+"'. Returning null.");
          return null;
       }
 
@@ -85,7 +87,7 @@ public class MbParser {
          }
       }
 
-      return new MbOperation(mbInstruction.getAddress(), mbInstruction.getInstructionName(), inputs, outputs);
+      return new MbOperation(instruction.getAddress(), instructionName, inputs, outputs);
    }
 
    public static String[] parseArguments(String instruction) {

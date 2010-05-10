@@ -17,19 +17,14 @@
 
 package org.ancora.IntermediateRepresentation.Transformations.MicroblazeInstructions;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.ancora.IntermediateRepresentation.Operand;
-import org.ancora.IntermediateRepresentation.Operands.Literal;
 import org.ancora.IntermediateRepresentation.Operands.MbImm;
 import org.ancora.IntermediateRepresentation.Operation;
 import org.ancora.IntermediateRepresentation.Operations.MbOperation;
 import org.ancora.IntermediateRepresentation.Operations.Nop;
 import org.ancora.MicroBlaze.InstructionName;
-import org.ancora.MicroBlaze.Definitions;
-import org.ancora.SharedLibrary.ParseUtils;
-import org.ancora.IntermediateRepresentation.MbTransformUtils;
 import org.ancora.IntermediateRepresentation.MbOperationType;
 import org.ancora.IntermediateRepresentation.Transformation;
 
