@@ -15,37 +15,35 @@
  *  under the License.
  */
 
-package org.ancora.Partitioning;
+package org.ancora.Partitioning.deprecated.Iterative;
 
 import org.ancora.InstructionBlock.GenericInstruction;
-import org.ancora.InstructionBlock.InstructionBlockProducerSkeleton;
-import org.ancora.InstructionBlock.InstructionBusReader;
+import org.ancora.InstructionBlock.InstructionBlock;
 
 /**
- * Generates InstructionBlocks from Generic Instructions
  *
  * @author Joao Bispo
  */
-public abstract class Partitioner extends InstructionBlockProducerSkeleton {
-
+public abstract class Partitioner {
 
    /**
     * @return the name of this partitioner
     */
    public abstract String getName();
 
-   public abstract void acceptInstruction(GenericInstruction instruction);
+   /**
+    * For each accepted instruction, it returns an InstructionBlock, if it gets
+    * completed. Returns null otherwise.
+    *
+    * <p>When an InstructionBlock is returned, it is cleares from the Partitioner
+    * memory.
+    *
+    * @param instruction
+    * @param lastInstruction
+    * @return
+    */
+   public abstract InstructionBlock acceptInstruction(GenericInstruction instruction);
 
-   public abstract void flush();
-
-
-   public void run(InstructionBusReader reader) {
-      GenericInstruction instruction = reader.nextInstruction();
-      while(instruction != null) {
-         acceptInstruction(instruction);
-         instruction = reader.nextInstruction();
-      }
-      flush();
-   }
-
+   public abstract InstructionBlock lastInstruction();
+   //public abstract void flush();
 }

@@ -17,6 +17,7 @@
 
 package org.ancora.Partitioning;
 
+import org.ancora.Partitioning.Partitioner;
 import org.ancora.Partitioning.Tools.InstructionFilter;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +64,7 @@ public abstract class BasicBlock extends Partitioner {
    }
 
    @Override
-   protected void acceptInstruction(GenericInstruction instruction) {
+   public void acceptInstruction(GenericInstruction instruction) {
        // Add instruction to current block of instructions
       currentInstructions.add(instruction);
 
@@ -76,7 +77,7 @@ public abstract class BasicBlock extends Partitioner {
    }
 
    @Override
-   protected void flush() {
+   public void flush() {
       completeBasicBlock();
       flushListeners();
    }

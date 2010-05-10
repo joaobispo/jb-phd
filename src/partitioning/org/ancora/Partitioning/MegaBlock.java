@@ -17,6 +17,7 @@
 package org.ancora.Partitioning;
 
 //import org.ancora.Partitioning.Tools.InstructionFilter;
+import org.ancora.Partitioning.Partitioner;
 import java.util.ArrayList;
 import java.util.List;
 import org.ancora.InstructionBlock.GenericInstruction;
@@ -46,12 +47,12 @@ public class MegaBlock extends Partitioner {
    }
 
    @Override
-   protected void acceptInstruction(GenericInstruction instruction) {
+   public void acceptInstruction(GenericInstruction instruction) {
       sbPartitioner.acceptInstruction(instruction);
    }
 
    @Override
-   protected void flush() {
+   public void flush() {
       sbPartitioner.flush();
    }
    /**

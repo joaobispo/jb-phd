@@ -17,6 +17,8 @@
 
 package org.ancora.Partitioning;
 
+import org.ancora.Partitioning.Partitioner;
+import org.ancora.Partitioning.BasicBlock;
 import java.util.ArrayList;
 import java.util.List;
 import org.ancora.InstructionBlock.GenericInstruction;
@@ -46,12 +48,12 @@ public class SuperBlock extends Partitioner {
    }
 
    @Override
-   protected void acceptInstruction(GenericInstruction instruction) {
+   public void acceptInstruction(GenericInstruction instruction) {
       bbPartitioner.acceptInstruction(instruction);
    }
 
    @Override
-   protected void flush() {
+   public void flush() {
       bbPartitioner.flush();
    }
 
