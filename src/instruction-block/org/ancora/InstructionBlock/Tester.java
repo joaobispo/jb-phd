@@ -17,6 +17,9 @@
 
 package org.ancora.InstructionBlock;
 
+import java.io.File;
+
+
 /**
  *
  * @author Ancora Group <ancora.codigo@gmail.com>
@@ -27,7 +30,13 @@ class Tester {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        System.out.println("Hello");
+        //System.out.println("Hello");
+        testBlockIO();
     }
+
+   private static void testBlockIO() {
+      InstructionBlock block = BlockIO.fromFile(new File("data/adpcm-coder_trace_without_optimization-0.block"));
+      BlockIO.toFile(new File("E:/block.txt"), block);
+   }
 
 }

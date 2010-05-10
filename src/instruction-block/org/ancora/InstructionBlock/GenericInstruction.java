@@ -17,21 +17,71 @@
 
 package org.ancora.InstructionBlock;
 
+import org.ancora.SharedLibrary.ParseUtils;
+
 /**
  * Represents a generic instruction
  *
  * @author Joao Bispo
  */
-public interface GenericInstruction {
+public class GenericInstruction {
+
+   public GenericInstruction(String instruction, int address) {
+      this.instruction = instruction;
+      this.address = address;
+   }
+
+
 
    /**
     * @return the address of this instruction
     */
-   int getAddress();
+   public int getAddress() {
+      return address;
+   }
 
    /**
     * @return a string representation of this instruction
     */
-   String getInstruction();
+   public String getInstruction() {
+      return instruction;
+   }
 
+   public String toLine() {
+      return address + SEPARATOR + instruction;
+   }
+
+   public static GenericInstruction fromLine(String line) {
+      /// Split the trace instruction in parts
+      int whiteSpaceIndex = line.indexOf(SEPARATOR);
+
+      /// Get Address
+      String addressString = line.substring(0, whiteSpaceIndex);
+
+      // Parse to integer
+      int instructionAddress = Integer.valueOf(addressString);
+
+      /// Get Instruction
+      String instruction = line.substring(whiteSpaceIndex).trim();
+
+      return new GenericInstruction(instruction, instructionAddress);
+   }
+
+   @Override
+   public String toString() {
+      return toLine();
+   }
+
+
+
+   /**
+    * INSTANCE VARIABLES
+    */
+   private String instruction;
+   private int address;
+
+   /**
+    * DEFINITIONS
+    */
+   public static final String SEPARATOR = " ";
 }
