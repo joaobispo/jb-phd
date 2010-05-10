@@ -17,7 +17,6 @@
 
 package org.ancora.Partitioning;
 
-import org.ancora.Partitioning.Tools.InstructionFilter;
 import java.util.ArrayList;
 import java.util.List;
 import org.ancora.InstructionBlock.GenericInstruction;
@@ -31,8 +30,9 @@ import org.ancora.SharedLibrary.BitUtils;
  */
 public class SuperBlock extends Partitioner {
 
-   public SuperBlock(InstructionFilter jumpFilter) {
-      this.bbPartitioner = new BasicBlock(jumpFilter);
+   public SuperBlock(BasicBlock basicBlock) {
+      //this.bbPartitioner = new BasicBlock(jumpFilter);
+      this.bbPartitioner = basicBlock;
       this.sbBuilder = new SuperBlockBuilder();
 
       this.bbPartitioner.addListener(sbBuilder);

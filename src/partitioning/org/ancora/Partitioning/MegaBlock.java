@@ -33,8 +33,8 @@ import org.ancora.SharedLibrary.BitUtils;
  */
 public class MegaBlock extends Partitioner {
 
-   public MegaBlock(InstructionFilter jumpFilter, int maxPatternSize) {
-      this.sbPartitioner = new SuperBlock(jumpFilter);
+   public MegaBlock(SuperBlock superBlock, int maxPatternSize) {
+      this.sbPartitioner = superBlock;
       this.mbBuilder = new MegaBlockBuilder(maxPatternSize);
 
       this.sbPartitioner.addListener(mbBuilder);

@@ -17,11 +17,7 @@
 
 package org.ancora.Partitioning;
 
-import java.util.HashSet;
-import java.util.Set;
 import org.ancora.InstructionBlock.GenericInstruction;
-import org.ancora.InstructionBlock.InstructionBlock;
-import org.ancora.InstructionBlock.InstructionBlockListener;
 import org.ancora.InstructionBlock.InstructionBlockProducerSkeleton;
 import org.ancora.InstructionBlock.InstructionBusReader;
 

@@ -28,7 +28,12 @@ import org.ancora.InstructionBlock.InstructionBlock;
  *
  * @author Joao Bispo
  */
-public class BasicBlock extends Partitioner {
+public abstract class BasicBlock extends Partitioner {
+
+
+   public BasicBlock() {
+      currentInstructions = new ArrayList<GenericInstruction>();
+   }
 
    /**
     * Needs an InstructionFilter which indicates if an instruction represents
@@ -36,11 +41,21 @@ public class BasicBlock extends Partitioner {
     *
     * @param jumpFilter
     */
+   /*
    public BasicBlock(InstructionFilter jumpFilter) {
       currentInstructions = new ArrayList<GenericInstruction>();
       this.jumpFilter = jumpFilter;
    }
+*/
 
+   /**
+    * CAUTION: In architectures with delay slots, the instruction where the
+    * control flow jumps might not be the branch instruction itself.
+    * 
+    * @param instruction
+    * @return true if the this instruction represents a jump in the control flow.
+    */
+   protected abstract boolean isJumpInstruction(GenericInstruction instruction);
 
    @Override
    public String getName() {
@@ -53,7 +68,8 @@ public class BasicBlock extends Partitioner {
       currentInstructions.add(instruction);
 
       // Check if instruction is a branch
-      if(jumpFilter.accept(instruction)) {
+      //if(jumpFilter.accept(instruction)) {
+      if(isJumpInstruction(instruction)) {
          completeBasicBlock();
       }
 
@@ -66,7 +82,7 @@ public class BasicBlock extends Partitioner {
    }
 
    private void completeBasicBlock() {
-      if(currentInstructions.size() == 0) {
+      if(currentInstructions.isEmpty()) {
          return;
       }
 
@@ -88,7 +104,7 @@ public class BasicBlock extends Partitioner {
     * INSTANCE VARIABLES
     */
    private List<GenericInstruction> currentInstructions;
-   private InstructionFilter jumpFilter;
+   //private InstructionFilter jumpFilter;
 
    public static final String NAME = "BasicBlock";
 }
