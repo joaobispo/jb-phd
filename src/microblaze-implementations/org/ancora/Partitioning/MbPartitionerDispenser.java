@@ -22,7 +22,7 @@ package org.ancora.Partitioning;
  *
  * @author Joao Bispo
  */
-public class PartitionerDispenser {
+public class MbPartitionerDispenser {
 
    public static MbBasicBlock getMbBasicBlock() {
       return new MbBasicBlock();

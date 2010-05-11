@@ -21,10 +21,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.ancora.InstructionBlock.GenericInstruction;
+import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.InstructionBlock.MbBlockUtils;
 import org.ancora.IntermediateRepresentation.Operands.MbImm;
 import org.ancora.IntermediateRepresentation.Operands.MbRegister;
 import org.ancora.IntermediateRepresentation.Operations.MbOperation;
+import org.ancora.IntermediateRepresentation.Transformations.MicroblazeGeneral.*;
+import org.ancora.IntermediateRepresentation.Transformations.MicroblazeInstructions.*;
+import org.ancora.IntermediateRepresentation.Transformations.SingleStaticAssignment;
 import org.ancora.MicroBlaze.ArgumentsProperties;
 import org.ancora.MicroBlaze.ArgumentsProperties.ArgumentProperty;
 import org.ancora.MicroBlaze.InstructionName;
@@ -128,6 +132,91 @@ public class MbParser {
 
       return null;
    }
+
+   // Transforms an InstructionBlock into a Pure-IR list of Operations.
+   public static List<Operation> mbToPureIr(InstructionBlock block) {
+      // Transform block in List of operations
+      List<Operation> operations = MbParser.parseMbInstructions(block.getInstructions());
+
+      // Transform operations in pure IR operations
+      for(Transformation transf : microblazeTransformations) {
+         operations = transf.transform(operations);
+      }
+
+      // Check that there are no microblaze operations  nor operands
+      for(Operation operation : operations) {
+         if(MbOperation.getMbOperation(operation) != null) {
+            Logger.getLogger(MbParser.class.getName()).
+                    warning("Could not transform block of MicroBlaze instructions " +
+                    "int a pure intermediate representation, due to operation '"+operation+"'");
+            return null;
+         }
+
+         for(Operand operand : operation.getInputs()) {
+            if(operand.getType() == MbOperandType.MbImm ||
+                    operand.getType() == MbOperandType.MbRegister) {
+                Logger.getLogger(MbParser.class.getName()).
+                    warning("Could not transform block of MicroBlaze instructions " +
+                    "int a pure intermediate representation, due to input operand '"+operand+"'");
+            return null;
+            }
+         }
+
+         for(Operand operand : operation.getOutputs()) {
+            if(operand.getType() == MbOperandType.MbImm ||
+                    operand.getType() == MbOperandType.MbRegister) {
+                Logger.getLogger(MbParser.class.getName()).
+                    warning("Could not transform block of MicroBlaze instructions " +
+                    "int a pure intermediate representation, due to output operand '"+operand+"'");
+            return null;
+            }
+         }
+      }
+
+      return operations;
+   }
+
+   public static final Transformation[] microblazeTransformations = {
+ //        new TransformImmToLiterals(),
+ //        new RegisterZeroToImm(),
+
+//         new RemoveImmInstruction(),
+//         new IdentifyMicroblazeNops(),
+
+
+         //Because this transformation depends on the positions of the IMM in the
+         //Microblaze instructions, this transformation must be done before the MbOperations
+         //are changed to IR Operations.
+
+         new RemoveImmInstruction(),
+
+         //new IdentifyMicroblazeNops(), //Maybe should wait until constant propagation?
+
+         // Parse Mb Operations into IR Operations
+
+         new ParseCarryArithmetic(),
+         new ParseConditionalBranch(),
+         new ParseUnconditionalBranches(),
+         new ParseLogic(),
+         new ParseDivision(),
+         new ParseSignExtension(),
+         new ParseReturnSubroutine(),
+         new ParseLoads(),
+         new ParseStores(),
+         new ParseMultiplication(),
+         new ParseShiftRight(),
+
+
+         // Parse MbOperands and IR Operands
+         new RegisterZeroToImm(),
+         new TransformImmToLiterals(),
+         new TransformRegistersToInternalData(),
+
+
+         // Further transform the now pure-ir representation
+         new SingleStaticAssignment()
+      };
+
 
 
    public static final String REGISTER_PREFIX = "r";
