@@ -15,29 +15,18 @@
  *  under the License.
  */
 
-package org.ancora.DMTool.TraceProcessor;
+package org.ancora.DMTool.deprecated.TraceProcessor;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
-import org.ancora.DMTool.TransformStudy.NamedBlock;
 import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.InstructionBlock.InstructionBlockProducer;
 import org.ancora.InstructionBlock.InstructionBusReader;
 import org.ancora.InstructionBlock.Listeners.InstructionBlockCollector;
 import org.ancora.InstructionBlock.Listeners.InstructionBlockStats;
-import org.ancora.InstructionBlock.MbInstructionBlockWriter;
-import org.ancora.InstructionBlock.MbTraceReader;
-import org.ancora.Partitioning.BasicBlock;
-import org.ancora.Partitioning.MbJumpFilter;
-import org.ancora.Partitioning.MegaBlock;
 import org.ancora.Partitioning.Partitioner;
-import org.ancora.Partitioning.SuperBlock;
 import org.ancora.Partitioning.Tools.Gatherer;
-import org.ancora.Partitioning.Tools.InstructionFilter;
 import org.ancora.Partitioning.Tools.Selector;
-import org.ancora.MicroBlaze.Trace.TraceUtils;
 
 /**
  * Given a trace, returns a list of InstructionBlocks.

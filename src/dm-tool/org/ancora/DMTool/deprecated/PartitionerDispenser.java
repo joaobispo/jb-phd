@@ -15,12 +15,13 @@
  *  under the License.
  */
 
-package org.ancora.DMTool.Shell.System;
+package org.ancora.DMTool.deprecated;
 
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.ancora.DMTool.Settings.Preference;
 import org.ancora.Partitioning.BasicBlock;
 import org.ancora.Partitioning.MegaBlock;
 import org.ancora.Partitioning.Partitioner;
@@ -38,7 +39,7 @@ public class PartitionerDispenser {
 
    public static Partitioner getCurrentPartitioner() {
 
-      String partitionerName = prefs.getPreference(GeneralPreferences.partitioner).toLowerCase();
+      String partitionerName = prefs.getPreference(Preference.partitioner).toLowerCase();
       PartitionerOption partitionerOption = partitionerOptions.get(partitionerName);
 
       if(partitionerOption == null) {
@@ -60,7 +61,7 @@ public class PartitionerDispenser {
       }
 
       if(partitionerOption == PartitionerOption.MegaBlock) {
-         int maxPatternSize = ParseUtils.parseInt(prefs.getPreference(GeneralPreferences.megablockMaxPatternSize));
+         int maxPatternSize = ParseUtils.parseInt(prefs.getPreference(Preference.megablockMaxPatternSize));
          return new MegaBlock(MICROBLAZE_JUMP_FILTER, maxPatternSize);
       }
 
@@ -72,7 +73,7 @@ public class PartitionerDispenser {
    /**
     * VARIABLES
     */
-   private static final EnumPreferences prefs = GeneralPreferences.getPreferences();
+   private static final EnumPreferences prefs = Preference.getPreferences();
    private static final InstructionFilter MICROBLAZE_JUMP_FILTER = new MbJumpFilter();
    
    private static final Map<String, PartitionerDispenser.PartitionerOption> partitionerOptions;

@@ -19,14 +19,12 @@ package org.ancora.DMTool.Shell;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.ancora.DMTool.Shell.System.Executable;
-import org.ancora.DMTool.Shell.System.GeneralPreferences;
-import org.ancora.DMTool.Utils.EnumUtils;
+import org.ancora.DMTool.Settings.Preference;
 import org.ancora.SharedLibrary.Preferences.EnumPreferences;
 
 /**
@@ -36,7 +34,7 @@ import org.ancora.SharedLibrary.Preferences.EnumPreferences;
 public class Set implements Executable {
 
    public Set() {
-      prefs = GeneralPreferences.getPreferences();
+      prefs = Preference.getPreferences();
    }
 
 
@@ -50,8 +48,8 @@ public class Set implements Executable {
 
       // Get preference
       String prefString = args.get(0).toLowerCase();
-      //GeneralPreferences prefEnum = EnumUtils.valueOf(GeneralPreferences.class, prefString);
-      GeneralPreferences prefEnum = settings.get(prefString);
+      //Preference prefEnum = EnumUtils.valueOf(Preference.class, prefString);
+      Preference prefEnum = settings.get(prefString);
 
       if(prefEnum == null) {
           Logger.getLogger(Set.class.getName()).
@@ -62,7 +60,7 @@ public class Set implements Executable {
                      info("- "+gPref);
          }
          /*
-         for(GeneralPreferences gPref : GeneralPreferences.values()) {
+         for(Preference gPref : Preference.values()) {
              Logger.getLogger(Set.class.getName()).
                      info("- "+gPref.name());
          }
@@ -74,7 +72,7 @@ public class Set implements Executable {
 
       String value = args.get(1);
       // Special case: transform-options
-      if(prefEnum == GeneralPreferences.transformOptions) {
+      if(prefEnum == Preference.transformOptions) {
          StringBuilder builder = new StringBuilder();
          builder.append(value);
          for(int i=2; i<args.size(); i++) {
@@ -94,7 +92,7 @@ public class Set implements Executable {
       //return true;
    }
 
-   private boolean updatePreferences(GeneralPreferences preference, String value) {
+   private boolean updatePreferences(Preference preference, String value) {
 
       // TODO: PARSE VALUES?
      prefs.putPreference(preference, value);
@@ -106,26 +104,26 @@ public class Set implements Executable {
    /**
     * Options names
     */
-    private static final Map<String, GeneralPreferences> settings;
+    private static final Map<String, Preference> settings;
    static {
-      Map<String, GeneralPreferences> aMap = new Hashtable<String, GeneralPreferences>();
+      Map<String, Preference> aMap = new Hashtable<String, Preference>();
 
-      aMap.put(Options.outputFolder.toLowerCase(), GeneralPreferences.outputFolder);
-      aMap.put(Options.partitioner.toLowerCase(), GeneralPreferences.partitioner);
+      aMap.put(Options.outputFolder.toLowerCase(), Preference.outputFolder);
+      aMap.put(Options.partitioner.toLowerCase(), Preference.partitioner);
 
-      aMap.put(Options.megablockMaxPatternSize.toLowerCase(), GeneralPreferences.megablockMaxPatternSize);
+      aMap.put(Options.megablockMaxPatternSize.toLowerCase(), Preference.megablockMaxPatternSize);
 
-      aMap.put(Options.extensionBlock.toLowerCase(), GeneralPreferences.blockExtension);
-      aMap.put(Options.extensionElf.toLowerCase(), GeneralPreferences.elfExtension);
-      aMap.put(Options.extensionTrace.toLowerCase(), GeneralPreferences.traceExtension);
+      aMap.put(Options.extensionBlock.toLowerCase(), Preference.blockExtension);
+      aMap.put(Options.extensionElf.toLowerCase(), Preference.elfExtension);
+      aMap.put(Options.extensionTrace.toLowerCase(), Preference.traceExtension);
 
-      aMap.put(Options.busSelectorThreshold.toLowerCase(), GeneralPreferences.selectorThreshold);
-      aMap.put(Options.busUseGatherer.toLowerCase(), GeneralPreferences.useGatherer);
-      aMap.put(Options.busUseSelector.toLowerCase(), GeneralPreferences.useSelector);
+      aMap.put(Options.busSelectorThreshold.toLowerCase(), Preference.selectorThreshold);
+      aMap.put(Options.busUseGatherer.toLowerCase(), Preference.useGatherer);
+      aMap.put(Options.busUseSelector.toLowerCase(), Preference.useSelector);
 
-      aMap.put(Options.mapper.toLowerCase(), GeneralPreferences.mapper);
-      aMap.put(Options.transformOptions.toLowerCase(), GeneralPreferences.transformOptions);
-      aMap.put(Options.transformWriteDot.toLowerCase(), GeneralPreferences.transformWriteDot);
+      aMap.put(Options.mapper.toLowerCase(), Preference.mapper);
+      aMap.put(Options.transformOptions.toLowerCase(), Preference.transformOptions);
+      aMap.put(Options.transformWriteDot.toLowerCase(), Preference.transformWriteDot);
 
       settings = Collections.unmodifiableMap(aMap);
    }

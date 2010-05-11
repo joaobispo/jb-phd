@@ -22,20 +22,21 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
-import org.ancora.DMTool.Configuration.Definitions;
-import org.ancora.DMTool.Shell.System.GeneralPreferences;
+import org.ancora.DMTool.deprecated.Configuration.Definitions;
+import org.ancora.DMTool.Settings.Preference;
 import org.ancora.DMTool.Shell.System.Executable;
 import org.ancora.DMTool.Shell.System.MapperDispenser;
-import org.ancora.DMTool.Shell.System.PartitionerDispenser;
+import org.ancora.DMTool.deprecated.PartitionerDispenser;
 import org.ancora.DMTool.Shell.System.Transform.OperationListStats;
 import org.ancora.DMTool.Shell.System.TransformDispenser;
-import org.ancora.DMTool.TraceProcessor.TraceProcessorWorker;
-import org.ancora.DMTool.Utils.IoUtilsAppend;
-import org.ancora.DMTool.Utils.TransformUtils;
+import org.ancora.DMTool.deprecated.TraceProcessor.TraceProcessorWorker;
+import org.ancora.DMTool.deprecated.TransformUtils;
+import org.ancora.InstructionBlock.BlockIO;
+import org.ancora.InstructionBlock.BlockStream;
 import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.InstructionBlock.InstructionBusReader;
-import org.ancora.InstructionBlock.MbElfReader;
-import org.ancora.InstructionBlock.MbTraceReader;
+import org.ancora.InstructionBlock.ElfBusReader;
+import org.ancora.InstructionBlock.SingleBlockStream;
 import org.ancora.Partitioning.Partitioner;
 import org.ancora.IrMapping.Tools.Dotty;
 import org.ancora.IrMapping.Mapper;
@@ -44,6 +45,7 @@ import org.ancora.SharedLibrary.IoUtils;
 import org.ancora.SharedLibrary.ParseUtils;
 import org.ancora.SharedLibrary.Preferences.EnumPreferences;
 import org.ancora.IntermediateRepresentation.Transformation;
+import org.ancora.Partitioning.Tools.BlockWorker;
 
 /**
  *
@@ -59,13 +61,13 @@ public class Transform implements Executable {
    }
 
    private void setup() {
-      EnumPreferences prefs = GeneralPreferences.getPreferences();
-      blockExtension = prefs.getPreference(GeneralPreferences.blockExtension);
-      elfExtension = prefs.getPreference(GeneralPreferences.elfExtension);
-      traceExtension = prefs.getPreference(GeneralPreferences.traceExtension);
+      EnumPreferences prefs = Preference.getPreferences();
+      blockExtension = prefs.getPreference(Preference.blockExtension);
+      elfExtension = prefs.getPreference(Preference.elfExtension);
+      traceExtension = prefs.getPreference(Preference.traceExtension);
       mapper = MapperDispenser.getCurrentMapper();
       transf = TransformDispenser.getCurrentTransformations();
-      writeDot = Boolean.parseBoolean(prefs.getPreference(GeneralPreferences.transformWriteDot));
+      writeDot = Boolean.parseBoolean(prefs.getPreference(Preference.transformWriteDot));
    }
 
 
@@ -98,18 +100,97 @@ public class Transform implements Executable {
          supportedExtensions.add(elfExtension);
          supportedExtensions.add(traceExtension);
          //inputFiles = IoUtilsAppend.getFilesRecursive(file);
-         inputFiles = IoUtilsAppend.getFilesRecursive(file, supportedExtensions);
+         inputFiles = IoUtils.getFilesRecursive(file, supportedExtensions);
       }
 
       logger.info("Found "+inputFiles.size()+" files.");
 
-      processFiles(inputFiles);
+//      processFiles(inputFiles);
+      processFiles2(inputFiles);
 
 
       return true;
    }
 
+   private void processFiles2(List<File> inputFiles) {
+      List<OperationListStats> statsBefore = new ArrayList<OperationListStats>();
+      List<OperationListStats> statsAfter = new ArrayList<OperationListStats>();
 
+      for(File file : inputFiles) {
+         logger.info("Processing file '"+file.getName()+"'...");
+         String baseFilename = ParseUtils.removeSuffix(file.getName(), Definitions.EXTENSION_SEPARATOR);
+
+         // Get BlockStream
+         BlockStream blockStream = getBlockStream(file);
+         InstructionBlock block = blockStream.nextBlock();
+         // Start counter
+         int counter = 0;
+         while(block != null) {
+             String blockName = baseFilename+"-"+counter;
+            logger.info("Block "+counter+", "+block.getRepetitions()+" repetitions.");
+
+            // Transform Instruction Block into PureIR
+            List<Operation> operations = TransformUtils.mbToPureIr(block);
+
+            if(operations == null) {
+               continue;
+            }
+
+            // Get stats before transformations
+            OperationListStats beforeTransf = OperationListStats.buildStats(operations, mapper,
+                    block.getRepetitions(), blockName);
+/*
+            // Show operations before
+            System.out.println("BEFORE OPERATIONS:");
+            for(Operation operation : operations) {
+               System.out.println(operation.getFullOperation());
+            }
+  */
+            // Write DOT Before
+            if(writeDot) {
+               File folder = IoUtils.safeFolder("dot/"+baseFilename);
+               String filename = baseFilename + "-" + counter + "-before.dot";
+               writeDot(operations, new File(folder, filename));
+            }
+
+
+            // Transform
+            for(Transformation t : transf) {
+               // Show transformations
+               System.out.println("Transformation:"+t);
+               //operations = t.transform(operations);
+               t.transform(operations);
+            }
+
+
+            // Get stats after transformation
+            OperationListStats afterTransf = OperationListStats.buildStats(operations, mapper,
+                    block.getRepetitions(), blockName);
+
+            showStats(beforeTransf, afterTransf);
+            statsBefore.add(beforeTransf);
+            statsAfter.add(afterTransf);
+            /*
+            System.out.println("AFTER OPERATIONS:");
+            for(Operation operation : operations) {
+               System.out.println(operation.getFullOperation());
+            }
+             */
+
+
+            // Write DOT After
+            if(writeDot) {
+               File folder = IoUtils.safeFolder("dot/"+baseFilename);
+               String filename = baseFilename + "-" + counter + "-after.dot";
+               writeDot(operations, new File(folder, filename));
+            }
+            // Increment counter
+            counter++;
+         }
+      }
+   }
+
+   
    private void processFiles(List<File> inputFiles) {
       List<OperationListStats> statsBefore = new ArrayList<OperationListStats>();
       List<OperationListStats> statsAfter = new ArrayList<OperationListStats>();
@@ -210,7 +291,38 @@ public class Transform implements Executable {
 
       if(extension.equals(elfExtension)) {
          String systemConfig = "./Configuration Files/systemconfig.xml";
-         InstructionBusReader busReader = MbElfReader.createMbElfReader(systemConfig, file.getAbsolutePath());
+         InstructionBusReader busReader = ElfBusReader.createElfReader(systemConfig, file.getAbsolutePath());
+         TraceProcessorWorker worker = getProcessorWorker(busReader);
+         return worker.processTrace(busReader);
+      }
+
+      if(extension.equals(traceExtension)) {
+         InstructionBusReader busReader = MbTraceReader.createTraceReader(file);
+         TraceProcessorWorker worker = getProcessorWorker(busReader);
+         return worker.processTrace(busReader);
+      }
+
+      // Not of the type expected
+      logger.warning("Could not process file with extension '"+extension+"'.");
+      return new ArrayList<InstructionBlock>();
+   }
+
+   private BlockStream getBlockStream(File file) {
+       // Determine file extension and determine type of file
+      String filename = file.getName();
+      int separatorIndex = filename.lastIndexOf(Definitions.EXTENSION_SEPARATOR);
+      String extension = filename.substring(separatorIndex+1);
+
+      if(extension.equals(blockExtension)) {
+         InstructionBlock block = BlockIO.fromFile(file);
+         return new SingleBlockStream(block);
+      }
+
+      if(extension.equals(elfExtension)) {
+         String systemConfig = "./Configuration Files/systemconfig.xml";
+         InstructionBusReader busReader = ElfBusReader.createElfReader(systemConfig, file.getAbsolutePath());
+         return new BlockWorker(null, busReader)
+
          TraceProcessorWorker worker = getProcessorWorker(busReader);
          return worker.processTrace(busReader);
       }
@@ -227,16 +339,35 @@ public class Transform implements Executable {
    }
 
    private TraceProcessorWorker getProcessorWorker(InstructionBusReader busReader) {
-      EnumPreferences prefs = GeneralPreferences.getPreferences();
+      EnumPreferences prefs = Preference.getPreferences();
 
       // Get the partitioner
       Partitioner partitioner = PartitionerDispenser.getCurrentPartitioner();
       TraceProcessorWorker worker = new TraceProcessorWorker(partitioner);
 
       // Setup worker
-      boolean useGatherer = Boolean.parseBoolean(prefs.getPreference(GeneralPreferences.useGatherer));
-      boolean useSelector = Boolean.parseBoolean(prefs.getPreference(GeneralPreferences.useSelector));
-      int selectorThreshold = ParseUtils.parseInt(prefs.getPreference(GeneralPreferences.selectorThreshold));
+      boolean useGatherer = Boolean.parseBoolean(prefs.getPreference(Preference.useGatherer));
+      boolean useSelector = Boolean.parseBoolean(prefs.getPreference(Preference.useSelector));
+      int selectorThreshold = ParseUtils.parseInt(prefs.getPreference(Preference.selectorThreshold));
+
+      worker.setUseGatherer(useGatherer);
+      worker.setUseSelector(useSelector);
+      worker.setSelectorRepThreshold(selectorThreshold);
+
+      return worker;
+   }
+
+   private TraceProcessorWorker getBlockWorker(InstructionBusReader busReader) {
+      EnumPreferences prefs = Preference.getPreferences();
+
+      // Get the partitioner
+      Partitioner partitioner = PartitionerDispenser.getCurrentPartitioner();
+      TraceProcessorWorker worker = new TraceProcessorWorker(partitioner);
+
+      // Setup worker
+      boolean useGatherer = Boolean.parseBoolean(prefs.getPreference(Preference.useGatherer));
+      boolean useSelector = Boolean.parseBoolean(prefs.getPreference(Preference.useSelector));
+      int selectorThreshold = ParseUtils.parseInt(prefs.getPreference(Preference.selectorThreshold));
       
       worker.setUseGatherer(useGatherer);
       worker.setUseSelector(useSelector);
@@ -344,6 +475,8 @@ public class Transform implements Executable {
    private Mapper mapper;
    private Transformation[] transf;
    private boolean writeDot;
+
+
 
 
 

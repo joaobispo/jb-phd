@@ -17,6 +17,7 @@
 
 package org.ancora.DMTool.Shell.System;
 
+import org.ancora.DMTool.Settings.Preference;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class MapperDispenser {
 
    public static Mapper getCurrentMapper() {
 
-      String mapperName = prefs.getPreference(GeneralPreferences.mapper).toLowerCase();
+      String mapperName = prefs.getPreference(Preference.mapper).toLowerCase();
       MapperOption mapperOption = mapperOptions.get(mapperName);
 
       if(mapperOption == null) {
@@ -64,7 +65,7 @@ public class MapperDispenser {
    /**
     * VARIABLES
     */
-   private static final EnumPreferences prefs = GeneralPreferences.getPreferences();
+   private static final EnumPreferences prefs = Preference.getPreferences();
    //private static final InstructionFilter MICROBLAZE_JUMP_FILTER = new MbJumpFilter();
    
    private static final Map<String, MapperDispenser.MapperOption> mapperOptions;

@@ -15,7 +15,7 @@
  *  under the License.
  */
 
-package org.ancora.DMTool.Shell.System;
+package org.ancora.DMTool.Settings;
 
 import org.ancora.SharedLibrary.Interfaces.EnumKey;
 import org.ancora.SharedLibrary.Preferences.EnumPreferences;
@@ -24,7 +24,7 @@ import org.ancora.SharedLibrary.Preferences.EnumPreferences;
  *
  * @author Joao Bispo
  */
-public enum GeneralPreferences implements EnumKey {
+public enum Preference implements EnumKey {
 
    outputFolder("./"),
    blockExtension("block"),
@@ -40,7 +40,7 @@ public enum GeneralPreferences implements EnumKey {
    transformWriteDot("false"),
    transformOptions("");
 
-   private GeneralPreferences(String defaultValue) {
+   private Preference(String defaultValue) {
       this.defaultValue = defaultValue;
    }
 
@@ -74,7 +74,7 @@ public enum GeneralPreferences implements EnumKey {
     */
    private static EnumPreferences initializePreferences() {
       // Build Preferences
-      EnumPreferences newPreferences = new EnumPreferences(GeneralPreferences.class, true);
+      EnumPreferences newPreferences = new EnumPreferences(Preference.class, true);
 
       return newPreferences;
    }

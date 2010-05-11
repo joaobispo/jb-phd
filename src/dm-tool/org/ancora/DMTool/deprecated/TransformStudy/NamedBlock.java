@@ -15,7 +15,7 @@
  *  under the License.
  */
 
-package org.ancora.DMTool.TransformStudy;
+package org.ancora.DMTool.deprecated.TransformStudy;
 
 import org.ancora.InstructionBlock.InstructionBlock;
 

@@ -17,6 +17,7 @@
 
 package org.ancora.DMTool.Shell.System;
 
+import org.ancora.DMTool.Settings.Preference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -37,7 +38,7 @@ public class TransformDispenser {
 
    public static Transformation[] getCurrentTransformations() {
 
-      String transformOptions = prefs.getPreference(GeneralPreferences.transformOptions).toLowerCase();
+      String transformOptions = prefs.getPreference(Preference.transformOptions).toLowerCase();
       String separator = " ";
       // Split transformations
       String[] transformations = transformOptions.split(separator);
@@ -66,7 +67,7 @@ public class TransformDispenser {
    /**
     * VARIABLES
     */
-   private static final EnumPreferences prefs = GeneralPreferences.getPreferences();
+   private static final EnumPreferences prefs = Preference.getPreferences();
    //private static final InstructionFilter MICROBLAZE_JUMP_FILTER = new MbJumpFilter();
    
    private static final Map<String, Transformation> transfOptions;

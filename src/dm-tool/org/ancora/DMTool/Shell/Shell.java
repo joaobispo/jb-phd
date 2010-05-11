@@ -20,18 +20,16 @@ package org.ancora.DMTool.Shell;
 import org.ancora.DMTool.Shell.System.Executable;
 import java.io.File;
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Logger;
-import org.ancora.DMTool.Shell.System.GeneralPreferences;
-import org.ancora.DMTool.Utils.EnumUtils;
-import org.ancora.DMTool.Utils.LineReader;
 import org.ancora.DMTool.Utils.ShellUtils;
+import org.ancora.SharedLibrary.EnumUtils;
 import org.ancora.SharedLibrary.IoUtils;
+import org.ancora.SharedLibrary.LineReader;
 import org.ancora.SharedLibrary.LoggingUtils;
-import org.ancora.SharedLibrary.Preferences.EnumPreferences;
 
 /**
  *
@@ -103,7 +101,7 @@ public class Shell {
       //System.out.println(splitCommand);
 
       // Check if there is a command
-      if(splitCommand.size() == 0) {
+      if(splitCommand.isEmpty()) {
          // Show current properties - dropped
          return true;
       }
@@ -211,11 +209,11 @@ public class Shell {
    /**
     * INSTANCE VARIABLES
     */
-   private static Logger logger = Logger.getLogger(Shell.class.getName());
+   private static final Logger logger = Logger.getLogger(Shell.class.getName());
 
    private static final Map<Command, Executable> executables;
    static {
-      Map<Command, Executable> aMap = new Hashtable<Command, Executable>();
+      Map<Command, Executable> aMap = new EnumMap<Command, Executable>(Command.class);
 
       aMap.put(Command.set, new Set());
       aMap.put(Command.transform, new Transform());

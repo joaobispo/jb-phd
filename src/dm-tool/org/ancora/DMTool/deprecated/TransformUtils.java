@@ -15,7 +15,7 @@
  *  under the License.
  */
 
-package org.ancora.DMTool.Utils;
+package org.ancora.DMTool.deprecated;
 
 import org.ancora.IntermediateRepresentation.Transformations.MicroblazeInstructions.*;
 import org.ancora.IntermediateRepresentation.Transformations.MicroblazeGeneral.*;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.ancora.InstructionBlock.InstructionBlock;
-import org.ancora.InstructionBlock.MbInstructionBlockWriter;
+//import org.ancora.InstructionBlock.MbInstructionBlockWriter;
 import org.ancora.IntermediateRepresentation.MbParser;
 import org.ancora.IntermediateRepresentation.Operand;
 import org.ancora.IntermediateRepresentation.MbOperandType;
@@ -92,6 +92,7 @@ public class TransformUtils {
     * @param file
     * @param blocks
     */
+   /*
    public static List<InstructionBlock> blockLoader(File file) {
    //private void addBlocksLoader(File file, List<NamedBlock> blocks) {
       List<InstructionBlock> list = new ArrayList<InstructionBlock>();
@@ -106,6 +107,8 @@ public class TransformUtils {
 
       list.add(block);
       return list;
+    *
+    */
       /*
       String blockName = file.getName();
       int separatorIndex = blockName.lastIndexOf(Definitions.EXTENSION_SEPARATOR);
@@ -113,7 +116,7 @@ public class TransformUtils {
 
       blocks.add(new NamedBlock(block, blockName));
        */
-   }
+   //}
 
   
 

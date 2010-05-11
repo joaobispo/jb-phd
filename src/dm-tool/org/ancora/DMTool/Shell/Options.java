@@ -20,7 +20,7 @@ package org.ancora.DMTool.Shell;
 import java.util.List;
 import java.util.logging.Logger;
 import org.ancora.DMTool.Shell.System.Executable;
-import org.ancora.DMTool.Shell.System.GeneralPreferences;
+import org.ancora.DMTool.Settings.Preference;
 import org.ancora.SharedLibrary.Preferences.EnumPreferences;
 
 /**
@@ -31,7 +31,7 @@ public class Options implements Executable {
 
    public Options() {
       logger = Logger.getLogger(Options.class.getName());
-      prefs = GeneralPreferences.getPreferences();
+      prefs = Preference.getPreferences();
    }
 
 
@@ -39,7 +39,7 @@ public class Options implements Executable {
    public boolean execute(List<String> arguments) {
 
       logger.info("Current values for program options:");
-      for(GeneralPreferences gPref : GeneralPreferences.values()) {
+      for(Preference gPref : Preference.values()) {
          String value = prefs.getPreference(gPref);
          String message = gPref.name() + " - " + value;
          logger.info(message);

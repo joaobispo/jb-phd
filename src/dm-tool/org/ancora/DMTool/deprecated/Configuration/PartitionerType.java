@@ -15,12 +15,16 @@
  *  under the License.
  */
 
-package org.ancora.DMTool.Configuration;
+package org.ancora.DMTool.deprecated.Configuration;
 
 /**
  *
  * @author Joao Bispo
  */
-public interface Definitions {
-   String EXTENSION_SEPARATOR = ".";
+public enum PartitionerType {
+
+   BasicBlock,
+   SuperBlock,
+   MegaBlock;
+   
 }

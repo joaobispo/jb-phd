@@ -15,9 +15,9 @@
  *  under the License.
  */
 
-package org.ancora.DMTool.Configuration;
+package org.ancora.DMTool.deprecated.Configuration;
 
-import org.ancora.DMTool.Shell.System.GeneralPreferences;
+import org.ancora.DMTool.Settings.Preference;
 import java.util.logging.Logger;
 import org.ancora.SharedLibrary.Preferences.EnumPreferences;
 
@@ -31,17 +31,17 @@ public enum FileType {
    block;
 
    public static FileType getFileType(String extension) {
-      EnumPreferences prefs = GeneralPreferences.getPreferences();
+      EnumPreferences prefs = Preference.getPreferences();
 
-      if(prefs.getPreference(GeneralPreferences.blockExtension).equals(extension)) {
+      if(prefs.getPreference(Preference.blockExtension).equals(extension)) {
          return block;
       }
 
-      if(prefs.getPreference(GeneralPreferences.elfExtension).equals(extension)) {
+      if(prefs.getPreference(Preference.elfExtension).equals(extension)) {
          return elf;
       }
 
-      if(prefs.getPreference(GeneralPreferences.traceExtension).equals(extension)) {
+      if(prefs.getPreference(Preference.traceExtension).equals(extension)) {
          return trace;
       }
 
@@ -49,16 +49,16 @@ public enum FileType {
    }
 
       public static String getExtension(FileType fileType) {
-      GeneralPreferences pref = null;
+      Preference pref = null;
       switch(fileType) {
          case block:
-            pref = GeneralPreferences.blockExtension;
+            pref = Preference.blockExtension;
             break;
          case elf:
-            pref = GeneralPreferences.elfExtension;
+            pref = Preference.elfExtension;
             break;
          case trace:
-            pref = GeneralPreferences.traceExtension;
+            pref = Preference.traceExtension;
             break;
          default:
             Logger.getLogger(FileType.class.getName()).
@@ -66,7 +66,7 @@ public enum FileType {
             return null;
       }
 
-      return GeneralPreferences.getPreferences().getPreference(pref);
+      return Preference.getPreferences().getPreference(pref);
    }
 
 }
