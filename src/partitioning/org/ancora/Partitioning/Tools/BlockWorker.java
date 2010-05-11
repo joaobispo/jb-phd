@@ -20,6 +20,7 @@ package org.ancora.Partitioning.Tools;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import org.ancora.InstructionBlock.BlockStream;
 import org.ancora.InstructionBlock.GenericInstruction;
 import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.InstructionBlock.InstructionBlockProducer;
@@ -27,8 +28,6 @@ import org.ancora.InstructionBlock.InstructionBusReader;
 import org.ancora.InstructionBlock.Listeners.InstructionBlockCollector;
 import org.ancora.InstructionBlock.Listeners.InstructionBlockStats;
 import org.ancora.Partitioning.Partitioner;
-import org.ancora.Partitioning.Tools.Gatherer;
-import org.ancora.Partitioning.Tools.Selector;
 
 /**
  * Given a trace, returns a list of InstructionBlocks.
@@ -38,7 +37,7 @@ import org.ancora.Partitioning.Tools.Selector;
  *
  * @author Joao Bispo
  */
-public class BlockWorker {
+public class BlockWorker implements BlockStream {
 
    public BlockWorker(Partitioner partitioner, InstructionBusReader busReader) {
       this.partitioner = partitioner;
