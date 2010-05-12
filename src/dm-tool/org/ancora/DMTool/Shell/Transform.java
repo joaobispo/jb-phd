@@ -123,7 +123,7 @@ public class Transform implements Executable {
          int counter = 0;
          while(block != null) {
              String blockName = baseFilename+"-"+counter;
-            logger.info("Block "+counter+", "+block.getRepetitions()+" repetitions.");
+//            logger.info("Block "+counter+", "+block.getRepetitions()+" repetitions.");
 
             // Transform Instruction Block into PureIR
             List<Operation> operations = MbParser.mbToPureIr(block);
@@ -151,9 +151,10 @@ public class Transform implements Executable {
 
 
             // Transform
+
             for(Transformation t : transf) {
                // Show transformations
-               System.out.println("Transformation:"+t);
+//               System.out.println("Transformation:"+t);
                //operations = t.transform(operations);
                t.transform(operations);
             }
@@ -163,7 +164,7 @@ public class Transform implements Executable {
             OperationListStats afterTransf = OperationListStats.buildStats(operations, mapper,
                     block.getRepetitions(), blockName);
 
-            showStats(beforeTransf, afterTransf);
+//            showStats(beforeTransf, afterTransf);
             statsBefore.add(beforeTransf);
             statsAfter.add(afterTransf);
             /*
