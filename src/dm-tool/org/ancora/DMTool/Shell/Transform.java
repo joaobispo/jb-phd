@@ -29,6 +29,7 @@ import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Shell.System.Transform.OperationListStats;
 import org.ancora.DMTool.Stats.DataProcess;
+import org.ancora.DMTool.Stats.DataProcessDouble;
 import org.ancora.DMTool.Stats.LongTransformDataSingle;
 import org.ancora.DMTool.Stats.LongTransformDataTotal;
 import org.ancora.IntermediateRepresentation.DmTransformDispenser;
@@ -210,6 +211,8 @@ public class Transform implements Executable {
       //showStatsAverage(statsAfter.size(), OperationListStats.calcAverage("Avg Before", statsBefore), OperationListStats.calcAverage("Avg After", statsAfter));
       System.out.println("\nChanges in total, analysed "+totalAfter.getDataCounter()+" blocks.");
       DataProcess.showTransformDataChanges(totalBefore.getTotalData(), totalAfter.getTotalData());
+      System.out.println("Average per block:");
+      DataProcessDouble.showTransformDataChanges(totalBefore.getAverageData(), totalAfter.getAverageData());
    }
 
 

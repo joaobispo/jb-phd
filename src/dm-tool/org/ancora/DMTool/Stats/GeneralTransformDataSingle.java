@@ -24,13 +24,13 @@ import java.util.Map;
  *
  * @author Joao Bispo
  */
-public class LongTransformDataSingle {
+public class GeneralTransformDataSingle<T extends Number> {
 
-   public LongTransformDataSingle() {
-      data = new EnumMap<TransformParam, Long>(TransformParam.class);
-
-      for(TransformParam param : TransformParam.values()) {
-         data.put(param, 0l);
+   public GeneralTransformDataSingle() {
+      data = new EnumMap<Parameter, T>(Parameter.class);
+      Long zero = 0l;
+      for(Parameter param : Parameter.values()) {
+         data.put(param, (T)zero);
       }
       //dataCounter = 0;
 
@@ -46,15 +46,17 @@ public class LongTransformDataSingle {
    }
     *
     */
-   
-   public void addValue(TransformParam parameter, long value) {
-      Long oldValue = data.get(parameter);
-      Long newValue = oldValue + value;
 
-      data.put(parameter, newValue);
+/*
+   public void addValue(Parameter parameter, T value) {
+      T oldValue = data.get(parameter);
+      Long newValue = (T)oldValue + (T)value;
+
+      data.put(parameter, (T)newValue);
    }
-
-   public Long getValue(TransformParam parameter) {
+*/
+   
+   public T getValue(Parameter parameter) {
       return data.get(parameter);
    }
 
@@ -74,13 +76,12 @@ public class LongTransformDataSingle {
    /**
     * INSTANCE VARIABLES
     */
-   Map<TransformParam, Long> data;
+   Map<Parameter, T> data;
    //private long dataCounter;
 
    /**
     * ENUM PROPERTIES
     */
-   /*
    public enum Parameter {
       mappedLines,
       executedLines,
@@ -90,6 +91,4 @@ public class LongTransformDataSingle {
       liveOuts,
       cycles;
    }
-    *
-    */
 }

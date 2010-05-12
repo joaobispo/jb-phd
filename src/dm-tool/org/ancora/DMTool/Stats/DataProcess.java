@@ -32,13 +32,13 @@ public class DataProcess {
       LongTransformDataSingle data = new LongTransformDataSingle();
 
       // Gather data
-      data.addValue(LongTransformDataSingle.Parameter.mappedOperations, mapper.getNumberOfOps());
-      data.addValue(LongTransformDataSingle.Parameter.executedOperations, mapper.getNumberOfOps()*repetitions);
-      data.addValue(LongTransformDataSingle.Parameter.mappedLines, mapper.getNumberOfLines());
-      data.addValue(LongTransformDataSingle.Parameter.executedLines, mapper.getNumberOfLines()*repetitions);
-      data.addValue(LongTransformDataSingle.Parameter.liveIns, mapper.getLiveIns());
-      data.addValue(LongTransformDataSingle.Parameter.liveOuts, mapper.getLiveOuts());
-      data.addValue(LongTransformDataSingle.Parameter.cycles, repetitions);
+      data.addValue(TransformParam.mappedOperations, mapper.getNumberOfOps());
+      data.addValue(TransformParam.executedOperations, mapper.getNumberOfOps()*repetitions);
+      data.addValue(TransformParam.mappedLines, mapper.getNumberOfLines());
+      data.addValue(TransformParam.executedLines, mapper.getNumberOfLines()*repetitions);
+      data.addValue(TransformParam.liveIns, mapper.getLiveIns());
+      data.addValue(TransformParam.liveOuts, mapper.getLiveOuts());
+      data.addValue(TransformParam.cycles, repetitions);
 
       return data;
    }
@@ -49,21 +49,21 @@ public class DataProcess {
       String[] before = {
          String.valueOf(getCommunicationCost(beforeTransf)),
         //String.valueOf(getCpl(beforeTransf)),
-        String.valueOf(beforeTransf.getValue(LongTransformDataSingle.Parameter.mappedLines)),
-        String.valueOf(beforeTransf.getValue(LongTransformDataSingle.Parameter.executedLines)),
+        String.valueOf(beforeTransf.getValue(TransformParam.mappedLines)),
+        String.valueOf(beforeTransf.getValue(TransformParam.executedLines)),
         String.valueOf(getIlp(beforeTransf)),
-        String.valueOf(beforeTransf.getValue(LongTransformDataSingle.Parameter.mappedOperations)),
-        String.valueOf(beforeTransf.getValue(LongTransformDataSingle.Parameter.executedOperations)),
+        String.valueOf(beforeTransf.getValue(TransformParam.mappedOperations)),
+        String.valueOf(beforeTransf.getValue(TransformParam.executedOperations)),
 
       };
       String[] after = {
                   String.valueOf(getCommunicationCost(afterTransf)),
 //        String.valueOf(getCpl(afterTransf)),
-        String.valueOf(afterTransf.getValue(LongTransformDataSingle.Parameter.mappedLines)),
-        String.valueOf(afterTransf.getValue(LongTransformDataSingle.Parameter.executedLines)),
+        String.valueOf(afterTransf.getValue(TransformParam.mappedLines)),
+        String.valueOf(afterTransf.getValue(TransformParam.executedLines)),
         String.valueOf(getIlp(afterTransf)),
-        String.valueOf(afterTransf.getValue(LongTransformDataSingle.Parameter.mappedOperations)),
-        String.valueOf(afterTransf.getValue(LongTransformDataSingle.Parameter.executedOperations)),
+        String.valueOf(afterTransf.getValue(TransformParam.mappedOperations)),
+        String.valueOf(afterTransf.getValue(TransformParam.executedOperations)),
 
       };
 
@@ -88,8 +88,8 @@ public class DataProcess {
    }
 
    public static long getCommunicationCost(LongTransformDataSingle data) {
-      return getCommunicationCost(data.getValue(LongTransformDataSingle.Parameter.liveIns),
-              data.getValue(LongTransformDataSingle.Parameter.liveOuts));
+      return getCommunicationCost(data.getValue(TransformParam.liveIns),
+              data.getValue(TransformParam.liveOuts));
    }
 
    public static long getCommunicationCost(long liveins, long liveouts) {
@@ -106,8 +106,8 @@ public class DataProcess {
    }
 
    public static double getIlp(LongTransformDataSingle data) {
-      return ((double)data.getValue(LongTransformDataSingle.Parameter.mappedOperations)/
-              (double)data.getValue(LongTransformDataSingle.Parameter.mappedLines));
+      return ((double)data.getValue(TransformParam.mappedOperations)/
+              (double)data.getValue(TransformParam.mappedLines));
    }
 
    /**
@@ -119,7 +119,7 @@ public class DataProcess {
    }
     
    public static long getCpl(LongTransformDataSingle data) {
-      return getCpl(data.getValue(LongTransformDataSingle.Parameter.mappedLines));
+      return getCpl(data.getValue(TransformParam.mappedLines));
    }
 
 

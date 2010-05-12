@@ -17,7 +17,6 @@
 
 package org.ancora.DMTool.Stats;
 
-import org.ancora.DMTool.Stats.LongTransformDataSingle.Parameter;
 
 /**
  *
@@ -34,7 +33,7 @@ public class LongTransformDataTotal {
 
    public void addValues(LongTransformDataSingle data) {
       //long repetitions = data.getValue(Parameter.cycles);
-      for(Parameter param : Parameter.values()) {
+      for(TransformParam param : TransformParam.values()) {
 
          /*
          long repetitionsMod = repetitions;
@@ -65,12 +64,13 @@ public class LongTransformDataTotal {
       return data;
    }
 
-   public LongTransformDataSingle getAverageData() {
-      LongTransformDataSingle averageData = new LongTransformDataSingle();
+   public DoubleTransformDataSingle getAverageData() {
+      DoubleTransformDataSingle averageData = new DoubleTransformDataSingle();
       
-      for(Parameter param : Parameter.values()) {
-         long value = data.getValue(param);
-         this.data.addValue(param, value);
+      for(TransformParam param : TransformParam.values()) {
+         long originalValue = data.getValue(param);
+         Double average = (double)originalValue / (double)dataCounter;
+         averageData.addValue(param, average);
       }
       
       return averageData;
@@ -126,7 +126,6 @@ public class LongTransformDataTotal {
     * INSTANCE VARIABLES
     */
    LongTransformDataSingle data;
-   //LongTransformDataSingle dataWithRepetitions;
    private long dataCounter;
 
 
