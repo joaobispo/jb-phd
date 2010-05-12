@@ -19,9 +19,11 @@ package org.ancora.DMTool.Shell;
 
 import java.util.List;
 import java.util.logging.Logger;
+import org.ancora.DMTool.IrMapping.DmMapperDispenser.MapperName;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Shell.Shell.Command;
 import org.ancora.DMTool.Shell.System.Executable;
+import org.ancora.IntermediateRepresentation.DmTransformDispenser.TransformationName;
 import org.ancora.Partitioning.DmPartitionerDispenser.PartitionerName;
 import org.ancora.SharedLibrary.EnumUtils;
 
@@ -58,6 +60,12 @@ public class Help implements Executable {
             return true;
          case setoptions:
             showSetOptions();
+            return true;
+         case transformations:
+            showTransformations();
+            return true;
+         case mappers:
+            showMappers();
             return true;
          default:
             logger.warning("Case not implemented: '"+helpArgument+"'");
@@ -130,14 +138,31 @@ public class Help implements Executable {
       }
    }
 
+   private void showTransformations() {
+      logger.info("\nAvaliable transformations:");
+
+      for(TransformationName transf : TransformationName .values()) {
+         logger.info(transf.getTransformationName());
+      }
+   }
+
+   private void showMappers() {
+      logger.info("\nAvaliable Mappers:");
+
+      for(MapperName mapper : MapperName .values()) {
+         logger.info(mapper.getMapperName());
+      }
+   }
+
 
    /**
     * ENUM
     */
    enum HelpArgument {
-      partitioners,
-      setoptions,
       commands,
-      transformations;
+      setoptions,
+      partitioners,
+      transformations,
+      mappers;
    }
 }

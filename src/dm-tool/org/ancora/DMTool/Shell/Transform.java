@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
-import org.ancora.DMTool.deprecated.Configuration.Definitions;
 import org.ancora.DMTool.Settings.Settings;
 import org.ancora.DMTool.Shell.System.Executable;
 import org.ancora.DMTool.IrMapping.DmMapperDispenser;
@@ -30,7 +29,6 @@ import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Shell.System.Transform.OperationListStats;
 import org.ancora.IntermediateRepresentation.DmTransformDispenser;
-import org.ancora.DMTool.deprecated.TransformUtils;
 import org.ancora.InstructionBlock.BlockIO;
 import org.ancora.InstructionBlock.BlockStream;
 import org.ancora.InstructionBlock.DtoolTraceBusReader;
@@ -38,6 +36,7 @@ import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.InstructionBlock.InstructionBusReader;
 import org.ancora.InstructionBlock.ElfBusReader;
 import org.ancora.InstructionBlock.SingleBlockStream;
+import org.ancora.IntermediateRepresentation.MbParser;
 import org.ancora.Partitioning.Partitioner;
 import org.ancora.IrMapping.Tools.Dotty;
 import org.ancora.IrMapping.Mapper;
@@ -61,13 +60,11 @@ public class Transform implements Executable {
    }
 
    private void setup() {
-      //EnumPreferences prefs = Preference.getPreferences();
       blockExtension = Options.optionsTable.get(OptionName.extension_block);
       elfExtension = Options.optionsTable.get(OptionName.extension_elf);
       traceExtension = Options.optionsTable.get(OptionName.extension_trace);
       mapper = DmMapperDispenser.getCurrentMapper();
       transf = DmTransformDispenser.getCurrentTransformations();
-      //writeDot = Boolean.parseBoolean(prefs.getPreference(Preference.transformWriteDot));
       writeDot = Boolean.parseBoolean(Options.optionsTable.get(OptionName.ir_writedot));
    }
 
@@ -100,26 +97,24 @@ public class Transform implements Executable {
          supportedExtensions.add(blockExtension);
          supportedExtensions.add(elfExtension);
          supportedExtensions.add(traceExtension);
-         //inputFiles = IoUtilsAppend.getFilesRecursive(file);
          inputFiles = IoUtils.getFilesRecursive(file, supportedExtensions);
       }
 
       logger.info("Found "+inputFiles.size()+" files.");
 
-//      processFiles(inputFiles);
-      processFiles2(inputFiles);
+      processFiles(inputFiles);
 
 
       return true;
    }
 
-   private void processFiles2(List<File> inputFiles) {
+   private void processFiles(List<File> inputFiles) {
       List<OperationListStats> statsBefore = new ArrayList<OperationListStats>();
       List<OperationListStats> statsAfter = new ArrayList<OperationListStats>();
 
       for(File file : inputFiles) {
          logger.info("Processing file '"+file.getName()+"'...");
-         String baseFilename = ParseUtils.removeSuffix(file.getName(), Definitions.EXTENSION_SEPARATOR);
+         String baseFilename = ParseUtils.removeSuffix(file.getName(), IoUtils.DEFAULT_EXTENSION_SEPARATOR);
 
          // Get BlockStream
          BlockStream blockStream = getBlockStream(file);
@@ -131,7 +126,7 @@ public class Transform implements Executable {
             logger.info("Block "+counter+", "+block.getRepetitions()+" repetitions.");
 
             // Transform Instruction Block into PureIR
-            List<Operation> operations = TransformUtils.mbToPureIr(block);
+            List<Operation> operations = MbParser.mbToPureIr(block);
 
             if(operations == null) {
                continue;
@@ -194,129 +189,12 @@ public class Transform implements Executable {
       showStatsAverage(statsAfter.size(), OperationListStats.calcAverage("Avg Before", statsBefore), OperationListStats.calcAverage("Avg After", statsAfter));
    }
 
-   /*
-   private void processFiles(List<File> inputFiles) {
-      List<OperationListStats> statsBefore = new ArrayList<OperationListStats>();
-      List<OperationListStats> statsAfter = new ArrayList<OperationListStats>();
 
-      for(File file : inputFiles) {
-         logger.info("Processing file '"+file.getName()+"'...");
-         String baseFilename = ParseUtils.removeSuffix(file.getName(), Definitions.EXTENSION_SEPARATOR);
-
-
-         // Get InstructionBlocks
-         List<InstructionBlock> blocks = getBlocks(file);
-         for(int i=0; i<blocks.size(); i++) {
-            String blockName = baseFilename+"-"+i;
-
-            InstructionBlock block = blocks.get(i);
-            logger.info("Block "+i+", "+block.getRepetitions()+" repetitions.");
-
-            // Transform Instruction Block into PureIR
-            List<Operation> operations = TransformUtils.mbToPureIr(block);
-
-            if(operations == null) {
-               continue;
-            }
-
-            // Get stats before transformations
-            OperationListStats beforeTransf = OperationListStats.buildStats(operations, mapper,
-                    block.getRepetitions(), blockName);
-
-            // Show operations before
-            //System.out.println("BEFORE OPERATIONS:");
-            //for(Operation operation : operations) {
-            //   System.out.println(operation.getFullOperation());
-            //}
-  
-            // Write DOT Before
-            if(writeDot) {
-               File folder = IoUtils.safeFolder("dot/"+baseFilename);
-               String filename = baseFilename + "-" + i + "-before.dot";
-               writeDot(operations, new File(folder, filename));
-            }
-
-
-            // Transform
-            for(Transformation t : transf) {
-               // Show transformations
-               System.out.println("Transformation:"+t);
-               //operations = t.transform(operations);
-               t.transform(operations);
-            }
-
-
-            // Get stats after transformation
-            OperationListStats afterTransf = OperationListStats.buildStats(operations, mapper,
-                    block.getRepetitions(), blockName);
-
-            showStats(beforeTransf, afterTransf);
-            statsBefore.add(beforeTransf);
-            statsAfter.add(afterTransf);
-            
-            //System.out.println("AFTER OPERATIONS:");
-            //for(Operation operation : operations) {
-            //   System.out.println(operation.getFullOperation());
-            //}
-             
-             
-
-            // Write DOT After
-            if(writeDot) {
-               File folder = IoUtils.safeFolder("dot/"+baseFilename);
-               String filename = baseFilename + "-" + i + "-after.dot";
-               writeDot(operations, new File(folder, filename));
-            }
-
-
-         }
-         
-
-      }
-
-      // Calculate average
-//      System.out.println("Average Stats Before Transformations:");
-//      OperationListStats.calcAverage("Avg Before", statsBefore);
-//      System.out.println("Average Stats After Transformations:");
-//      OperationListStats.calcAverage("Avg After", statsAfter);
-      showStatsAverage(statsAfter.size(), OperationListStats.calcAverage("Avg Before", statsBefore), OperationListStats.calcAverage("Avg After", statsAfter));
-   }
-   */
-/*
-   private List<InstructionBlock> getBlocks(File file) {
-
-      // Determine file extension and determine type of file
-      String filename = file.getName();
-      int separatorIndex = filename.lastIndexOf(Definitions.EXTENSION_SEPARATOR);
-      String extension = filename.substring(separatorIndex+1);
-
-      if(extension.equals(blockExtension)) {
-         return TransformUtils.blockLoader(file);
-      }
-
-      if(extension.equals(elfExtension)) {
-         String systemConfig = "./Configuration Files/systemconfig.xml";
-         InstructionBusReader busReader = ElfBusReader.createElfReader(systemConfig, file.getAbsolutePath());
-         TraceProcessorWorker worker = getProcessorWorker(busReader);
-         return worker.processTrace(busReader);
-      }
-
-      if(extension.equals(traceExtension)) {
-         InstructionBusReader busReader = MbTraceReader.createTraceReader(file);
-         TraceProcessorWorker worker = getProcessorWorker(busReader);
-         return worker.processTrace(busReader);
-      }
-
-      // Not of the type expected
-      logger.warning("Could not process file with extension '"+extension+"'.");
-      return new ArrayList<InstructionBlock>();
-   }
-   */
 
    private BlockStream getBlockStream(File file) {
        // Determine file extension and determine type of file
       String filename = file.getName();
-      int separatorIndex = filename.lastIndexOf(Definitions.EXTENSION_SEPARATOR);
+      int separatorIndex = filename.lastIndexOf(IoUtils.DEFAULT_EXTENSION_SEPARATOR);
       String extension = filename.substring(separatorIndex+1);
 
       if(extension.equals(blockExtension)) {
@@ -329,15 +207,10 @@ public class Transform implements Executable {
       if(extension.equals(elfExtension)) {
          String systemConfig = "./Configuration Files/systemconfig.xml";
          busReader = ElfBusReader.createElfReader(systemConfig, file.getAbsolutePath());
-         //TraceProcessorWorker worker = getProcessorWorker(busReader);
-         //return worker.processTrace(busReader);
       }
 
       if(extension.equals(traceExtension)) {
          busReader = DtoolTraceBusReader.createTraceReader(file);
-         //busReader = MbTraceReader.createTraceReader(file);
-         //TraceProcessorWorker worker = getProcessorWorker(busReader);
-         //return worker.processTrace(busReader);
       }
 
       if (busReader != null) {
@@ -352,46 +225,7 @@ public class Transform implements Executable {
       logger.warning("Could not process file with extension '"+extension+"'.");
       return null;
    }
-/*
-   private TraceProcessorWorker getProcessorWorker(InstructionBusReader busReader) {
-      EnumPreferences prefs = Preference.getPreferences();
 
-      // Get the partitioner
-      Partitioner partitioner = PartitionerDispenser.getCurrentPartitioner();
-      TraceProcessorWorker worker = new TraceProcessorWorker(partitioner);
-
-      // Setup worker
-      boolean useGatherer = Boolean.parseBoolean(prefs.getPreference(Preference.useGatherer));
-      boolean useSelector = Boolean.parseBoolean(prefs.getPreference(Preference.useSelector));
-      int selectorThreshold = ParseUtils.parseInt(prefs.getPreference(Preference.selectorThreshold));
-
-      worker.setUseGatherer(useGatherer);
-      worker.setUseSelector(useSelector);
-      worker.setSelectorRepThreshold(selectorThreshold);
-
-      return worker;
-   }
-*/
-   /*
-   private TraceProcessorWorker getBlockWorker(InstructionBusReader busReader) {
-      EnumPreferences prefs = Preference.getPreferences();
-
-      // Get the partitioner
-      Partitioner partitioner = PartitionerDispenser.getCurrentPartitioner();
-      TraceProcessorWorker worker = new TraceProcessorWorker(partitioner);
-
-      // Setup worker
-      boolean useGatherer = Boolean.parseBoolean(prefs.getPreference(Preference.useGatherer));
-      boolean useSelector = Boolean.parseBoolean(prefs.getPreference(Preference.useSelector));
-      int selectorThreshold = ParseUtils.parseInt(prefs.getPreference(Preference.selectorThreshold));
-      
-      worker.setUseGatherer(useGatherer);
-      worker.setUseSelector(useSelector);
-      worker.setSelectorRepThreshold(selectorThreshold);
-
-      return worker;
-   }
-*/
    private static void showStats(OperationListStats beforeTransf, OperationListStats afterTransf) {
       // only show after stats that change
 //      String[] param = {"CommCosts", "Cpl", "Ilp", "Operations", "MbOperations"};

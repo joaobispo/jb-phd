@@ -17,21 +17,15 @@
 
 package org.ancora.IntermediateRepresentation;
 
-import org.ancora.DMTool.deprecated.Preference;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Utils.ShellUtils;
-import org.ancora.SharedLibrary.Preferences.EnumPreferences;
 import org.ancora.IntermediateRepresentation.Transformations.PropagateConstants;
 import org.ancora.IntermediateRepresentation.Transformations.RemoveInternalLoads;
-import org.ancora.IntermediateRepresentation.Transformations.SingleStaticAssignment;
-import org.ancora.IntermediateRepresentation.Transformation;
 import org.ancora.Shared.EnumUtilsAppend;
 
 /**
@@ -60,80 +54,15 @@ public class DmTransformDispenser {
       }
 
       return transfs;
-/*
-      String mapperName = Options.optionsTable.get(OptionName.mapping_mapper);
 
-      String transformOptions = prefs.getPreference(Preference.transformOptions).toLowerCase();
-      String separator = " ";
-      // Split transformations
-      String[] transformations = transformOptions.split(separator);
-
-      List<Integer> indexes = new ArrayList<Integer>();
-      for(int i=0; i<transformations.length; i++) {
-         String transformation = transformations[i];
-         if(transfOptions.containsKey(transformation)) {
-            indexes.add(i);
-         } else {
-            Logger.getLogger(TransformDispenser.class.getName()).
-                    info("Could not find transformation '"+transformation+"'.");
-         }
-      }
-
-      // Build return array
-      Transformation[] transf = new Transformation[indexes.size()];
-      for(int i=0; i<indexes.size(); i++) {
-         transf[i] = transfOptions.get(transformations[indexes.get(i)]);
-      }
-
-      return transf;
-*/
    }
-
-   /**
-    * VARIABLES
-    */
-   //private static final EnumPreferences prefs = Preference.getPreferences();
-   //private static final InstructionFilter MICROBLAZE_JUMP_FILTER = new MbJumpFilter();
-   /*
-   private static final Map<String, Transformation> transfOptions;
-   static {
-      Map<String, Transformation> aMap =
-              new Hashtable<String, Transformation>();
-
-      aMap.put(Options.PropagateConstants.toLowerCase(), new PropagateConstants());
-      aMap.put(Options.SingleStaticAssignment.toLowerCase(), new SingleStaticAssignment());
-      aMap.put(Options.RemoveInternalLoads.toLowerCase(), new RemoveInternalLoads());
-
-
-      transfOptions = Collections.unmodifiableMap(aMap);
-   }
-*/
-
-   /**
-    * ENUM
-    */
-   /*
-   public enum TransformOption {
-      PropagateConstants,
-      SingleStaticAssignment,
-      RemoveInternalLoads;
-   }
-*/
-   /*
-   public interface Options {
-      String PropagateConstants = "ConstantPropagation";
-      String SingleStaticAssignment = "SSA";
-      String RemoveInternalLoads = "spilling-loads";
-   }
-    *
-    */
 
    public static Map<String, TransformationName> transformations =
            EnumUtilsAppend.buildMap(TransformationName.values());
 
 
    /**
-    * TRANSFORMATION
+    * TRANSFORMATIONS
     */
    public static enum TransformationName {
 

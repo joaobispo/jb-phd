@@ -121,7 +121,7 @@ public class Shell {
       /// Check simple commands (exit, help, config, set)
       // Check simple commands (exit)
       if(commandEnum == Command.exit) {
-         logger.info("Bye...");
+         logger.info("Bye!");
          System.exit(0);
       }
 
