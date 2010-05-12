@@ -209,9 +209,9 @@ public class Transform implements Executable {
       }
 
       //showStatsAverage(statsAfter.size(), OperationListStats.calcAverage("Avg Before", statsBefore), OperationListStats.calcAverage("Avg After", statsAfter));
-      System.out.println("\nChanges in total, analysed "+totalAfter.getDataCounter()+" blocks.");
+      System.out.println("\nTotals, analysed "+totalAfter.getDataCounter()+" blocks.");
       DataProcess.showTransformDataChanges(totalBefore.getTotalData(), totalAfter.getTotalData());
-      System.out.println("Average per block:");
+      System.out.println("\nAverage per block:");
       DataProcessDouble.showTransformDataChanges(totalBefore.getAverageData(), totalAfter.getAverageData());
    }
 
