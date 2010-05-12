@@ -23,14 +23,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
 import org.ancora.DMTool.deprecated.Configuration.Definitions;
-import org.ancora.DMTool.Settings.Preference;
 import org.ancora.DMTool.Settings.Settings;
 import org.ancora.DMTool.Shell.System.Executable;
-import org.ancora.DMTool.Shell.System.MapperDispenser;
-import org.ancora.DMTool.deprecated.PartitionerDispenser;
+import org.ancora.DMTool.IrMapping.DmMapperDispenser;
+import org.ancora.DMTool.Settings.Options;
+import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Shell.System.Transform.OperationListStats;
-import org.ancora.DMTool.Shell.System.TransformDispenser;
-import org.ancora.DMTool.deprecated.TraceProcessor.TraceProcessorWorker;
+import org.ancora.IntermediateRepresentation.DmTransformDispenser;
 import org.ancora.DMTool.deprecated.TransformUtils;
 import org.ancora.InstructionBlock.BlockIO;
 import org.ancora.InstructionBlock.BlockStream;
@@ -45,7 +44,6 @@ import org.ancora.IrMapping.Mapper;
 import org.ancora.IntermediateRepresentation.Operation;
 import org.ancora.SharedLibrary.IoUtils;
 import org.ancora.SharedLibrary.ParseUtils;
-import org.ancora.SharedLibrary.Preferences.EnumPreferences;
 import org.ancora.IntermediateRepresentation.Transformation;
 import org.ancora.Partitioning.Tools.BlockWorker;
 
@@ -63,13 +61,14 @@ public class Transform implements Executable {
    }
 
    private void setup() {
-      EnumPreferences prefs = Preference.getPreferences();
-      blockExtension = prefs.getPreference(Preference.blockExtension);
-      elfExtension = prefs.getPreference(Preference.elfExtension);
-      traceExtension = prefs.getPreference(Preference.traceExtension);
-      mapper = MapperDispenser.getCurrentMapper();
-      transf = TransformDispenser.getCurrentTransformations();
-      writeDot = Boolean.parseBoolean(prefs.getPreference(Preference.transformWriteDot));
+      //EnumPreferences prefs = Preference.getPreferences();
+      blockExtension = Options.optionsTable.get(OptionName.extension_block);
+      elfExtension = Options.optionsTable.get(OptionName.extension_elf);
+      traceExtension = Options.optionsTable.get(OptionName.extension_trace);
+      mapper = DmMapperDispenser.getCurrentMapper();
+      transf = DmTransformDispenser.getCurrentTransformations();
+      //writeDot = Boolean.parseBoolean(prefs.getPreference(Preference.transformWriteDot));
+      writeDot = Boolean.parseBoolean(Options.optionsTable.get(OptionName.ir_writedot));
    }
 
 
@@ -490,7 +489,8 @@ public class Transform implements Executable {
    private String elfExtension;
    private String blockExtension;
    private Mapper mapper;
-   private Transformation[] transf;
+   //private Transformation[] transf;
+   private List<Transformation> transf;
    private boolean writeDot;
 
 

@@ -23,8 +23,6 @@ import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Shell.System.Executable;
-import org.ancora.DMTool.Settings.Preference;
-import org.ancora.SharedLibrary.Preferences.EnumPreferences;
 
 /**
  *
@@ -34,7 +32,7 @@ public class ShowOptions implements Executable {
 
    public ShowOptions() {
       logger = Logger.getLogger(ShowOptions.class.getName());
-      prefs = Preference.getPreferences();
+      //prefs = Preference.getPreferences();
    }
 
 
@@ -67,5 +65,5 @@ public class ShowOptions implements Executable {
     * INSTANCE VARIABLES
     */
    private Logger logger;
-   private EnumPreferences prefs;
+   //private EnumPreferences prefs;
 }

@@ -15,7 +15,7 @@
  *  under the License.
  */
 
-package org.ancora.DMTool.Settings;
+package org.ancora.DMTool.deprecated;
 
 import org.ancora.SharedLibrary.Interfaces.EnumKey;
 import org.ancora.SharedLibrary.Preferences.EnumPreferences;

@@ -17,7 +17,7 @@
 
 package org.ancora.DMTool.deprecated.Configuration;
 
-import org.ancora.DMTool.Settings.Preference;
+import org.ancora.DMTool.deprecated.Preference;
 import java.util.logging.Logger;
 import org.ancora.SharedLibrary.Preferences.EnumPreferences;
 

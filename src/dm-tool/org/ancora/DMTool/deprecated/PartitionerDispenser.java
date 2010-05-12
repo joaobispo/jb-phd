@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.logging.Logger;
-import org.ancora.DMTool.Settings.Preference;
 import org.ancora.Partitioning.BasicBlock;
 import org.ancora.Partitioning.MegaBlock;
 import org.ancora.Partitioning.Partitioner;
@@ -73,7 +72,7 @@ public class PartitionerDispenser {
    /**
     * VARIABLES
     */
-   private static final EnumPreferences prefs = Preference.getPreferences();
+   //private static final EnumPreferences prefs = Preference.getPreferences();
    //private static final InstructionFilter MICROBLAZE_JUMP_FILTER = new MbJumpFilter();
    
    private static final Map<String, PartitionerDispenser.PartitionerOption> partitionerOptions;

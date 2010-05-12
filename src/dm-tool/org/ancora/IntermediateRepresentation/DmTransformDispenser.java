@@ -15,28 +15,53 @@
  *  under the License.
  */
 
-package org.ancora.DMTool.Shell.System;
+package org.ancora.IntermediateRepresentation;
 
-import org.ancora.DMTool.Settings.Preference;
+import org.ancora.DMTool.deprecated.Preference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.ancora.DMTool.Settings.Options;
+import org.ancora.DMTool.Settings.Options.OptionName;
+import org.ancora.DMTool.Utils.ShellUtils;
 import org.ancora.SharedLibrary.Preferences.EnumPreferences;
 import org.ancora.IntermediateRepresentation.Transformations.PropagateConstants;
 import org.ancora.IntermediateRepresentation.Transformations.RemoveInternalLoads;
 import org.ancora.IntermediateRepresentation.Transformations.SingleStaticAssignment;
 import org.ancora.IntermediateRepresentation.Transformation;
+import org.ancora.Shared.EnumUtilsAppend;
 
 /**
  *
  * @author Joao Bispo
  */
-public class TransformDispenser {
+public class DmTransformDispenser {
 
-   public static Transformation[] getCurrentTransformations() {
+   public static List<Transformation> getCurrentTransformations() {
+      
+      // Get transformations
+      String transformationString = Options.optionsTable.get(OptionName.ir_options);
+      List<String> transformationList = ShellUtils.splitCommand(transformationString);
+
+      List<Transformation> transfs = new ArrayList<Transformation>();
+      for(String transf : transformationList) {
+         // Get enum
+         TransformationName transformation = transformations.get(transf);
+         if(transformation == null) {
+            Logger.getLogger(DmTransformDispenser.class.getName()).
+                    info("Could not find transformation '"+transf+"'.");
+            continue;
+         }
+
+         transfs.add(transformation.getTransformation());
+      }
+
+      return transfs;
+/*
+      String mapperName = Options.optionsTable.get(OptionName.mapping_mapper);
 
       String transformOptions = prefs.getPreference(Preference.transformOptions).toLowerCase();
       String separator = " ";
@@ -61,15 +86,15 @@ public class TransformDispenser {
       }
 
       return transf;
-
+*/
    }
 
    /**
     * VARIABLES
     */
-   private static final EnumPreferences prefs = Preference.getPreferences();
+   //private static final EnumPreferences prefs = Preference.getPreferences();
    //private static final InstructionFilter MICROBLAZE_JUMP_FILTER = new MbJumpFilter();
-   
+   /*
    private static final Map<String, Transformation> transfOptions;
    static {
       Map<String, Transformation> aMap =
@@ -82,20 +107,65 @@ public class TransformDispenser {
 
       transfOptions = Collections.unmodifiableMap(aMap);
    }
-
+*/
 
    /**
     * ENUM
     */
+   /*
    public enum TransformOption {
       PropagateConstants,
       SingleStaticAssignment,
       RemoveInternalLoads;
    }
-
+*/
+   /*
    public interface Options {
       String PropagateConstants = "ConstantPropagation";
       String SingleStaticAssignment = "SSA";
       String RemoveInternalLoads = "spilling-loads";
+   }
+    *
+    */
+
+   public static Map<String, TransformationName> transformations =
+           EnumUtilsAppend.buildMap(TransformationName.values());
+
+
+   /**
+    * TRANSFORMATION
+    */
+   public static enum TransformationName {
+
+      PropagateConstants("constant-propagation"),
+      RemoveInternalLoads("remove-loads");
+
+      private TransformationName(String transformationName) {
+         this.transformationName = transformationName;
+      }
+
+      @Override
+      public String toString() {
+         return transformationName;
+      }
+
+      public String getTransformationName() {
+         return transformationName;
+      }
+
+
+      public Transformation getTransformation() {
+         switch (this) {
+            case PropagateConstants:
+               return new PropagateConstants();
+            case RemoveInternalLoads:
+               return new RemoveInternalLoads();
+            default:
+               Logger.getLogger(DmTransformDispenser.class.getName()).
+                       warning("Case not defined: '" + this);
+               return null;
+         }
+      }
+      private String transformationName;
    }
 }
