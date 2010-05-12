@@ -35,7 +35,7 @@ public class Options {
 
        general_outputfolder("general.outputfolder",""),
 
-      partition_partitioner("partition.partitioner",DmPartitionerDispenser.PartitionerName.MbMegaBlock.toString()),
+      partition_partitioner("partition.partitioner",DmPartitionerDispenser.PartitionerName.MbBasicBlock.getPartitionerName()),
       partition_repetitionthreshold("partition.repetitionthreshold","2"),
       partition_groupblocks("partition.groupblocks","true"),
       partition_filterbyrepetitions("partition.filterbyrepetitions","false"),

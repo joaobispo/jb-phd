@@ -23,8 +23,13 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import org.ancora.DMTool.Settings.Options;
+import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Shell.System.Executable;
 import org.ancora.DMTool.Settings.Preference;
+import org.ancora.DMTool.Shell.Shell.Command;
+import org.ancora.DMTool.Utils.ShellUtils;
+import org.ancora.Shared.EnumUtilsAppend;
 import org.ancora.SharedLibrary.Preferences.EnumPreferences;
 
 /**
@@ -34,7 +39,9 @@ import org.ancora.SharedLibrary.Preferences.EnumPreferences;
 public class Set implements Executable {
 
    public Set() {
-      prefs = Preference.getPreferences();
+      optionsValues = Options.optionsTable;
+      optionsNames = EnumUtilsAppend.buildMap(OptionName.values());
+      //prefs = Preference.getPreferences();
    }
 
 
@@ -46,64 +53,65 @@ public class Set implements Executable {
          return false;
       }
 
-      // Get preference
-      String prefString = args.get(0).toLowerCase();
-      //Preference prefEnum = EnumUtils.valueOf(Preference.class, prefString);
-      Preference prefEnum = settings.get(prefString);
+      // Get option
+      OptionName optionName = optionsNames.get(args.get(0));
 
-      if(prefEnum == null) {
+      // Get preference
+      //String prefString = args.get(0).toLowerCase();
+      //Preference prefEnum = settings.get(prefString);
+
+      //if(prefEnum == null) {
+      if(optionName == null) {
           Logger.getLogger(Set.class.getName()).
-                  info("'"+args.get(0)+"' is not a valid setting. Avaliable:");
-         //logger.info("");
+                  info("'"+args.get(0)+"' is not a valid setting. Type "+
+                  Command.help+" "+Help.HelpArgument.setoptions+" to see avaliable settings.");
+          /*
          for(String gPref : keys) {
              Logger.getLogger(Set.class.getName()).
                      info("- "+gPref);
          }
-         /*
-         for(Preference gPref : Preference.values()) {
-             Logger.getLogger(Set.class.getName()).
-                     info("- "+gPref.name());
-         }
-          */
+           *
+           */
          return false;
       }
 
-      // Get value
-
       String value = args.get(1);
-      // Special case: transform-options
-      if(prefEnum == Preference.transformOptions) {
+      // Concatenate remainging arguments into a single string
+      if(args.size() > 2) {
          StringBuilder builder = new StringBuilder();
          builder.append(value);
-         for(int i=2; i<args.size(); i++) {
-            builder.append(" ");
+         for(int i=1; i<args.size(); i++) {
+            builder.append(ShellUtils.COMMAND_SEPARATOR);
             builder.append(args.get(i));
          }
          value = builder.toString();
       }
 
-
       // Introduce value
-      return updatePreferences(prefEnum, value);
+      optionsValues.put(optionName, value);
+      return true;
+      //return updatePreferences(prefEnum, value);
 
-      // Update preferences
-      //prefs.putPreference(prefEnum, value);
-
-      //return true;
    }
 
+   /*
    private boolean updatePreferences(Preference preference, String value) {
 
       // TODO: PARSE VALUES?
      prefs.putPreference(preference, value);
      return true;
    }
+    *
+    */
 
+   Map<OptionName, String> optionsValues;
+   Map<String, OptionName> optionsNames;
+/*
    private EnumPreferences prefs;
 
-   /**
-    * Options names
-    */
+   ///
+    // Options names
+    //
     private static final Map<String, Preference> settings;
    static {
       Map<String, Preference> aMap = new Hashtable<String, Preference>();
@@ -166,5 +174,5 @@ public class Set implements Executable {
       String transformOptions = "transform-options";
 
    }
-
+*/
 }
