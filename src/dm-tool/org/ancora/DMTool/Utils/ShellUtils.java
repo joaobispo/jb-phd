@@ -51,14 +51,13 @@ public class ShellUtils {
          if(spaceIndex == -1 && quoteIndex == -1) {
             commands.add(command);
             command = "";
+            continue;
          }
 
          if(spaceIndex < quoteIndex) {
             String argument = command.substring(0, spaceIndex);
             commands.add(argument);
             command = command.substring(spaceIndex+1).trim();
-
-
          } else {
             // Find second quote
             int quoteIndex2Increment = command.substring(quoteIndex+1).indexOf(COMMAND_GATHERER);

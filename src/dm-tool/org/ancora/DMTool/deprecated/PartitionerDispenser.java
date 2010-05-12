@@ -27,7 +27,7 @@ import org.ancora.Partitioning.MegaBlock;
 import org.ancora.Partitioning.Partitioner;
 import org.ancora.Partitioning.SuperBlock;
 import org.ancora.Partitioning.Tools.InstructionFilter;
-import org.ancora.Partitioning.MbJumpFilter;
+//import org.ancora.Partitioning.MbJumpFilter;
 import org.ancora.SharedLibrary.ParseUtils;
 import org.ancora.SharedLibrary.Preferences.EnumPreferences;
 
@@ -36,7 +36,7 @@ import org.ancora.SharedLibrary.Preferences.EnumPreferences;
  * @author Joao Bispo
  */
 public class PartitionerDispenser {
-
+/*
    public static Partitioner getCurrentPartitioner() {
 
       String partitionerName = prefs.getPreference(Preference.partitioner).toLowerCase();
@@ -69,12 +69,12 @@ public class PartitionerDispenser {
               info("Case not defined for partitionerOption '" + partitionerOption + "'");
       return null;
    }
-
+*/
    /**
     * VARIABLES
     */
    private static final EnumPreferences prefs = Preference.getPreferences();
-   private static final InstructionFilter MICROBLAZE_JUMP_FILTER = new MbJumpFilter();
+   //private static final InstructionFilter MICROBLAZE_JUMP_FILTER = new MbJumpFilter();
    
    private static final Map<String, PartitionerDispenser.PartitionerOption> partitionerOptions;
    static {

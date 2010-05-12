@@ -19,6 +19,7 @@ package org.ancora.DMTool.Shell;
 
 import org.ancora.DMTool.Shell.System.Executable;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
@@ -61,7 +62,7 @@ public class Shell {
    private static void runScript(String[] args) {
       File scriptFile = IoUtils.existingFile(args[0]);
       if(scriptFile == null) {
-         logger.info("Terminating...");
+         logger.info("Script file '"+args[0]+"' not found. Terminating...");
          return;
       }
 
@@ -114,7 +115,8 @@ public class Shell {
          return false;
       }
 
-      splitCommand = splitCommand.subList(1, splitCommand.size());
+      List<String> arguments = new ArrayList<String>();
+      arguments.addAll(splitCommand.subList(1, splitCommand.size()));
 
       /// Check simple commands (exit, help, config, set)
       // Check simple commands (exit)
@@ -129,7 +131,7 @@ public class Shell {
          logger.warning("Executable for command '"+commandEnum+"' not found.");
       }
 
-      return executable.execute(splitCommand);
+      return executable.execute(arguments);
       /*
       if(commandEnum == Command.help) {
          showHelp();
@@ -218,7 +220,7 @@ public class Shell {
       aMap.put(Command.set, new Set());
       aMap.put(Command.transform, new Transform());
       aMap.put(Command.help, new Help());
-      aMap.put(Command.options, new Options());
+      aMap.put(Command.options, new ShowOptions());
 
       executables = Collections.unmodifiableMap(aMap);
    }

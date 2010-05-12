@@ -17,8 +17,9 @@
 
 package org.ancora.DMTool.Settings;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
+import org.ancora.Partitioning.DmPartitionerDispenser;
 
 /**
  * Options supported by the program.
@@ -26,45 +27,63 @@ import java.util.Map;
  * @author Joao Bispo
  */
 public class Options {
-      public static final String general_outputfolder = "general.outputfolder";
 
-      public static final String partition_partitioner = "partition.partitioner";
-      public static final String partition_repetitionthreshold = "partition.repetitionthreshold";
-      public static final String partition_groupblocks = "partition.groupblocks";
-      public static final String partition_filterbyrepetitions = "partition.filterbyrepetitions";
-      public static final String partition_megablockmaxpatternsize = "partition.megablockmaxpatternsize";
+   /**
+    * OPTIONS NAMES
+    */
+   public static enum OptionName {
 
-      public static final String extension_block = "extension.block";
-      public static final String extension_trace = "extension.trace";
-      public static final String extension_elf = "extension.elf";
+       general_outputfolder("general.outputfolder",""),
 
-      public static final String mapping_mapper = "mapping.mapper";
+      partition_partitioner("partition.partitioner",DmPartitionerDispenser.PartitionerName.MbMegaBlock.toString()),
+      partition_repetitionthreshold("partition.repetitionthreshold","2"),
+      partition_groupblocks("partition.groupblocks","true"),
+      partition_filterbyrepetitions("partition.filterbyrepetitions","false"),
+      partition_megablockmaxpatternsize("partition.megablockmaxpatternsize","32"),
 
-      public static final String ir_writedot = "ir.writedot";
-      public static final String ir_options = "ir.options";
+      extension_block("extension.block","block"),
+      extension_trace("extension.trace","trace"),
+      extension_elf("extension.elf","elf"),
+
+      mapping_mapper("mapping.mapper",""),
+
+      ir_writedot("ir.writedot","false"),
+      ir_options("ir.options","");
+
+      private OptionName(String optionName, String defaultValue) {
+         this.optionName = optionName;
+         this.defaultValue = defaultValue;
+      }
+
+      @Override
+      public String toString() {
+         return optionName;
+      }
+
+      public String getDefaultValue() {
+         return defaultValue;
+      }
+
+      public String getOptionName() {
+         return optionName;
+      }
 
 
-   public static final Map<String, String> optionsTable;
+      private final String optionName;
+      private final String defaultValue;
+   }    
 
+
+   /**
+    * OPTIONS TABLE
+    */
+   public static final Map<OptionName, String> optionsTable;
    static {
-      Map<String, String> aMap = new HashMap<String, String>();
+      Map<OptionName, String> aMap = new EnumMap<OptionName, String>(OptionName.class);
 
-      aMap.put(Options.partition_repetitionthreshold, "2");
-      aMap.put(Options.partition_groupblocks, "true");
-      aMap.put(Options.partition_filterbyrepetitions, "false");
-      aMap.put(Options.partition_partitioner, "BasicBlock");
-      aMap.put(Options.partition_megablockmaxpatternsize, "32");
-
-      aMap.put(Options.general_outputfolder, "");
-
-      aMap.put(Options.extension_block, "block");
-      aMap.put(Options.extension_elf, "elf");
-      aMap.put(Options.extension_trace, "trace");
-
-      aMap.put(Options.mapping_mapper, "");
-
-      aMap.put(Options.ir_options, "");
-      aMap.put(Options.ir_writedot, "false");
+      for (OptionName name : OptionName.values()) {
+         aMap.put(name, name.getDefaultValue());
+      }
 
       optionsTable = aMap;
    }

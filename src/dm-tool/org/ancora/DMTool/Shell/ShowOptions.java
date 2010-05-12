@@ -18,7 +18,10 @@
 package org.ancora.DMTool.Shell;
 
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
+import org.ancora.DMTool.Settings.Options;
+import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Shell.System.Executable;
 import org.ancora.DMTool.Settings.Preference;
 import org.ancora.SharedLibrary.Preferences.EnumPreferences;
@@ -27,10 +30,10 @@ import org.ancora.SharedLibrary.Preferences.EnumPreferences;
  *
  * @author Joao Bispo
  */
-public class Options implements Executable {
+public class ShowOptions implements Executable {
 
-   public Options() {
-      logger = Logger.getLogger(Options.class.getName());
+   public ShowOptions() {
+      logger = Logger.getLogger(ShowOptions.class.getName());
       prefs = Preference.getPreferences();
    }
 
@@ -38,12 +41,24 @@ public class Options implements Executable {
 
    public boolean execute(List<String> arguments) {
 
-      logger.info("Current values for program options:");
+      //logger.info("Current values for program options:");
+      logger.info("\nCurrent settings:");
+
+      Map<OptionName, String> optionsTable = Options.optionsTable;
+
+      for(OptionName option : OptionName.values()) {
+         String value = optionsTable.get(option);
+         String message = option.getOptionName() + " = '" + value+"'";
+         logger.info(message);
+      }
+      /*
       for(Preference gPref : Preference.values()) {
          String value = prefs.getPreference(gPref);
          String message = gPref.name() + " - " + value;
          logger.info(message);
       }
+       *
+       */
 
       return true;
    }

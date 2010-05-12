@@ -17,8 +17,12 @@
 
 package org.ancora.DMTool.Settings;
 
+import java.util.Map;
+import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.Partitioning.DmPartitionerDispenser;
 import org.ancora.Partitioning.Partitioner;
+import org.ancora.Partitioning.Tools.BlockWorker;
+import org.ancora.SharedLibrary.ParseUtils;
 
 /**
  * Get parsed settings values.
@@ -31,5 +35,20 @@ public class Settings {
       return DmPartitionerDispenser.getCurrentPartitioner();
    }
 
+   public static void setupBlockWorker(BlockWorker worker) {
+      
+      Map<OptionName, String> options = Options.optionsTable;
+      
+      // Setup worker
+      boolean useGatherer = Boolean.parseBoolean(options.get(OptionName.partition_groupblocks));
+      boolean useSelector = Boolean.parseBoolean(options.get(OptionName.partition_filterbyrepetitions));
+      int selectorThreshold = ParseUtils.parseInt(options.get(OptionName.partition_repetitionthreshold));
+
+      worker.setUseGatherer(useGatherer);
+      worker.setUseSelector(useSelector);
+      worker.setSelectorRepThreshold(selectorThreshold);
+
+      worker.init();
+   }
 
 }

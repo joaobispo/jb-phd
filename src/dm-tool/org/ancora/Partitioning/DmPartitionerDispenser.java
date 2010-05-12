@@ -19,8 +19,8 @@ package org.ancora.Partitioning;
 
 import java.util.Map;
 import java.util.logging.Logger;
-import org.ancora.DMTool.Settings.OptionTable;
 import org.ancora.DMTool.Settings.Options;
+import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.Shared.EnumUtilsAppend;
 import org.ancora.SharedLibrary.ParseUtils;
 
@@ -33,7 +33,8 @@ public class DmPartitionerDispenser {
 
    public static Partitioner getCurrentPartitioner() {
       //Get name of the current partitioner
-      String partitionerName = OptionTable.options.get(Options.partition_partitioner);
+      String partitionerName = Options.optionsTable.get(OptionName.partition_partitioner);
+      //String partitionerName = Options.optionsTable.get(Options.partition_partitioner);
 
       // Get the correspondent enum
       PartitionerName partitioner = partitioners.get(partitionerName);
@@ -65,6 +66,11 @@ public class DmPartitionerDispenser {
          return partitionerName;
       }
 
+      public String getPartitionerName() {
+         return partitionerName;
+      }
+      
+
       public Partitioner getPartitioner() {
          switch (this) {
             case MbBasicBlock:
@@ -74,7 +80,7 @@ public class DmPartitionerDispenser {
             case MbMegaBlock:
                MegaBlock mb = MbPartitionerDispenser.getMbMegaBlock();
                // Get max pattern size
-               String maxPatternString = OptionTable.options.get(Options.partition_megablockmaxpatternsize);
+               String maxPatternString = Options.optionsTable.get(OptionName.partition_megablockmaxpatternsize);
                int maxPatternSize = ParseUtils.parseInt(maxPatternString);
                mb.setMaxPatternSize(maxPatternSize);
                return mb;

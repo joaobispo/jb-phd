@@ -49,7 +49,8 @@ public class Tester {
 
       BasicBlock bb = new MbBasicBlock();
       SuperBlock sb = new SuperBlock(bb);
-      MegaBlock mb = new MegaBlock(sb, 32);
+  //    MegaBlock mb = new MegaBlock(sb, 32);
+      MegaBlock mb = new MegaBlock(sb);
       InstructionBusReader busReader = ElfBusReader.createElfReader(systemConfigFile, binaryFile);
 
       BlockWorker worker = new BlockWorker(mb, busReader);
@@ -73,7 +74,8 @@ public class Tester {
 
       BasicBlock bb = new MbBasicBlock();
       SuperBlock sb = new SuperBlock(bb);
-      MegaBlock mb = new MegaBlock(sb, 32);
+//      MegaBlock mb = new MegaBlock(sb, 32);
+      MegaBlock mb = new MegaBlock(sb);
       InstructionBusReader busReader = ElfBusReader.createElfReader(systemConfigFile, binaryFile);
 
       TraceProcessorWorker worker = new TraceProcessorWorker(mb);

@@ -18,8 +18,12 @@
 package org.ancora.DMTool.Shell;
 
 import java.util.List;
+import java.util.logging.Logger;
+import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Shell.Shell.Command;
 import org.ancora.DMTool.Shell.System.Executable;
+import org.ancora.Partitioning.DmPartitionerDispenser.PartitionerName;
+import org.ancora.SharedLibrary.EnumUtils;
 
 /**
  *
@@ -28,15 +32,50 @@ import org.ancora.DMTool.Shell.System.Executable;
 public class Help implements Executable {
 
    public boolean execute(List<String> arguments) {
-       //logger.info("Supported commands:");
-       System.out.println("Supported commands:");
-      for(Command command : Command.values()) {
+      if(arguments.isEmpty()) {
+
+      logger.info("\nType the following for more info:");
+         noArgumentMessage();
+         return true;
+      }
+
+
+      String argument = arguments.get(0);
+      HelpArgument helpArgument = EnumUtils.valueOf(HelpArgument.class, argument);
+
+      if(helpArgument == null) {
+         logger.info("\nInvalid argument: '"+argument+"'. Type the following for more info:");
+         noArgumentMessage();
+         return true;
+      }
+
+      switch(helpArgument) {
+         case commands:
+            showCommandsHelp();
+            return true;
+         case partitioners:
+            showPartitioners();
+            return true;
+         case setoptions:
+            showSetOptions();
+            return true;
+         default:
+            logger.warning("Case not implemented: '"+helpArgument+"'");
+            return false;
+      }
+      //logger.info("Supported commands:");
+       //System.out.println("\nSupported commands:");
+       
+
+       /*
+       for(Command command : Command.values()) {
          String message = command.name() + " - " + helpMessage(command);
          //logger.info(message);
          System.out.println(message);
       }
+        *
+        */
 
-      return true;
    }
 
     private String helpMessage(Command command) {
@@ -55,4 +94,50 @@ public class Help implements Executable {
                return "Help message not defined";
          }
       }
+
+    private static final Logger logger = Logger.getLogger(Help.class.getName());
+
+   private void noArgumentMessage() {
+      String helpCommand = Command.help.name();
+
+      for(HelpArgument arg : HelpArgument.values()) {
+         String message = helpCommand + " " + arg.name();
+         logger.info(message);
+         //System.out.println(message);
+      }
+   }
+
+   private void showCommandsHelp() {
+      logger.info("\nAvaliable shell commands:");
+      for(Command command : Command.values()) {
+         logger.info(command.name() + " - "+ helpMessage(command));
+      }
+   }
+
+   private void showPartitioners() {
+      logger.info("\nAvaliable partitioners:");
+
+      for(PartitionerName  partitioner : PartitionerName .values()) {
+         logger.info(partitioner.getPartitionerName());
+      }
+   }
+
+   private void showSetOptions() {
+      logger.info("\nAvaliable options:");
+
+      for(OptionName option : OptionName .values()) {
+         logger.info(option.getOptionName());
+      }
+   }
+
+
+   /**
+    * ENUM
+    */
+   enum HelpArgument {
+      partitioners,
+      setoptions,
+      commands,
+      transformations;
+   }
 }

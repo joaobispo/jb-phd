@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import org.ancora.DMTool.deprecated.Configuration.Definitions;
 import org.ancora.DMTool.Settings.Preference;
+import org.ancora.DMTool.Settings.Settings;
 import org.ancora.DMTool.Shell.System.Executable;
 import org.ancora.DMTool.Shell.System.MapperDispenser;
 import org.ancora.DMTool.deprecated.PartitionerDispenser;
@@ -33,6 +34,7 @@ import org.ancora.DMTool.deprecated.TraceProcessor.TraceProcessorWorker;
 import org.ancora.DMTool.deprecated.TransformUtils;
 import org.ancora.InstructionBlock.BlockIO;
 import org.ancora.InstructionBlock.BlockStream;
+import org.ancora.InstructionBlock.DtoolTraceBusReader;
 import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.InstructionBlock.InstructionBusReader;
 import org.ancora.InstructionBlock.ElfBusReader;
@@ -186,11 +188,14 @@ public class Transform implements Executable {
             }
             // Increment counter
             counter++;
+            block = blockStream.nextBlock();
          }
       }
+
+      showStatsAverage(statsAfter.size(), OperationListStats.calcAverage("Avg Before", statsBefore), OperationListStats.calcAverage("Avg After", statsAfter));
    }
 
-   
+   /*
    private void processFiles(List<File> inputFiles) {
       List<OperationListStats> statsBefore = new ArrayList<OperationListStats>();
       List<OperationListStats> statsAfter = new ArrayList<OperationListStats>();
@@ -218,13 +223,13 @@ public class Transform implements Executable {
             // Get stats before transformations
             OperationListStats beforeTransf = OperationListStats.buildStats(operations, mapper,
                     block.getRepetitions(), blockName);
-/*
+
             // Show operations before
-            System.out.println("BEFORE OPERATIONS:");
-            for(Operation operation : operations) {
-               System.out.println(operation.getFullOperation());
-            }
-  */
+            //System.out.println("BEFORE OPERATIONS:");
+            //for(Operation operation : operations) {
+            //   System.out.println(operation.getFullOperation());
+            //}
+  
             // Write DOT Before
             if(writeDot) {
                File folder = IoUtils.safeFolder("dot/"+baseFilename);
@@ -249,12 +254,12 @@ public class Transform implements Executable {
             showStats(beforeTransf, afterTransf);
             statsBefore.add(beforeTransf);
             statsAfter.add(afterTransf);
-            /*
-            System.out.println("AFTER OPERATIONS:");
-            for(Operation operation : operations) {
-               System.out.println(operation.getFullOperation());
-            }
-             */
+            
+            //System.out.println("AFTER OPERATIONS:");
+            //for(Operation operation : operations) {
+            //   System.out.println(operation.getFullOperation());
+            //}
+             
              
 
             // Write DOT After
@@ -277,7 +282,8 @@ public class Transform implements Executable {
 //      OperationListStats.calcAverage("Avg After", statsAfter);
       showStatsAverage(statsAfter.size(), OperationListStats.calcAverage("Avg Before", statsBefore), OperationListStats.calcAverage("Avg After", statsAfter));
    }
-
+   */
+/*
    private List<InstructionBlock> getBlocks(File file) {
 
       // Determine file extension and determine type of file
@@ -306,6 +312,7 @@ public class Transform implements Executable {
       logger.warning("Could not process file with extension '"+extension+"'.");
       return new ArrayList<InstructionBlock>();
    }
+   */
 
    private BlockStream getBlockStream(File file) {
        // Determine file extension and determine type of file
@@ -318,26 +325,35 @@ public class Transform implements Executable {
          return new SingleBlockStream(block);
       }
 
+      InstructionBusReader busReader = null;
+
       if(extension.equals(elfExtension)) {
          String systemConfig = "./Configuration Files/systemconfig.xml";
-         InstructionBusReader busReader = ElfBusReader.createElfReader(systemConfig, file.getAbsolutePath());
-         return new BlockWorker(null, busReader)
-
-         TraceProcessorWorker worker = getProcessorWorker(busReader);
-         return worker.processTrace(busReader);
+         busReader = ElfBusReader.createElfReader(systemConfig, file.getAbsolutePath());
+         //TraceProcessorWorker worker = getProcessorWorker(busReader);
+         //return worker.processTrace(busReader);
       }
 
       if(extension.equals(traceExtension)) {
-         InstructionBusReader busReader = MbTraceReader.createTraceReader(file);
-         TraceProcessorWorker worker = getProcessorWorker(busReader);
-         return worker.processTrace(busReader);
+         busReader = DtoolTraceBusReader.createTraceReader(file);
+         //busReader = MbTraceReader.createTraceReader(file);
+         //TraceProcessorWorker worker = getProcessorWorker(busReader);
+         //return worker.processTrace(busReader);
       }
+
+      if (busReader != null) {
+         Partitioner partitioner = Settings.getPartitioner();
+         BlockWorker worker = new BlockWorker(partitioner, busReader);
+         Settings.setupBlockWorker(worker);
+         return worker;
+      }
+
 
       // Not of the type expected
       logger.warning("Could not process file with extension '"+extension+"'.");
-      return new ArrayList<InstructionBlock>();
+      return null;
    }
-
+/*
    private TraceProcessorWorker getProcessorWorker(InstructionBusReader busReader) {
       EnumPreferences prefs = Preference.getPreferences();
 
@@ -356,7 +372,8 @@ public class Transform implements Executable {
 
       return worker;
    }
-
+*/
+   /*
    private TraceProcessorWorker getBlockWorker(InstructionBusReader busReader) {
       EnumPreferences prefs = Preference.getPreferences();
 
@@ -375,7 +392,7 @@ public class Transform implements Executable {
 
       return worker;
    }
-
+*/
    private static void showStats(OperationListStats beforeTransf, OperationListStats afterTransf) {
       // only show after stats that change
 //      String[] param = {"CommCosts", "Cpl", "Ilp", "Operations", "MbOperations"};
