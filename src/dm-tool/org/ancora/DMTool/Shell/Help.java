@@ -19,7 +19,7 @@ package org.ancora.DMTool.Shell;
 
 import java.util.List;
 import java.util.logging.Logger;
-import org.ancora.DMTool.IrMapping.DmMapperDispenser.MapperName;
+import org.ancora.IrMapping.DmMapperDispenser.MapperName;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Shell.Shell.Command;
 import org.ancora.DMTool.Shell.System.Executable;

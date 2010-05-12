@@ -15,7 +15,7 @@
  *  under the License.
  */
 
-package org.ancora.DMTool.IrMapping;
+package org.ancora.IrMapping;
 
 import java.util.Map;
 import java.util.logging.Logger;

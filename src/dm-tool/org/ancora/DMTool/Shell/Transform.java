@@ -24,10 +24,13 @@ import java.util.List;
 import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Settings;
 import org.ancora.DMTool.Shell.System.Executable;
-import org.ancora.DMTool.IrMapping.DmMapperDispenser;
+import org.ancora.IrMapping.DmMapperDispenser;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Shell.System.Transform.OperationListStats;
+import org.ancora.DMTool.Stats.DataProcess;
+import org.ancora.DMTool.Stats.LongTransformDataSingle;
+import org.ancora.DMTool.Stats.LongTransformDataTotal;
 import org.ancora.IntermediateRepresentation.DmTransformDispenser;
 import org.ancora.InstructionBlock.BlockIO;
 import org.ancora.InstructionBlock.BlockStream;
@@ -109,8 +112,10 @@ public class Transform implements Executable {
    }
 
    private void processFiles(List<File> inputFiles) {
-      List<OperationListStats> statsBefore = new ArrayList<OperationListStats>();
-      List<OperationListStats> statsAfter = new ArrayList<OperationListStats>();
+      //List<OperationListStats> statsBefore = new ArrayList<OperationListStats>();
+      //List<OperationListStats> statsAfter = new ArrayList<OperationListStats>();
+      LongTransformDataTotal totalBefore = new LongTransformDataTotal();
+      LongTransformDataTotal totalAfter = new LongTransformDataTotal();
 
       for(File file : inputFiles) {
          logger.info("Processing file '"+file.getName()+"'...");
@@ -133,8 +138,15 @@ public class Transform implements Executable {
             }
 
             // Get stats before transformations
-            OperationListStats beforeTransf = OperationListStats.buildStats(operations, mapper,
-                    block.getRepetitions(), blockName);
+            // Map
+            mapper.reset();
+            mapper.processOperations(operations);
+
+            // Get stats after transformation
+            LongTransformDataSingle beforeData = DataProcess.collectTransformData(mapper, block.getRepetitions());
+
+//            OperationListStats beforeTransf = OperationListStats.buildStats(operations, mapper,
+//                    block.getRepetitions(), blockName);
 /*
             // Show operations before
             System.out.println("BEFORE OPERATIONS:");
@@ -160,13 +172,21 @@ public class Transform implements Executable {
             }
 
 
+            // Map
+            mapper.reset();
+            mapper.processOperations(operations);
+
             // Get stats after transformation
-            OperationListStats afterTransf = OperationListStats.buildStats(operations, mapper,
-                    block.getRepetitions(), blockName);
+            LongTransformDataSingle afterData = DataProcess.collectTransformData(mapper, block.getRepetitions());
+
+            //OperationListStats afterTransf = OperationListStats.buildStats(operations, mapper,
+            //        block.getRepetitions(), blockName);
 
 //            showStats(beforeTransf, afterTransf);
-            statsBefore.add(beforeTransf);
-            statsAfter.add(afterTransf);
+//            statsBefore.add(beforeTransf);
+//            statsAfter.add(afterTransf);
+            totalBefore.addValues(beforeData);
+            totalAfter.addValues(afterData);
             /*
             System.out.println("AFTER OPERATIONS:");
             for(Operation operation : operations) {
@@ -187,7 +207,9 @@ public class Transform implements Executable {
          }
       }
 
-      showStatsAverage(statsAfter.size(), OperationListStats.calcAverage("Avg Before", statsBefore), OperationListStats.calcAverage("Avg After", statsAfter));
+      //showStatsAverage(statsAfter.size(), OperationListStats.calcAverage("Avg Before", statsBefore), OperationListStats.calcAverage("Avg After", statsAfter));
+      System.out.println("\nChanges in total, analysed "+totalAfter.getDataCounter()+" blocks.");
+      DataProcess.showTransformDataChanges(totalBefore.getTotalData(), totalAfter.getTotalData());
    }
 
 
