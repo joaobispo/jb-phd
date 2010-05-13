@@ -32,8 +32,9 @@ public class MbPartitionerDispenser {
       return new SuperBlock(new MbBasicBlock());
    }
 
-   public static MegaBlock getMbMegaBlock(int maxPatternSize) {
-       return new MegaBlock(new SuperBlock(new MbBasicBlock()), maxPatternSize);
+   //public static MegaBlock getMbMegaBlock(int maxPatternSize) {
+   public static MegaBlock getMbMegaBlock() {
+       return new MegaBlock(new SuperBlock(new MbBasicBlock()));
    }
 
 }

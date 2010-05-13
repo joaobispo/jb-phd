@@ -179,7 +179,10 @@ public class ParseUnconditionalBranches implements Transformation {
 
       // Check if it as a value
       //Integer value = MbTransformUtils.getIntegerValue(branchOp.getInputs().get(1));
-      Integer value = MbImm.getImmValue(branchOp.getInputs().get(1));
+      //System.out.println("MbOp:"+branchOp.getFullOperation());
+      //System.out.println("MbOp:"+branchOp.getInputs());
+      Integer value = MbImm.getImmValue(branchOp.getInputs().get(0));
+      //Integer value = MbImm.getImmValue(branchOp.getInputs().get(1));
       if(value == null) {
          return false;
       }
