@@ -34,11 +34,17 @@ import org.ancora.SharedLibrary.BitUtils;
  */
 public class MegaBlock extends Partitioner {
 
-   public MegaBlock(SuperBlock superBlock, int maxPatternSize) {
+   public MegaBlock(SuperBlock superBlock) {
+   //public MegaBlock(SuperBlock superBlock, int maxPatternSize) {
       this.sbPartitioner = superBlock;
-      this.mbBuilder = new MegaBlockBuilder(maxPatternSize);
+      //this.mbBuilder = new MegaBlockBuilder(maxPatternSize);
+      this.mbBuilder = new MegaBlockBuilder(DEFAULT_MAX_PATTERN_SIZE);
 
       this.sbPartitioner.addListener(mbBuilder);
+   }
+
+   public void setMaxPatternSize(int maxPatternSize) {
+      this.mbBuilder.setMaxPatternSize(maxPatternSize);
    }
 
    @Override
@@ -61,6 +67,7 @@ public class MegaBlock extends Partitioner {
    private SuperBlock sbPartitioner;
    private MegaBlockBuilder mbBuilder;
    public static final String NAME = "MegaBlock";
+   public static final int DEFAULT_MAX_PATTERN_SIZE = 32;
 
    class MegaBlockBuilder implements InstructionBlockListener {
 
@@ -71,6 +78,10 @@ public class MegaBlock extends Partitioner {
          // Init object state
          lastPatternSize = 0;
          state = BuilderState.LOOKING_FOR_PATTERN;
+         patternFinder = new PatternFinder(maxPatternSize);
+      }
+
+      public void setMaxPatternSize(int maxPatternSize) {
          patternFinder = new PatternFinder(maxPatternSize);
       }
 
