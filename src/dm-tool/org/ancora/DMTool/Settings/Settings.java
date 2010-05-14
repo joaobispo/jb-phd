@@ -42,10 +42,12 @@ public class Settings {
       // Setup worker
       boolean useGatherer = Boolean.parseBoolean(options.get(OptionName.partition_groupblocks));
       boolean useSelector = Boolean.parseBoolean(options.get(OptionName.partition_filterbyrepetitions));
+      boolean useUniqueFilter = Boolean.parseBoolean(options.get(OptionName.partition_filteridenticalblocks));
       int selectorThreshold = ParseUtils.parseInt(options.get(OptionName.partition_repetitionthreshold));
 
       worker.setUseGatherer(useGatherer);
       worker.setUseSelector(useSelector);
+      worker.setUseUniqueFilter(useUniqueFilter);
       worker.setSelectorRepThreshold(selectorThreshold);
 
       worker.init();

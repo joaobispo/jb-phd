@@ -22,33 +22,28 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
-import org.ancora.DMTool.Settings.Settings;
 import org.ancora.DMTool.Shell.System.Executable;
 import org.ancora.IrMapping.DmMapperDispenser;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
+import org.ancora.DMTool.Shell.Shell.Command;
 import org.ancora.DMTool.Shell.System.Transform.OperationListStats;
 import org.ancora.DMTool.Stats.DataProcess;
 import org.ancora.DMTool.Stats.DataProcessDouble;
 import org.ancora.DMTool.Stats.LongTransformDataSingle;
 import org.ancora.DMTool.Stats.LongTransformDataTotal;
 import org.ancora.IntermediateRepresentation.DmTransformDispenser;
-import org.ancora.InstructionBlock.BlockIO;
 import org.ancora.InstructionBlock.BlockStream;
-import org.ancora.InstructionBlock.DtoolTraceBusReader;
+import org.ancora.InstructionBlock.DmBlockUtils;
 import org.ancora.InstructionBlock.InstructionBlock;
-import org.ancora.InstructionBlock.InstructionBusReader;
-import org.ancora.InstructionBlock.ElfBusReader;
-import org.ancora.InstructionBlock.SingleBlockStream;
 import org.ancora.IntermediateRepresentation.MbParser;
-import org.ancora.Partitioning.Partitioner;
 import org.ancora.IrMapping.Tools.Dotty;
 import org.ancora.IrMapping.Mapper;
 import org.ancora.IntermediateRepresentation.Operation;
 import org.ancora.SharedLibrary.IoUtils;
 import org.ancora.SharedLibrary.ParseUtils;
 import org.ancora.IntermediateRepresentation.Transformation;
-import org.ancora.Partitioning.Tools.BlockWorker;
+import org.ancora.IrMapping.DmDottyUtils;
 
 /**
  *
@@ -70,6 +65,8 @@ public class Transform implements Executable {
       mapper = DmMapperDispenser.getCurrentMapper();
       transf = DmTransformDispenser.getCurrentTransformations();
       writeDot = Boolean.parseBoolean(Options.optionsTable.get(OptionName.ir_writedot));
+
+      input = Options.optionsTable.get(OptionName.general_input);
    }
 
 
@@ -77,17 +74,22 @@ public class Transform implements Executable {
    public boolean execute(List<String> arguments) {
       setup();
 
+      /*
       if(arguments.size() < 1) {
          logger.info("Too few arguments for 'transform' ("+arguments.size()+"). Minimum is 1:");
-         logger.info("transform <folder/file>");
+         logger.info(Command.transform+" <folder/file>");
          return false;
       }
+       *
+       */
 
 
       // Check file/folder
-      File file = new File(arguments.get(0));
+//      File file = new File(arguments.get(0));
+      File file = new File(input);
       if(!file.exists()) {
-         logger.info("Path '"+arguments.get(0)+"' does not exist.");
+         //logger.info("Input '"+arguments.get(0)+"' does not exist.");
+         logger.info("Input '"+input+"' does not exist.");
          return false;
       }
 
@@ -123,7 +125,7 @@ public class Transform implements Executable {
          String baseFilename = ParseUtils.removeSuffix(file.getName(), IoUtils.DEFAULT_EXTENSION_SEPARATOR);
 
          // Get BlockStream
-         BlockStream blockStream = getBlockStream(file);
+         BlockStream blockStream = DmBlockUtils.getBlockStream(file);
          InstructionBlock block = blockStream.nextBlock();
          // Start counter
          int counter = 0;
@@ -157,9 +159,21 @@ public class Transform implements Executable {
   */
             // Write DOT Before
             if(writeDot) {
-               File folder = IoUtils.safeFolder("dot/"+baseFilename);
-               String filename = baseFilename + "-" + counter + "-before.dot";
+               File dotFile = DmDottyUtils.getDottyFile(baseFilename, blockName+"-before");
+               DmDottyUtils.writeDot(operations, dotFile);
+               /*
+                String outputFolder = Options.optionsTable.get(OptionName.general_outputfolder)
+                       + "/dot/" + baseFilename;
+               File folder = IoUtils.safeFolder(outputFolder);
+               //File folder = IoUtils.safeFolder("dot/"+baseFilename);
+               String extension = IoUtils.DEFAULT_EXTENSION_SEPARATOR +
+                       Options.optionsTable.get(OptionName.extension_dot);
+               
+               //String filename = baseFilename + "-" + counter + "-before.dot";
+               String filename = baseFilename + "-" + counter + "-before"+extension;
                writeDot(operations, new File(folder, filename));
+                * 
+                */
             }
 
 
@@ -198,9 +212,19 @@ public class Transform implements Executable {
 
             // Write DOT After
             if(writeDot) {
-               File folder = IoUtils.safeFolder("dot/"+baseFilename);
-               String filename = baseFilename + "-" + counter + "-after.dot";
+               File dotFile = DmDottyUtils.getDottyFile(baseFilename, blockName+"-after");
+               DmDottyUtils.writeDot(operations, dotFile);
+               /*
+               String outputFolder = Options.optionsTable.get(OptionName.general_outputfolder)
+                       + "/dot/" + baseFilename;
+               File folder = IoUtils.safeFolder(outputFolder);
+               //File folder = IoUtils.safeFolder("dot/"+baseFilename);
+               String extension = IoUtils.DEFAULT_EXTENSION_SEPARATOR +
+                       Options.optionsTable.get(OptionName.extension_dot);
+               //String filename = baseFilename + "-" + counter + "-after.dot";
+               String filename = blockName + "-after"+extension;
                writeDot(operations, new File(folder, filename));
+                */
             }
             // Increment counter
             counter++;
@@ -216,7 +240,7 @@ public class Transform implements Executable {
    }
 
 
-
+/*
    private BlockStream getBlockStream(File file) {
        // Determine file extension and determine type of file
       String filename = file.getName();
@@ -251,7 +275,7 @@ public class Transform implements Executable {
       logger.warning("Could not process file with extension '"+extension+"'.");
       return null;
    }
-
+*/
    private static void showStats(OperationListStats beforeTransf, OperationListStats afterTransf) {
       // only show after stats that change
 //      String[] param = {"CommCosts", "Cpl", "Ilp", "Operations", "MbOperations"};
@@ -348,6 +372,7 @@ public class Transform implements Executable {
    private String traceExtension;
    private String elfExtension;
    private String blockExtension;
+   private String input;
    private Mapper mapper;
    //private Transformation[] transf;
    private List<Transformation> transf;

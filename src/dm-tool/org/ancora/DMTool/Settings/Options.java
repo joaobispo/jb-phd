@@ -34,16 +34,19 @@ public class Options {
    public static enum OptionName {
 
        general_outputfolder("general.outputfolder",""),
+       general_input("general.input",""),
 
       partition_partitioner("partition.partitioner",DmPartitionerDispenser.PartitionerName.MbBasicBlock.getPartitionerName()),
       partition_repetitionthreshold("partition.repetitionthreshold","2"),
       partition_groupblocks("partition.groupblocks","true"),
       partition_filterbyrepetitions("partition.filterbyrepetitions","false"),
+      partition_filteridenticalblocks("partition.filteridenticalblocks","false"),
       partition_megablockmaxpatternsize("partition.megablockmaxpatternsize","32"),
 
       extension_block("extension.block","block"),
       extension_trace("extension.trace","trace"),
       extension_elf("extension.elf","elf"),
+      extension_dot("extension.dot","dotty"),
 
       mapping_mapper("mapping.mapper",""),
 

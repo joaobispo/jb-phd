@@ -126,7 +126,8 @@ public class Shell {
       }
 
       // Get Executable
-      Executable executable = executables.get(commandEnum);
+      //Executable executable = executables.get(commandEnum);
+      Executable executable = commandEnum.getExecutable();
       if(executable == null) {
          logger.warning("Executable for command '"+commandEnum+"' not found.");
       }
@@ -212,7 +213,7 @@ public class Shell {
     * INSTANCE VARIABLES
     */
    private static final Logger logger = Logger.getLogger(Shell.class.getName());
-
+/*
    private static final Map<Command, Executable> executables;
    static {
       Map<Command, Executable> aMap = new EnumMap<Command, Executable>(Command.class);
@@ -224,7 +225,7 @@ public class Shell {
 
       executables = Collections.unmodifiableMap(aMap);
    }
-
+*/
 
    /**
     * ENUM
@@ -235,7 +236,8 @@ public class Shell {
       exit,
       set,
       options,
-      transform;
+      transform,
+      extractblocks;
 /*
       public String helpMessage() {
          switch (this) {
@@ -254,18 +256,26 @@ public class Shell {
          }
       }
 */
-      /*
+  
       public Executable getExecutable() {
          switch (this) {
+            case set:
+               return new Set();
+            case help:
+               return new Help();
+            case options:
+               return new ShowOptions();
             case transform:
                return new Transform();
+            case extractblocks:
+               return new WriteBlocks();
             default:
                Logger.getLogger(Command.class.getName()).
                        warning("Executable not defined for '" + this.name() + "'");
                return null;
          }
       }
-       */
+       
    }
 
 
