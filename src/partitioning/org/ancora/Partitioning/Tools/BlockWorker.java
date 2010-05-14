@@ -43,6 +43,7 @@ public class BlockWorker implements BlockStream {
       this.partitioner = partitioner;
       useGatherer = false;
       useSelector = false;
+      useUniqueFilter = false;
       selectorRepThreshold = 1;
 
       this.busReader = busReader;
@@ -174,6 +175,12 @@ public class BlockWorker implements BlockStream {
          lastProducer = selector;
       }
 
+      // Setup Unique Filter
+      if(useUniqueFilter) {
+         filterUnique = new UniqueBlocks();
+         lastProducer.addListener(filterUnique);
+         lastProducer = filterUnique;
+      }
 
       return lastProducer;
    }
@@ -203,6 +210,10 @@ public class BlockWorker implements BlockStream {
       this.useGatherer = useGatherer;
    }
 
+   public void setUseUniqueFilter(boolean useUniqueFilter) {
+      this.useUniqueFilter = useUniqueFilter;
+   }
+
    public void setUseSelector(boolean useSelector) {
       this.useSelector = useSelector;
    }
@@ -217,6 +228,7 @@ public class BlockWorker implements BlockStream {
     */
    private Gatherer gatherer;
    private Selector selector;
+   private UniqueBlocks filterUnique;
    InstructionBlockCollector collector;
    InstructionBlockStats ibStats;
 
@@ -225,6 +237,7 @@ public class BlockWorker implements BlockStream {
    private Partitioner partitioner;
    private boolean useGatherer;
    private boolean useSelector;
+   private boolean useUniqueFilter;
    private int selectorRepThreshold;
 
    private InstructionBusReader busReader;
