@@ -37,7 +37,8 @@ public class MbGcc {
     public static void main(String[] args) {
 
       //buildMenottiElfs();
-      buildAdhocElfs();
+      //buildAdhocElfs();
+      buildDtooElfs();
        
    }
 
@@ -121,6 +122,12 @@ public class MbGcc {
 
    private static void buildAdhocElfs() {
       for(GccRun run : AdhocGccRuns.getRuns()) {
+         run.run();
+       }
+   }
+
+   private static void buildDtooElfs() {
+       for(GccRun run : DtoolGccRuns.getRuns()) {
          run.run();
        }
    }
