@@ -195,6 +195,9 @@ public class BlockWorker implements BlockStream {
                  warning("Total instructions does not add up: Trace(" + traceInst + ") " +
                  "vs. Partitioner(" + blockInst + ")");
          return false;
+      } else {
+         Logger.getLogger(BlockWorker.class.getName()).
+                 info("Processed "+blockInst+" instructions.");
       }
       /*
       else {
