@@ -19,13 +19,16 @@ package org.ancora.DMTool.Shell;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
+import org.ancora.DMTool.Settings.Settings;
 import org.ancora.DMTool.Shell.System.Executable;
 import org.ancora.DMTool.Shell.Shell.Command;
 import org.ancora.DMTool.Utils.ShellUtils;
 import org.ancora.Shared.EnumUtilsAppend;
+import org.ancora.SharedLibrary.LoggingUtils;
 
 /**
  *
@@ -73,6 +76,10 @@ public class Set implements Executable {
 
       // Introduce value
       optionsValues.put(optionName, value);
+
+      // Special cases
+      specialCases(optionName);
+
       return true;
 
    }
@@ -80,5 +87,13 @@ public class Set implements Executable {
 
    Map<OptionName, String> optionsValues;
    Map<String, OptionName> optionsNames;
+
+   private void specialCases(OptionName optionName) {
+      // If loggerlevel, reset logger
+      if(optionName.equals(OptionName.general_loggerlevel)) {
+         Level level = Settings.getLoggerLevel();
+         LoggingUtils.setLevel(level);
+      }
+   }
 
 }

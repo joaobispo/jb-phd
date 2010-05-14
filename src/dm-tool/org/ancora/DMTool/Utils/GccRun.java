@@ -17,8 +17,10 @@
 
 package org.ancora.DMTool.Utils;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  *
@@ -35,6 +37,19 @@ public class GccRun {
    }
 
    public int run() {
+      // Create Folder for outputfile
+      File outputFil = new File(outputFile);
+      File outputFol = outputFil.getParentFile();
+      if (!outputFol.exists()) {
+         boolean success = outputFol.mkdirs();
+         if (!success) {
+            Logger.getLogger(GccRun.class.getName()).
+                    warning("Could not create output folder '" + outputFol + "'");
+         }
+      }
+      
+
+
        List<String> command = new ArrayList<String>();
         command.add(getProgram());
         for(String input : inputFiles) {

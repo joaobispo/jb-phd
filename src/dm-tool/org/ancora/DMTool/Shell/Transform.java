@@ -26,7 +26,6 @@ import org.ancora.DMTool.Shell.System.Executable;
 import org.ancora.IrMapping.DmMapperDispenser;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
-import org.ancora.DMTool.Shell.Shell.Command;
 import org.ancora.DMTool.Shell.System.Transform.OperationListStats;
 import org.ancora.DMTool.Stats.DataProcess;
 import org.ancora.DMTool.Stats.DataProcessDouble;
@@ -119,6 +118,7 @@ public class Transform implements Executable {
       //List<OperationListStats> statsAfter = new ArrayList<OperationListStats>();
       LongTransformDataTotal totalBefore = new LongTransformDataTotal();
       LongTransformDataTotal totalAfter = new LongTransformDataTotal();
+      //long totalInstructions = 0;
 
       for(File file : inputFiles) {
          logger.info("Processing file '"+file.getName()+"'...");
@@ -130,6 +130,8 @@ public class Transform implements Executable {
          // Start counter
          int counter = 0;
          while(block != null) {
+            //totalInstructions+=block.getInstructions().size();
+            
              String blockName = baseFilename+"-"+counter;
 //            logger.info("Block "+counter+", "+block.getRepetitions()+" repetitions.");
 
@@ -233,6 +235,7 @@ public class Transform implements Executable {
       }
 
       //showStatsAverage(statsAfter.size(), OperationListStats.calcAverage("Avg Before", statsBefore), OperationListStats.calcAverage("Avg After", statsAfter));
+      //System.out.println("\nProcessed "+totalInstructions+" instructions.");
       System.out.println("\nTotals, analysed "+totalAfter.getDataCounter()+" blocks.");
       DataProcess.showTransformDataChanges(totalBefore.getTotalData(), totalAfter.getTotalData());
       System.out.println("\nAverage per block:");

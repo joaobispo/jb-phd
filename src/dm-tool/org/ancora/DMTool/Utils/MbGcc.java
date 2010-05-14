@@ -35,36 +35,9 @@ public class MbGcc {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-       /*
-       String program = "mb-gcc";
-        String inputFile = "adpcm_coder.c";
-        String outputFlag = "-o";
-        String outputFile = "adpcm_coder.elf";
-        String optimization = "-O3";
-        String otherFlags = "-Wall -g -mxl-barrel-shift -mno-xl-soft-div -mno-xl-soft-mul -xl-mode-executable";
-        String[] otherFlagsArray = otherFlags.split(" ");
 
-        List<String> command = new ArrayList<String>();
-        command.add(program);
-        command.add(inputFile);
-        command.add(outputFlag);
-        command.add(outputFile);
-        command.add(optimization);
-        for(String flag : otherFlagsArray) {
-            command.add(flag);
-         }
-*/
-        //String arguments = "adpcm_coder.c -o adpcm_coder.elf -O0 -Wall -g " +
-        //        "-mxl-barrel-shift -mno-xl-soft-div -mno-xl-soft-mul -xl-mode-executable";
-  //      String workDir = "E:/dmout/mbgcc/battery";
-
-        //runProcess(command, workDir);
-
-        //runProcess(program, arguments, workDir);
-
-       for(GccRun run : MenottiGccRuns.getRuns()) {
-         run.run();
-       }
+      //buildMenottiElfs();
+      buildAdhocElfs();
        
    }
 
@@ -72,7 +45,9 @@ public class MbGcc {
    //public static int runProcess(String program, String args, String workingDir) {
       int returnValue = -1;
       try {
-         System.out.println("Running: " + command.get(0) + "  ...");
+         String commandString = getCommandString(command);
+         System.out.println("Running: " + commandString + "  ...");
+         //System.out.println("Running: " + command.get(0) + "  ...");
          //   List<String> command = new ArrayList<String>();
          //command.add(System.getenv("windir") +"\\system32\\"+"tree.com");
          //command.add("/A");
@@ -90,16 +65,29 @@ public class MbGcc {
          BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
          BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-         String line;
+         String errline = null;
+         String stdline = null;
 
-         while ((line = stdInput.readLine()) != null) {
-            System.out.println(line);
-         }
-
+/*
          while ((line = stdError.readLine()) != null) {
             System.out.println(line);
          }
 
+         while ((line = stdInput.readLine()) != null) {
+            System.out.println(line);
+         }
+*/
+         while ((errline = stdError.readLine()) != null ||
+                 (stdline = stdInput.readLine()) != null) {
+            if(errline!= null) {
+               System.err.println(errline);
+            }
+            if(stdline != null) {
+               System.out.println(stdline);
+            }
+         }
+
+         
          returnValue = process.waitFor();
          System.out.println("Program terminated.");
       } catch (InterruptedException ex) {
@@ -111,5 +99,29 @@ public class MbGcc {
       }
       
       return returnValue;
+   }
+
+   private static String getCommandString(List<String> command) {
+      StringBuilder builder = new StringBuilder();
+
+      builder.append(command.get(0));
+      for(int i=1; i<command.size(); i++) {
+         builder.append(" ");
+         builder.append(command.get(i));
+      }
+
+      return builder.toString();
+   }
+
+   private static void buildMenottiElfs() {
+      for(GccRun run : MenottiGccRuns.getRuns()) {
+         run.run();
+       }
+   }
+
+   private static void buildAdhocElfs() {
+      for(GccRun run : AdhocGccRuns.getRuns()) {
+         run.run();
+       }
    }
 }

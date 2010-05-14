@@ -45,7 +45,11 @@ public class MenottiGccRuns {
             inputFiles[0] = file.getName();
 
             String baseFilename = IoUtils.removeExtension(inputFiles[0], IoUtils.DEFAULT_EXTENSION_SEPARATOR);
-            String outputFile = baseFilename + optimization + ".elf";
+            String parentInputFolder = (new File(DEFAULT_INPUT_FOLDER)).getParent();
+            String outputFolder = parentInputFolder+"\\elf\\"+optimization.substring(1)+"\\";
+            //String outputFolder = DEFAULT_INPUT_FOLDER+"\\..\\elf\\"+optimization.substring(1)+"\\";
+            //String outputFile = baseFilename + optimization + ".elf";
+            String outputFile = outputFolder + baseFilename + optimization + ".elf";
 
             runs.add(new GccRun(outputFile, inputFiles, optimization, flagsArray, DEFAULT_INPUT_FOLDER));
          }

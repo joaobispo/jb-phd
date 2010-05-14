@@ -18,6 +18,8 @@
 package org.ancora.DMTool.Settings;
 
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.Partitioning.DmPartitionerDispenser;
 import org.ancora.Partitioning.Partitioner;
@@ -51,6 +53,22 @@ public class Settings {
       worker.setSelectorRepThreshold(selectorThreshold);
 
       worker.init();
+   }
+
+   public static Level getLoggerLevel() {
+      String loggerLevel = Options.optionsTable.get(OptionName.general_loggerlevel).toUpperCase();
+      Level defaultLevel = Level.ALL;
+      Level level = defaultLevel;
+      // Parse Logger Level
+      try {
+         level = Level.parse(loggerLevel);
+      } catch(IllegalArgumentException ex) {
+         Logger.getLogger(Settings.class.getName()).
+                 info("Could not parse logger level '"+loggerLevel+"'. " +
+                 "Setting level to '"+defaultLevel+"'");
+      }
+
+      return level;
    }
 
 }

@@ -20,10 +20,7 @@ package org.ancora.DMTool.Shell;
 import org.ancora.DMTool.Shell.System.Executable;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.Logger;
 import org.ancora.DMTool.Utils.ShellUtils;
@@ -44,6 +41,9 @@ public class Shell {
     public static void main(String[] args) {
        // Configure Logger to capture all output to console
        LoggingUtils.setupConsoleOnly();
+       //Handler handler = LoggingUtils.buildConsoleHandler();
+       //handler.setLevel(Level.WARNING);
+       //LoggingUtils.setLevel(Level.WARNING);
 
        if (args.length > 0) {
           // Try to get script file

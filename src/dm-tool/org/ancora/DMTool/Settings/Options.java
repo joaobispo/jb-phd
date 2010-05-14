@@ -35,6 +35,7 @@ public class Options {
 
        general_outputfolder("general.outputfolder",""),
        general_input("general.input",""),
+       general_loggerlevel("general.loggerlevel","ALL"),
 
       partition_partitioner("partition.partitioner",DmPartitionerDispenser.PartitionerName.MbBasicBlock.getPartitionerName()),
       partition_repetitionthreshold("partition.repetitionthreshold","2"),
