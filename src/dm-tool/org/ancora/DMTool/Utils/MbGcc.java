@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.logging.Logger;
+import org.ancora.DMTool.Stats.TraceCoverage.TcProcess;
 
 /**
  *
@@ -38,7 +39,6 @@ public class MbGcc {
       //buildMenottiElfs();
       //buildAdhocElfs();
       buildDtooElfs();
-       
    }
 
    public static int runProcess(List<String> command, String workingDir) {

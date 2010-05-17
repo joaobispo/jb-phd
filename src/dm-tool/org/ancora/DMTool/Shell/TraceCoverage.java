@@ -29,6 +29,8 @@ import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Settings.Settings;
 import org.ancora.DMTool.Shell.Shell.Command;
 import org.ancora.DMTool.Shell.System.Executable;
+import org.ancora.DMTool.Stats.TraceCoverage.TcBlocksizeData;
+import org.ancora.DMTool.Stats.TraceCoverage.TcBlocksizeProcess;
 import org.ancora.InstructionBlock.DmBlockUtils;
 import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.Partitioning.Blocks.BlockStream;
@@ -115,6 +117,7 @@ public class TraceCoverage implements Executable {
 
       // Calculate maximum number of repetitions
       int maxRep = 0;
+      int maxBlockSize = 0;
 
       // Iterate over files
       for (File file : inputFiles) {
@@ -139,6 +142,7 @@ public class TraceCoverage implements Executable {
             stats.get(currentPartitioner).addBlock(currentBlock);
 
             maxRep = Math.max(maxRep, currentBlock.getRepetitions());
+            maxBlockSize = Math.max(maxBlockSize, currentBlock.getTotalInstructions());
 
             currentBlock = blockStream.nextBlock();
             currentPartitioner = blockStream.getPartitionerName();
@@ -165,6 +169,8 @@ public class TraceCoverage implements Executable {
       // Process stats according to each partitioner
       maxRep++;
       processStats(partitioners, mainTable, maxRep);
+//      maxBlockSize++;
+//      processBlocksizeStats(partitioners, mainTable, maxBlockSize);
    }
 
    private void estimateSize(Map<String, List<TcData>> mainTable) {
@@ -244,6 +250,62 @@ double ratioAverage[] = new double[maxRepetitions];
          System.err.println(Arrays.toString(ratioAverage));
  *
  */
+      }
+   }
+
+   private void processBlocksizeStats(List<PartitionerName> partitioners, Map<String, List<TcBlocksizeData>> mainTable, int maxBlocksize) {
+      for(PartitionerName partitioner : partitioners) {
+         // Build csv file object
+         //File absNormFile = Settings.getCsvFile("absnorm-"+partitioner.getPartitionerName());
+         File ratioFile = Settings.getCsvFile("blocksize-"+partitioner.getPartitionerName());
+         //TcProcess.csvStart(absNormFile, maxRepetitions);
+         TcBlocksizeProcess.csvBlocksizeStart(ratioFile, maxBlocksize);
+
+         // Scale size
+         int scaleSize = TcBlocksizeProcess.createLogScale(10, maxBlocksize).size();
+         // Collect totals
+         long absTotals[] = new long[scaleSize];
+         double ratioTotals[] = new double[scaleSize];
+
+
+         // Calculate the instruction coverage for each file
+         List<TcBlocksizeData> stats = mainTable.get(partitioner.getPartitionerName());
+         for(TcBlocksizeData stat : stats) {
+            // Get line with values for the number of instructions
+            long[] absValues = TcBlocksizeProcess.getBlockLogLine(stat, maxBlocksize);
+            // Calculate ratio
+            double[] ratioValues = new double[scaleSize];
+            long totalInst = stat.getTotalInstructions();
+            for(int i=0; i<scaleSize; i++) {
+               ratioValues[i] = (double)absValues[i] / (double)totalInst;
+
+               // Add to totals
+               ratioTotals[i] += ratioValues[i];
+               absTotals[i] += absValues[i];
+            }
+
+            // Save data to the csv file
+            //TcProcess.csvAppend(absNormFile, stat.getFilename(), absValues);
+            TcProcess.csvAppend(ratioFile, stat.getFilename(), ratioValues);
+         }
+
+         // Calculate averages
+         double iterations = stats.size();
+         double absAvg[] = new double[scaleSize];
+         double ratioAvg[] = new double[scaleSize];
+         // Calculate max value from absAvg to use for normalization
+         double absNormFactor = (double)absTotals[0] / iterations;
+
+         for(int i=0; i<scaleSize; i++) {
+            absAvg[i] = ((double) absTotals[i] / (double) iterations) / absNormFactor;
+            ratioAvg[i] = ratioTotals[i] / iterations;
+         }
+
+         // Write csv
+         //TcProcess.csvAppend(absNormFile, "absnorm-avg", absAvg);
+         TcProcess.csvAppend(ratioFile, "absnorm-avg", absAvg);
+         TcProcess.csvAppend(ratioFile, "ratio-avg", ratioAvg);
+
       }
    }
 
