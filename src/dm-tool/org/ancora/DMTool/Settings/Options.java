@@ -36,8 +36,9 @@ public class Options {
        general_outputfolder("general.outputfolder",""),
        general_input("general.input",""),
        general_loggerlevel("general.loggerlevel","ALL"),
+       general_csvfilebasename("general.csvfilebasename","csvfile"),
 
-      partition_partitioner("partition.partitioner",DmPartitionerDispenser.PartitionerName.MbBasicBlock.getPartitionerName()),
+      partition_partitioner("partition.partitioner",DmPartitionerDispenser.PartitionerName.MbBasicBlock.getDmPartitionerName()),
       partition_repetitionthreshold("partition.repetitionthreshold","2"),
       partition_groupblocks("partition.groupblocks","true"),
       partition_filterbyrepetitions("partition.filterbyrepetitions","false"),
@@ -48,6 +49,7 @@ public class Options {
       extension_trace("extension.trace","trace"),
       extension_elf("extension.elf","elf"),
       extension_dot("extension.dot","dotty"),
+      extension_csv("extension.csv","csv"),
 
       mapping_mapper("mapping.mapper",""),
 

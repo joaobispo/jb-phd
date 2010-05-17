@@ -17,13 +17,20 @@
 
 package org.ancora.InstructionBlock;
 
+import org.ancora.Partitioning.Blocks.SingleBlockStream;
+import org.ancora.Partitioning.Blocks.BlockStream;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Settings.Settings;
+import org.ancora.Partitioning.DmPartitionerDispenser.PartitionerName;
 import org.ancora.Partitioning.Partitioner;
 import org.ancora.Partitioning.Tools.BlockWorker;
+import org.ancora.Partitioning.Tools.BlockWorkerStream;
+import org.ancora.Partitioning.Tools.MultiBlockStream;
 import org.ancora.SharedLibrary.IoUtils;
 
 /**
@@ -65,7 +72,7 @@ public class DmBlockUtils {
       // If we got a BusReader, setup BlockWorker.
       if (busReader != null) {
          Partitioner partitioner = Settings.getPartitioner();
-         BlockWorker worker = new BlockWorker(partitioner, busReader);
+         BlockWorkerStream worker = new BlockWorkerStream(partitioner, busReader);
          Settings.setupBlockWorker(worker);
          return worker;
       }
@@ -74,6 +81,51 @@ public class DmBlockUtils {
       // Not of the type expected
       Logger.getLogger(DmBlockUtils.class.getName()).
               warning("Could not process file with extension '"+extension+"'.");
+      return null;
+   }
+
+    /**
+    * Transforms a File into a BlockStream, using the settings of the program.
+    * @param file
+    * @return
+    */
+   public static BlockStream getMultiBlockStream(File file, List<PartitionerName> partitioners) {
+       // Determine file extension and determine type of file
+      String filename = file.getName();
+      int separatorIndex = filename.lastIndexOf(IoUtils.DEFAULT_EXTENSION_SEPARATOR);
+      String extension = filename.substring(separatorIndex+1);
+
+      InstructionBusReader busReader = null;
+
+      String elfExtension = Options.optionsTable.get(OptionName.extension_elf);
+      if(extension.equals(elfExtension)) {
+         String systemConfig = "./Configuration Files/systemconfig.xml";
+         busReader = ElfBusReader.createElfReader(systemConfig, file.getAbsolutePath());
+      }
+
+      String traceExtension = Options.optionsTable.get(OptionName.extension_trace);
+      if(extension.equals(traceExtension)) {
+         busReader = DtoolTraceBusReader.createTraceReader(file);
+      }
+
+      // Setup BlockWorkers in BlockStream.
+      if (busReader != null) {
+         // Create partitioners
+         List<Partitioner> realPartitioners = new ArrayList<Partitioner>();
+         for(PartitionerName partitioner : partitioners) {
+            realPartitioners.add(partitioner.getPartitioner());
+         }
+         MultiBlockStream stream = new MultiBlockStream(realPartitioners, busReader);
+         for(BlockWorker worker : stream.getWorkers()) {
+            Settings.setupBlockWorker(worker);
+         }
+         return stream;
+      }
+
+
+      // Not of the type expected
+      Logger.getLogger(DmBlockUtils.class.getName()).
+              warning("Could not process file with extension '"+extension+"'. Only supports elf and trace.");
       return null;
    }
 }

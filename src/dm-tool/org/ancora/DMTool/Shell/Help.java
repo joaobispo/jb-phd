@@ -126,7 +126,7 @@ public class Help implements Executable {
       logger.info("\nAvaliable partitioners:");
 
       for(PartitionerName  partitioner : PartitionerName .values()) {
-         logger.info(partitioner.getPartitionerName());
+         logger.info(partitioner.getDmPartitionerName());
       }
    }
 

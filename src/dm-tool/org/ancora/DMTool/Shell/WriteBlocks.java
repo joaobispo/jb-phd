@@ -27,7 +27,7 @@ import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Shell.Shell.Command;
 import org.ancora.DMTool.Shell.System.Executable;
 import org.ancora.InstructionBlock.BlockIO;
-import org.ancora.InstructionBlock.BlockStream;
+import org.ancora.Partitioning.Blocks.BlockStream;
 import org.ancora.InstructionBlock.DmBlockUtils;
 import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.SharedLibrary.IoUtils;
@@ -54,13 +54,16 @@ public class WriteBlocks implements Executable {
    public boolean execute(List<String> arguments) {
       setup();
 
+      /*
       if(arguments.size() < 1) {
          Logger.getLogger(WriteBlocks.class.getName()).
-         info("Too few arguments for 'transform' ("+arguments.size()+"). Minimum is 1:");
+         info("Too few arguments for '"+Command.extractblocks+"' ("+arguments.size()+"). Minimum is 1:");
          Logger.getLogger(WriteBlocks.class.getName()).
          info(Command.extractblocks+" <folder/file>");
          return false;
       }
+       *
+       */
 
 
       // Check file/folder

@@ -34,14 +34,18 @@ public class DmPartitionerDispenser {
    public static Partitioner getCurrentPartitioner() {
       //Get name of the current partitioner
       String partitionerName = Options.optionsTable.get(OptionName.partition_partitioner);
-      //String partitionerName = Options.optionsTable.get(Options.partition_partitioner);
+      
+      return getPartitioner(partitionerName);
+   }
 
-      // Get the correspondent enum
+   public static Partitioner getPartitioner(String partitionerName) {
+       // Get the correspondent enum
       PartitionerName partitioner = partitioners.get(partitionerName);
 
       if(partitioner == null) {
          Logger.getLogger(DmPartitionerDispenser.class.getName()).
-                 info("Partitioner '"+partitionerName+"' not found.");
+                 //info("Partitioner '"+partitionerName+"' not found.");
+                 warning("Partitioner '"+partitionerName+"' not found.");
          return null;
       }
 
@@ -66,8 +70,12 @@ public class DmPartitionerDispenser {
          return partitionerName;
       }
 
-      public String getPartitionerName() {
+      public String getDmPartitionerName() {
          return partitionerName;
+      }
+
+      public String getPartitionerName() {
+         return getPartitioner().getName();
       }
       
 

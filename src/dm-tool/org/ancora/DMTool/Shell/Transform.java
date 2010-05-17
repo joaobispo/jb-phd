@@ -26,13 +26,14 @@ import org.ancora.DMTool.Shell.System.Executable;
 import org.ancora.IrMapping.DmMapperDispenser;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
+import org.ancora.DMTool.Settings.Settings;
 import org.ancora.DMTool.Shell.System.Transform.OperationListStats;
 import org.ancora.DMTool.Stats.DataProcess;
 import org.ancora.DMTool.Stats.DataProcessDouble;
 import org.ancora.DMTool.Stats.LongTransformDataSingle;
 import org.ancora.DMTool.Stats.LongTransformDataTotal;
 import org.ancora.IntermediateRepresentation.DmTransformDispenser;
-import org.ancora.InstructionBlock.BlockStream;
+import org.ancora.Partitioning.Blocks.BlockStream;
 import org.ancora.InstructionBlock.DmBlockUtils;
 import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.IntermediateRepresentation.MbParser;
@@ -65,7 +66,7 @@ public class Transform implements Executable {
       transf = DmTransformDispenser.getCurrentTransformations();
       writeDot = Boolean.parseBoolean(Options.optionsTable.get(OptionName.ir_writedot));
 
-      input = Options.optionsTable.get(OptionName.general_input);
+      //input = Options.optionsTable.get(OptionName.general_input);
    }
 
 
@@ -92,6 +93,16 @@ public class Transform implements Executable {
          return false;
       }
 
+      // Build list of file extensions
+      java.util.Set<String> supportedExtensions = new HashSet<String>();
+      supportedExtensions.add(blockExtension);
+      supportedExtensions.add(elfExtension);
+      supportedExtensions.add(traceExtension);
+
+      // Get files
+      List<File> inputFiles = Settings.getInputFiles(supportedExtensions);
+
+      /*
       // Get files
       List<File> inputFiles;
       if(file.isFile()) {
@@ -104,6 +115,7 @@ public class Transform implements Executable {
          supportedExtensions.add(traceExtension);
          inputFiles = IoUtils.getFilesRecursive(file, supportedExtensions);
       }
+*/
 
       logger.info("Found "+inputFiles.size()+" files.");
 

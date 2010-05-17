@@ -237,7 +237,8 @@ public class Shell {
       set,
       options,
       transform,
-      extractblocks;
+      extractblocks,
+      tracecoverage;
 /*
       public String helpMessage() {
          switch (this) {
@@ -269,6 +270,8 @@ public class Shell {
                return new Transform();
             case extractblocks:
                return new WriteBlocks();
+            case tracecoverage:
+               return new TraceCoverage();
             default:
                Logger.getLogger(Command.class.getName()).
                        warning("Executable not defined for '" + this.name() + "'");
