@@ -75,4 +75,9 @@ public class MbBasicBlock extends BasicBlock{
     */
    private boolean isDelaySlot;
 
+   @Override
+   protected void resetJumpInstruction() {
+      isDelaySlot = false;
+   }
+
 }
