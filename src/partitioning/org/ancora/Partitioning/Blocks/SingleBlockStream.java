@@ -15,21 +15,41 @@
  *  under the License.
  */
 
-package org.ancora.Partitioning.Tools;
+package org.ancora.Partitioning.Blocks;
+
+import org.ancora.InstructionBlock.InstructionBlock;
 
 /**
+ * Block Stream with a single InstructionBlock.
  *
  * @author Joao Bispo
  */
-public interface BlockWorker {
+public class SingleBlockStream implements BlockStream {
 
-   void setUseGatherer(boolean useGatherer);
+   public SingleBlockStream(InstructionBlock block) {
+      this.block = block;
+      blockUsed = false;
+   }
 
-   void setUseSelector(boolean useSelector);
+   public String getPartitionerName() {
+      return null;
+   }
 
-   void setUseUniqueFilter(boolean useUniqueFilter);
+   public InstructionBlock nextBlock() {
+      if(!blockUsed) {
+         blockUsed = true;
+         return block;
+      }
 
-   void setSelectorRepThreshold(int selectorThreshold);
+      return null;
+   }
 
-   void init();
+   private InstructionBlock block;
+   private boolean blockUsed;
+
+   public long getTotalInstructions() {
+      return block.getTotalInstructions();
+   }
+
+
 }

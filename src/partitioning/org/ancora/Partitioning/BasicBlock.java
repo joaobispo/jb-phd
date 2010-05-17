@@ -58,6 +58,8 @@ public abstract class BasicBlock extends Partitioner {
     */
    protected abstract boolean isJumpInstruction(GenericInstruction instruction);
 
+   protected abstract void resetJumpInstruction();
+
    @Override
    public String getName() {
       return NAME;
@@ -80,6 +82,7 @@ public abstract class BasicBlock extends Partitioner {
    public void flush() {
       completeBasicBlock();
       flushListeners();
+      resetJumpInstruction();
    }
 
    private void completeBasicBlock() {

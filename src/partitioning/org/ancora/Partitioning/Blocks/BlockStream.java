@@ -15,21 +15,24 @@
  *  under the License.
  */
 
-package org.ancora.Partitioning.Tools;
+package org.ancora.Partitioning.Blocks;
+
+import org.ancora.InstructionBlock.InstructionBlock;
 
 /**
+ * Returns InstructionBlocks, until it reaches the end of the stream.
  *
  * @author Joao Bispo
  */
-public interface BlockWorker {
+public interface BlockStream {
 
-   void setUseGatherer(boolean useGatherer);
+   /**
+    * 
+    * @return an instruction block, or null if it has reached the end of stream
+    */
+   InstructionBlock nextBlock();
 
-   void setUseSelector(boolean useSelector);
+   String getPartitionerName();
 
-   void setUseUniqueFilter(boolean useUniqueFilter);
-
-   void setSelectorRepThreshold(int selectorThreshold);
-
-   void init();
+   long getTotalInstructions();
 }
