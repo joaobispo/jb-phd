@@ -18,13 +18,11 @@
 package org.ancora.DMTool.Shell;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
-import org.ancora.DMTool.Shell.Shell.Command;
+import org.ancora.DMTool.Settings.Settings;
 import org.ancora.DMTool.Shell.System.Executable;
 import org.ancora.InstructionBlock.BlockIO;
 import org.ancora.Partitioning.Blocks.BlockStream;
@@ -65,7 +63,7 @@ public class WriteBlocks implements Executable {
        *
        */
 
-
+/*
       // Check file/folder
       File file = new File(arguments.get(0));
       if(!file.exists()) {
@@ -85,6 +83,8 @@ public class WriteBlocks implements Executable {
          supportedExtensions.add(traceExtension);
          inputFiles = IoUtils.getFilesRecursive(file, supportedExtensions);
       }
+      */
+      List<File> inputFiles = Settings.getInputFiles();
 
       Logger.getLogger(WriteBlocks.class.getName()).
               info("Found "+inputFiles.size()+" files.");

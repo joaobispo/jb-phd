@@ -21,6 +21,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Transformation;
+import org.ancora.IntermediateRepresentation.Transformations.RemoveDeadBranches;
 import org.ancora.IntermediateRepresentation.Transformations.ResolveLiteralInputs;
 import org.ancora.IntermediateRepresentation.Transformations.ResolveNeutralInput;
 
@@ -54,6 +55,11 @@ public class TransformStats {
 
       if(t.getClass() == ResolveNeutralInput.class) {
          showStats(((ResolveNeutralInput)t).toString(), ((ResolveNeutralInput)t).getStats());
+         return;
+      }
+
+      if(t.getClass() == RemoveDeadBranches.class) {
+         showStats(((RemoveDeadBranches)t).toString(), ((RemoveDeadBranches)t).getStats());
          return;
       }
 

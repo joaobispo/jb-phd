@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Utils.ShellUtils;
+import org.ancora.IntermediateRepresentation.Transformations.RemoveDeadBranches;
 import org.ancora.IntermediateRepresentation.Transformations.ResolveLiteralInputs;
 import org.ancora.IntermediateRepresentation.Transformations.RemoveInternalLoads;
 import org.ancora.IntermediateRepresentation.Transformations.ResolveNeutralInput;
@@ -69,7 +70,8 @@ public class DmTransformDispenser {
 
       ResolveLiteralInputs("resolve-inputs-lit"),
       ResolveNeutralInputs("resolve-inputs-neutral"),
-      RemoveInternalLoads("remove-loads");
+      RemoveInternalLoads("remove-loads"),
+      RemoveDeadBranches("remove-dead-branches");
 
       private TransformationName(String transformationName) {
          this.transformationName = transformationName;
@@ -93,6 +95,8 @@ public class DmTransformDispenser {
                return new ResolveNeutralInput();
             case RemoveInternalLoads:
                return new RemoveInternalLoads();
+            case RemoveDeadBranches:
+               return new RemoveDeadBranches();
             default:
                Logger.getLogger(DmTransformDispenser.class.getName()).
                        warning("Case not defined: '" + this);

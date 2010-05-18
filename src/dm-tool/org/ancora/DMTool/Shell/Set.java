@@ -76,8 +76,7 @@ public class Set implements Executable {
 
       // Introduce value
       optionsValues.put(optionName, value);
-      System.err.println("Putting option:"+optionName);
-      System.err.println("Value:"+value);
+
       // Special cases
       specialCases(optionName);
 
