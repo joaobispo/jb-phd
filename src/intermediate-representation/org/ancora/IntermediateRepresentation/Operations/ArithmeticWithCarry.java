@@ -363,7 +363,7 @@ public class ArithmeticWithCarry extends Operation {
       if(resolvedOperands != null) {
          return resolvedOperands;
       }
-//Forgot this in commit message
+
       // Check if one is neutral element
       resolvedOperands = resolveNeutral(arithmeticWithCarry);
       if(resolvedOperands != null) {

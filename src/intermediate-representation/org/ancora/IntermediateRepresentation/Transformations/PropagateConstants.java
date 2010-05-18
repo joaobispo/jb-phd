@@ -19,10 +19,8 @@ package org.ancora.IntermediateRepresentation.Transformations;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import org.ancora.IntermediateRepresentation.Operand;
 import org.ancora.IntermediateRepresentation.Operands.Literal;
 import org.ancora.IntermediateRepresentation.Operation;
@@ -31,6 +29,7 @@ import org.ancora.IntermediateRepresentation.Operations.Nop;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Operations.UnconditionalExit;
 import org.ancora.IntermediateRepresentation.Transformation;
+import org.ancora.IntermediateRepresentation.Transformations.Utils.SubstituteTable;
 
 /**
  *
@@ -52,11 +51,11 @@ public class PropagateConstants implements Transformation {
 
 
    public List<Operation> transform(List<Operation> operations) {
-      Map<String, Operand> resolvedOperandsMap = new HashMap<String, Operand>();
-
+      //Map<String, Operand> resolvedOperandsMap = new HashMap<String, Operand>();
+      SubstituteTable resolvedOperandsMap = new SubstituteTable();
       for(int i=0; i<operations.size(); i++) {
          Operation operation = operations.get(i);
-         substituteResolvedOperands(operation, resolvedOperandsMap);
+         //substituteResolvedOperands(operation, resolvedOperandsMap);
 
          // Resolve Operation
          List<Operand> resolvedOperands = resolveOperation(operation);
@@ -65,23 +64,18 @@ public class PropagateConstants implements Transformation {
             continue;
          }
 
-         // Check if list is the same size as outputs of operation
-         int opOutSize = operation.getOutputs().size();
-         int resolvedSize = resolvedOperands.size();
-         if(opOutSize != resolvedSize) {
-            Logger.getLogger(PropagateConstants.class.getName()).
-                    warning("Size of resolved operands ("+resolvedSize+") mismatches " +
-                    "size of output operands ("+opOutSize+") after resolving operation '"+
-                    operation.getType()+"'");
-         }
-
+         
          // Add operands to the table
+         resolvedOperandsMap.updateOutputs(operation, resolvedOperands);
+         /*
          for(int j=0; j<resolvedOperands.size(); j++) {
             //Literal literal = resolvedOperands.get(j);
             Operand resolvedOperand = resolvedOperands.get(j);
             //resolvedOperandsMap.put(operation.getOutputs().get(j).toString(), Literal.getInteger(literal));
             resolvedOperandsMap.put(operation.getOutputs().get(j).toString(), resolvedOperand);
          }
+          *
+          */
          
          // Remove instruction if it has not side-effects
          if(!operation.hasSideEffects()) {
@@ -93,7 +87,7 @@ public class PropagateConstants implements Transformation {
 
       return operations;
    }
-
+/*
    private void substituteResolvedOperands(Operation operation,
            Map<String, Operand> resolvedOperands) {
 
@@ -134,7 +128,7 @@ public class PropagateConstants implements Transformation {
          //}
       }
    }
-
+*/
    /**
     * TODO: Add more transformations
     * @param operation
@@ -169,6 +163,7 @@ public class PropagateConstants implements Transformation {
       return operands;
    }
 
+   /*
    private boolean areImmutable(List<Operand> operands) {
       for(Operand operand : operands) {
          if(operand != null) {
@@ -180,6 +175,8 @@ public class PropagateConstants implements Transformation {
 
       return true;
    }
+    *
+    */
 
    public Map<OperationType, Integer> getStats() {
       return stats;
