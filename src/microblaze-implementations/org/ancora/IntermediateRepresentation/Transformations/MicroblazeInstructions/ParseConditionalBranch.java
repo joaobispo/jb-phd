@@ -17,18 +17,16 @@
 
 package org.ancora.IntermediateRepresentation.Transformations.MicroblazeInstructions;
 
-import java.util.ArrayList;
 import static org.ancora.IntermediateRepresentation.Operations.ConditionalExit.Op.*;
 
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import org.ancora.IntermediateRepresentation.Operation;
 import org.ancora.IntermediateRepresentation.Operations.ConditionalExit;
 import org.ancora.IntermediateRepresentation.Operations.MbOperation;
 import org.ancora.MicroBlaze.InstructionName;
-import org.ancora.MicroBlaze.InstructionProperties;
 import org.ancora.IntermediateRepresentation.MbTransformUtils;
 import org.ancora.IntermediateRepresentation.Transformation;
 
@@ -39,8 +37,6 @@ import org.ancora.IntermediateRepresentation.Transformation;
 public class ParseConditionalBranch implements Transformation {
 
    public List<Operation> transform(List<Operation> operations) {
-      //List<Operation> newList = new ArrayList<Operation>();
-      //List<Operation> newList = new LinkedList<Operation>();
 
       for(int i=0; i<operations.size(); i++) {
         // Check if MicroBlaze Operation
@@ -73,61 +69,13 @@ public class ParseConditionalBranch implements Transformation {
         operations.set(i, cexit);
         //newList.add(cexit);
 
-        // Remove old operation
-        /*
-        System.out.println("before remove:"+operations.size());
-        newList.remove(i);
-        newList.addAll(i, newOperations);
-        // Update i
-        i += newOperations.size() - 1;
-         */
+
       }
 
      return operations;
      //return newList;
    }
-/*
-   private ConditionalExit.Op getCompareOp(InstructionName instructionName) {
-      CexitProperties props = instructionProperties.get(instructionName);
-      if(props == null) {
-         return null;
-      } else {
-         return props.operation;
-      }
-   }
-*/
 
-   /**
-    * Calculates the next address.
-    * TODO: Public Static Candidate
-    *
-    * @param operations
-    * @param i
-    * @return
-    */
-   /*
-   private int calculateNextAddress(List<Operation> operations, int i,
-           InstructionName instructionName) {
-
-      // Usually, the index of the next instruction would be i+1
-      int nextInstructionIndex = i + 1;
-
-      // Check if instruction has delay slot
-      if (InstructionProperties.INSTRUCTIONS_WITH_DELAY_SLOT.contains(instructionName)) {
-         nextInstructionIndex++;
-      }
-
-      if (nextInstructionIndex >= operations.size()) {
-         nextInstructionIndex = 0;
-      }
-
-      return operations.get(nextInstructionIndex).getAddress();
-   }
-    */
-
-
-   
-   
    @Override
    public String toString() {
       return "ParseConditionalBranches";
@@ -138,7 +86,7 @@ public class ParseConditionalBranch implements Transformation {
     */
    private static final Map<InstructionName, ConditionalExit.Op> instructionProperties;
    static {
-      Map<InstructionName, ConditionalExit.Op> aMap = new Hashtable<InstructionName, ConditionalExit.Op>();
+      Map<InstructionName, ConditionalExit.Op> aMap = new EnumMap<InstructionName, ConditionalExit.Op>(InstructionName.class);
 
       aMap.put(InstructionName.beq, equal);
       aMap.put(InstructionName.beqd, equal);
@@ -173,34 +121,5 @@ public class ParseConditionalBranch implements Transformation {
 
       instructionProperties = Collections.unmodifiableMap(aMap);
    }
-
-
-
-
-
-   
-
-   /**
-    * INNER CLASS
-    */
-   /*
-   static class CexitProperties {
-
-      public CexitProperties(ConditionalExit.Op operation, boolean hasDelaySlot) {
-         this.operation = operation;
-         this.hasDelaySlot = hasDelaySlot;
-      }
-
-
-*/
-      /**
-       * INSTANCE VARIABLES
-       */
-   /*
-      private ConditionalExit.Op operation;
-      private boolean hasDelaySlot;
-   }
-    */
-
 
 }

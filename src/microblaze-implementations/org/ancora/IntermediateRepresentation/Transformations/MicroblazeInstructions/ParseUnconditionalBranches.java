@@ -17,9 +17,8 @@
 
 package org.ancora.IntermediateRepresentation.Transformations.MicroblazeInstructions;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -28,7 +27,6 @@ import org.ancora.IntermediateRepresentation.Operands.Literal;
 import org.ancora.IntermediateRepresentation.Operation;
 import org.ancora.IntermediateRepresentation.Operations.MbOperation;
 import org.ancora.IntermediateRepresentation.Operations.MockOperation;
-import org.ancora.IntermediateRepresentation.Operations.Nop;
 import org.ancora.IntermediateRepresentation.Operations.UnconditionalExit;
 import org.ancora.MicroBlaze.InstructionName;
 import org.ancora.MicroBlaze.Definitions;
@@ -44,12 +42,12 @@ public class ParseUnconditionalBranches implements Transformation {
 
    public List<Operation> transform(List<Operation> operations) {
       //List<Operation> newList = new ArrayList<Operation>();
-      Map<String, Integer> literalRegisters = new Hashtable<String, Integer>();
+      //Map<String, Integer> literalRegisters = new Hashtable<String, Integer>();
 
       for(int i=0; i<operations.size(); i++) {
          Operation operation = operations.get(i);
          //System.out.println("Address:"+operation.getAddress());
-         substituteRegisterForLiterals(operation, literalRegisters);
+//         substituteRegisterForLiterals(operation, literalRegisters);
 
         // Check if MicroBlaze Operation
         MbOperation branchOp = MbOperation.getMbOperation(operation);
@@ -92,11 +90,16 @@ public class ParseUnconditionalBranches implements Transformation {
 
         // Get input 1
         Operand input1 = branchOp.getInputs().get(0).copy();
+        Operand output1 = null;
+
         if(unconditionalProperties.performsLinking) {
            //input1 = branchOp.getInputs().get(1);
             // Update table
-           literalRegisters.put(branchOp.getOutputs().get(0).toString(), branchOp.getAddress());
-        //} else {
+
+           //literalRegisters.put(branchOp.getOutputs().get(0).toString(), branchOp.getAddress());
+           output1 = branchOp.getOutputs().get(0).copy();
+
+           //} else {
            //input1 = branchOp.getInputs().get(0);
         }
 
@@ -123,7 +126,7 @@ public class ParseUnconditionalBranches implements Transformation {
 
         // Create UnconditionalExit operation
         UnconditionalExit newOperation = new UnconditionalExit(branchOp.getAddress(),
-                baseAddress, nextSupposedAddress, delaySlots, input1);
+                baseAddress, nextSupposedAddress, delaySlots, input1, output1);
 
         operations.set(i, newOperation);
         //newList.add(newOperation);
@@ -227,7 +230,7 @@ public class ParseUnconditionalBranches implements Transformation {
 
    private static final Map<InstructionName, UnconditionalProperties> instructionProperties;
    static {
-      Map<InstructionName, UnconditionalProperties> aMap = new Hashtable<InstructionName, UnconditionalProperties>();
+      Map<InstructionName, UnconditionalProperties> aMap = new EnumMap<InstructionName, UnconditionalProperties>(InstructionName.class);
 
       aMap.put(InstructionName.br, new UnconditionalProperties(false, false));
       aMap.put(InstructionName.bra, new UnconditionalProperties(true, false));

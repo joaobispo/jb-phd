@@ -18,7 +18,7 @@
 package org.ancora.IntermediateRepresentation.Transformations.MicroblazeInstructions;
 
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import org.ancora.IntermediateRepresentation.Operand;
@@ -67,7 +67,7 @@ public class ParseReturnSubroutine implements Transformation {
          int delaySlots = 1;
 
          Operation newOperation = new UnconditionalExit(rstdOp.getAddress(),
-                 baseAddress, supposedJumpAddress, delaySlots, input1);
+                 baseAddress, supposedJumpAddress, delaySlots, input1, null);
 
         // Replace old operation
         operations.set(i, newOperation);
@@ -81,7 +81,7 @@ public class ParseReturnSubroutine implements Transformation {
     */
       private static final Map<InstructionName, Integer> instructionProperties;
    static {
-      Map<InstructionName, Integer> aMap = new Hashtable<InstructionName, Integer>();
+      Map<InstructionName, Integer> aMap = new EnumMap<InstructionName, Integer>(InstructionName.class);
 
       aMap.put(InstructionName.sext8, 8);
       aMap.put(InstructionName.sext16, 16);

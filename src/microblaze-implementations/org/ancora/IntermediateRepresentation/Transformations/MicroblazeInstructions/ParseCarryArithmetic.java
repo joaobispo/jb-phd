@@ -135,57 +135,6 @@ public class ParseCarryArithmetic implements Transformation {
       instructionProperties = Collections.unmodifiableMap(aMap);
    }
 
-   // Definitions
-   /*
-   EnumSet<InstructionName> addInstructions = EnumSet.of(
-           InstructionName.add,
-           InstructionName.addc,
-           InstructionName.addi,
-           InstructionName.addic,
-           InstructionName.addik,
-           InstructionName.addikc,
-           InstructionName.addk,
-           InstructionName.addkc);
-
-   EnumSet<InstructionName> subInstructions = EnumSet.of(
-           InstructionName.rsub,
-           InstructionName.rsubc,
-           InstructionName.rsubi,
-           InstructionName.rsubic,
-           InstructionName.rsubik,
-           InstructionName.rsubikc,
-           InstructionName.rsubk,
-           InstructionName.rsubkc);
-
-    private static final EnumSet<InstructionName> hasCarryOut = EnumSet.of(
-           InstructionName.add,
-           InstructionName.addc,
-           InstructionName.addi,
-           InstructionName.addic,
-           InstructionName.rsub,
-           InstructionName.rsubc,
-           InstructionName.rsubi,
-           InstructionName.rsubic);
-
-   private static final EnumSet<InstructionName> hasCarryIn = EnumSet.of(
-           InstructionName.addc,
-           InstructionName.addkc,
-           InstructionName.addic,
-           InstructionName.addikc,
-           InstructionName.rsubc,
-           InstructionName.rsubkc,
-           InstructionName.rsubic,
-           InstructionName.rsubikc
-           );
-    */
-
-   /*
-   private boolean isArithmeticWithCarry(InstructionName instructionName) {
-      return addInstructions.contains(instructionName)
-              || subInstructions.contains(instructionName);
-   }
-    */
-
    /**
     *
     * @param instructionName
@@ -200,17 +149,6 @@ public class ParseCarryArithmetic implements Transformation {
       } else {
          return props.operation;
       }
-
-      /*
-      if(addInstructions.contains(instructionName)) {
-         return ArithmeticWithCarry.Op.add;
-      }
-
-      if(subInstructions.contains(instructionName)) {
-         return ArithmeticWithCarry.Op.rsub;
-      }
-       */
-
    }
 
    private Operand getCarryIn(InstructionName instructionName) {
