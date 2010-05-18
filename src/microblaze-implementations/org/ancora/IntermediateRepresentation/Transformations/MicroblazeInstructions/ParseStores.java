@@ -18,7 +18,7 @@
 package org.ancora.IntermediateRepresentation.Transformations.MicroblazeInstructions;
 
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import org.ancora.IntermediateRepresentation.Operand;
@@ -80,7 +80,7 @@ public class ParseStores implements Transformation {
     */
    private static final Map<InstructionName, Integer> instructionProperties;
    static {
-      Map<InstructionName, Integer> aMap = new Hashtable<InstructionName, Integer>();
+      Map<InstructionName, Integer> aMap = new EnumMap<InstructionName, Integer>(InstructionName.class);
 
       aMap.put(InstructionName.sb, 1);
       aMap.put(InstructionName.sbi, 1);
