@@ -45,6 +45,7 @@ public class TransformRegistersToInternalData implements Transformation {
 
             String registerName = input.toString();
             Operand newOperand = new InternalData(registerName, input.getBits());
+            newOperand.setPrefix(input.getPrefix());
             inputs.set(j, newOperand);
          }
 

@@ -62,6 +62,9 @@ public class ParseLoads implements Transformation {
         Operand input2 = operation.getInputs().get(1).copy();
         Operand output = operation.getOutputs().get(0).copy();
 
+        input1.setPrefix("base-");
+        input2.setPrefix("offset-");
+        
         MemoryLoad newOp = new MemoryLoad(loadOp.getAddress(), input1, input2,
                 output, bytes);
 

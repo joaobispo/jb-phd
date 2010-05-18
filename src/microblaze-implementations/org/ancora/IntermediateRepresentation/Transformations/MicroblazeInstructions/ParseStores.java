@@ -62,6 +62,10 @@ public class ParseStores implements Transformation {
         Operand input2 = operation.getInputs().get(1).copy();
         Operand input3 = operation.getInputs().get(2).copy();
 
+        input1.setPrefix("value-");
+        input2.setPrefix("base-");
+        input3.setPrefix("offset-");
+
         MemoryStore newOp = new MemoryStore(storeOp.getAddress(), input1, input2,
                 input3, bytes);
 

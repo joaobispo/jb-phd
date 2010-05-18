@@ -106,8 +106,10 @@ public class TransformImmToLiterals implements Transformation {
          return null;
       }
 
-      return new Literal(Literal.LiteralType.integer, String.valueOf(immValue),
+      Literal newLiteral = new Literal(Literal.LiteralType.integer, String.valueOf(immValue),
               operand.getBits());
+      newLiteral.setPrefix(operand.getPrefix());
+      return newLiteral;
    }
 
 /*
