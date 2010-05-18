@@ -24,8 +24,9 @@ import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Utils.ShellUtils;
-import org.ancora.IntermediateRepresentation.Transformations.PropagateConstants;
+import org.ancora.IntermediateRepresentation.Transformations.ResolveLiteralInputs;
 import org.ancora.IntermediateRepresentation.Transformations.RemoveInternalLoads;
+import org.ancora.IntermediateRepresentation.Transformations.ResolveNeutralInput;
 import org.ancora.Shared.EnumUtilsAppend;
 
 /**
@@ -66,7 +67,8 @@ public class DmTransformDispenser {
     */
    public static enum TransformationName {
 
-      PropagateConstants("constant-propagation"),
+      ResolveLiteralInputs("resolve-inputs-lit"),
+      ResolveNeutralInputs("resolve-inputs-neutral"),
       RemoveInternalLoads("remove-loads");
 
       private TransformationName(String transformationName) {
@@ -85,8 +87,10 @@ public class DmTransformDispenser {
 
       public Transformation getTransformation() {
          switch (this) {
-            case PropagateConstants:
-               return new PropagateConstants();
+            case ResolveLiteralInputs:
+               return new ResolveLiteralInputs();
+            case ResolveNeutralInputs:
+               return new ResolveNeutralInput();
             case RemoveInternalLoads:
                return new RemoveInternalLoads();
             default:

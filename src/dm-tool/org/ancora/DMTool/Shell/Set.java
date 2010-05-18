@@ -67,7 +67,7 @@ public class Set implements Executable {
       if(args.size() > 2) {
          StringBuilder builder = new StringBuilder();
          builder.append(value);
-         for(int i=1; i<args.size(); i++) {
+         for(int i=2; i<args.size(); i++) {
             builder.append(ShellUtils.COMMAND_SEPARATOR);
             builder.append(args.get(i));
          }
@@ -76,7 +76,8 @@ public class Set implements Executable {
 
       // Introduce value
       optionsValues.put(optionName, value);
-
+      System.err.println("Putting option:"+optionName);
+      System.err.println("Value:"+value);
       // Special cases
       specialCases(optionName);
 

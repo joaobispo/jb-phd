@@ -21,7 +21,8 @@ import java.util.EnumMap;
 import java.util.Map;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Transformation;
-import org.ancora.IntermediateRepresentation.Transformations.PropagateConstants;
+import org.ancora.IntermediateRepresentation.Transformations.ResolveLiteralInputs;
+import org.ancora.IntermediateRepresentation.Transformations.ResolveNeutralInput;
 
 /**
  *
@@ -46,15 +47,33 @@ public class TransformStats {
 
    public void showStats(Transformation t) {
      // Check classes
-      if(t.getClass() == PropagateConstants.class) {
-         showPropagateConstants((PropagateConstants)t);
+      if(t.getClass() == ResolveLiteralInputs.class) {
+         showStats(((ResolveLiteralInputs)t).toString(), ((ResolveLiteralInputs)t).getStats());
          return;
       }
+
+      if(t.getClass() == ResolveNeutralInput.class) {
+         showStats(((ResolveNeutralInput)t).toString(), ((ResolveNeutralInput)t).getStats());
+         return;
+      }
+
+
    }
 
-   private void showPropagateConstants(PropagateConstants propagateConstants) {
-      System.err.println("Constant Propagation Transformation:");
+   /*
+   private void showTransfWithStats(ResolveLiteralInputs propagateConstants) {
+      System.err.println("'"+propagateConstants.toString()+"' Transformation:");
       System.err.println(propagateConstants.getStats());
+   }
+
+   private void showStats(Map<OperationType, Integer> stats) {
+      throw new UnsupportedOperationException("Not yet implemented");
+   }
+   */
+
+   private void showStats(String transformName, Map<OperationType, Integer> stats) {
+      System.err.println("Transformation '"+transformName+"':");
+      System.err.println(stats);
    }
 
    /**

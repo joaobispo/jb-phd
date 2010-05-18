@@ -234,9 +234,9 @@ public class Transform implements Executable {
       }
 
       // Collect transformation stats
-                  for(Transformation t : transf) {
-                     transformStats.showStats(t);
-            }
+      for (Transformation t : transf) {
+         transformStats.showStats(t);
+      }
 
       //showStatsAverage(statsAfter.size(), OperationListStats.calcAverage("Avg Before", statsBefore), OperationListStats.calcAverage("Avg After", statsAfter));
       //System.out.println("\nProcessed "+totalInstructions+" instructions.");
