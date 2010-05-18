@@ -35,9 +35,9 @@ import org.ancora.IntermediateRepresentation.Transformations.Utils.SubstituteTab
  *
  * @author Joao Bispo
  */
-public class PropagateConstants implements Transformation {
+public class ResolveLiteralInputs implements Transformation {
 
-   public PropagateConstants() {
+   public ResolveLiteralInputs() {
       stats = new EnumMap<OperationType, Integer>(OperationType.class);
    }
 
@@ -45,37 +45,25 @@ public class PropagateConstants implements Transformation {
 
    @Override
    public String toString() {
-      return "Propagate Constants";
+      return "Resolve Literal Inputs";
    }
 
 
 
    public List<Operation> transform(List<Operation> operations) {
-      //Map<String, Operand> resolvedOperandsMap = new HashMap<String, Operand>();
       SubstituteTable resolvedOperandsMap = new SubstituteTable();
       for(int i=0; i<operations.size(); i++) {
          Operation operation = operations.get(i);
-         //substituteResolvedOperands(operation, resolvedOperandsMap);
-
+         resolvedOperandsMap.processOperation(operation);
          // Resolve Operation
          List<Operand> resolvedOperands = resolveOperation(operation);
 
          if(resolvedOperands == null) {
             continue;
          }
-
          
          // Add operands to the table
          resolvedOperandsMap.updateOutputs(operation, resolvedOperands);
-         /*
-         for(int j=0; j<resolvedOperands.size(); j++) {
-            //Literal literal = resolvedOperands.get(j);
-            Operand resolvedOperand = resolvedOperands.get(j);
-            //resolvedOperandsMap.put(operation.getOutputs().get(j).toString(), Literal.getInteger(literal));
-            resolvedOperandsMap.put(operation.getOutputs().get(j).toString(), resolvedOperand);
-         }
-          *
-          */
          
          // Remove instruction if it has not side-effects
          if(!operation.hasSideEffects()) {
@@ -87,48 +75,7 @@ public class PropagateConstants implements Transformation {
 
       return operations;
    }
-/*
-   private void substituteResolvedOperands(Operation operation,
-           Map<String, Operand> resolvedOperands) {
 
-      // Check inputs, if an input matches an element from the table,
-      //substitute it for a literal
-      List<Operand> operands = operation.getInputs();
-      for(int i=0; i<operands.size(); i++) {
-         //Integer literalValue = resolvedOperands.get(operands.get(i).toString());
-         Operand resolvedOperand = resolvedOperands.get(operands.get(i).toString());
-         //if(literalValue != null) {
-         if(resolvedOperand == null) {
-            continue;
-         }
-
-//         int bits = operands.get(i).getBits();
-//         Literal newLiteral = new Literal(Literal.LiteralType.integer,
-//                 literalValue.toString(), bits);
-
-         operation.replaceInput(i, resolvedOperand.copy());
-         
-      }
-
-      // Check if outputs matches an element from the table. In that case,
-      // remove element from the table.
-      List<Operand> outputs = operation.getOutputs();
-      for(int i=0; i<outputs.size(); i++) {
-
-         String key = outputs.get(i).toString();
-         // TODO: CHOICE, REMOVE OR INSERT NULL?
-         resolvedOperands.remove(key);
-         //resolvedOperands.put(key, null);
-
-         //Integer literalValue = resolvedOperands.get(key);
-         
-         //if(literalValue != null) {
-         //   Integer previousValue = resolvedOperands.remove(key);
-            //System.out.println("Removed key '"+key+"' with value "+previousValue+".");
-         //}
-      }
-   }
-*/
    /**
     * TODO: Add more transformations
     * @param operation
@@ -137,8 +84,10 @@ public class PropagateConstants implements Transformation {
    private List<Operand> resolveOperation(Operation operation) {
       switch((OperationType)operation.getType()) {
          case IntegerArithmeticWithCarry:
+            return ((ArithmeticWithCarry)operation).resolveLiterals();
             //return resolveIntegerArithmeticWithCarry((ArithmeticWithCarry)operation);
-            return ArithmeticWithCarry.resolve((ArithmeticWithCarry)operation);
+            //return ArithmeticWithCarry.resolve((ArithmeticWithCarry)operation);
+            //return ArithmeticWithCarry.resolveNeutral((ArithmeticWithCarry)operation);
          case UnconditionalExit:
             return resolveUnconditionalExit((UnconditionalExit)operation);
          default:
@@ -163,26 +112,9 @@ public class PropagateConstants implements Transformation {
       return operands;
    }
 
-   /*
-   private boolean areImmutable(List<Operand> operands) {
-      for(Operand operand : operands) {
-         if(operand != null) {
-            if(!operand.isImmutable()) {
-               return false;
-            }
-         }
-      }
-
-      return true;
-   }
-    *
-    */
-
    public Map<OperationType, Integer> getStats() {
       return stats;
    }
-
-
 
    private void updateStats(Operation operation) {
       // Add operation to table

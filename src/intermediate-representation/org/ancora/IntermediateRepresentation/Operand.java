@@ -30,6 +30,7 @@ public abstract class Operand {
    public Operand() {
       producer = null;
       consumers = new ArrayList<Operation>();
+      prefix = "";
    }
 
 
@@ -122,6 +123,16 @@ public abstract class Operand {
       this.producer = producer;
    }
 
+   public void setPrefix(String prefix) {
+      this.prefix = prefix;
+   }
+
+   public String getPrefix() {
+      return prefix;
+   }
+
+   
+
    /**
     * Adds this object as a parameter of the given parameter.
     *
@@ -190,6 +201,7 @@ public abstract class Operand {
    private Operation producer;
    private List<Operation> consumers;
 
+   protected String prefix;
 
 
 

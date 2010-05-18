@@ -17,8 +17,10 @@
 
 package org.ancora.IntermediateRepresentation.Operations;
 
+import java.util.logging.Logger;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Operand;
+import org.ancora.IntermediateRepresentation.Operands.Literal;
 import org.ancora.IntermediateRepresentation.Operation;
 
 /**
@@ -99,7 +101,27 @@ public class UnconditionalExit extends Operation {
       return delaySlots;
    }
 
-   
+   public boolean isDeadBranch() {
+      Integer input1Value = Literal.getInteger(getInput1());
+
+      if (input1Value == null) {
+         return false;
+      }
+
+      // Confirm that next address is block is correct
+      int calculatedJump = baseAddress + input1Value;
+      boolean isDeadBranch = supposedJumpAddress == calculatedJump;
+      if (!isDeadBranch) {
+         Logger.getLogger(UnconditionalExit.class.getName()).
+                 warning("Unconditional exit mismatch: Calculated jump address "
+                 + "(" + calculatedJump + ") different from next trace address ("
+                 + supposedJumpAddress + ")");
+         return false;
+      }
+
+      return true;
+   }
+
 
 
    /**
@@ -108,5 +130,5 @@ public class UnconditionalExit extends Operation {
    private int baseAddress;
    private int supposedJumpAddress;
    private int delaySlots;
-   //private Operand input1;
+
 }

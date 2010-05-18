@@ -354,6 +354,7 @@ public class ArithmeticWithCarry extends Operation {
         return carryOut;
     }
 
+    /*
     public static List<Operand> resolve(ArithmeticWithCarry arithmeticWithCarry) {
       //List<Literal> literals = new ArrayList<Literal>();
       List<Operand> resolvedOperands = new ArrayList<Operand>();
@@ -374,10 +375,17 @@ public class ArithmeticWithCarry extends Operation {
       return null;
 
    }
-
-   private static List<Operand> resolveLiterals(ArithmeticWithCarry arithmeticWithCarry) {
+*/
+  
+    /**
+     * 
+     * @param arithmeticWithCarry
+     * @return the resolved outputs of this operation, if it can be resolved, or
+     * null if it can't.
+     */
+    public List<Operand> resolveLiterals() {
       // Calculate value
-      Integer resultValue = arithmeticWithCarry.resolveOutput();
+      Integer resultValue = resolveOutput();
       if (resultValue == null) {
          return null;
       }
@@ -385,43 +393,56 @@ public class ArithmeticWithCarry extends Operation {
       List<Operand> resultOperands = new ArrayList<Operand>();
 
       Literal resultLiteral = new Literal(Literal.LiteralType.integer,
-              resultValue.toString(), arithmeticWithCarry.getOutput().getBits());
+              resultValue.toString(), getOutput().getBits());
 
       resultOperands.add(resultLiteral);
 
 
       // Check if it has carry out
-      Integer carryOutValue = arithmeticWithCarry.resolveCarryOut();
+      Integer carryOutValue = resolveCarryOut();
       if (carryOutValue == null) {
          return resultOperands;
       }
 
       Literal resultCarry = new Literal(Literal.LiteralType.integer,
-              carryOutValue.toString(), arithmeticWithCarry.getCarryOut().getBits());
+              carryOutValue.toString(), getCarryOut().getBits());
 
       resultOperands.add(resultCarry);
 
       return resultOperands;
    }
 
-
-   private static List<Operand> resolveNeutral(ArithmeticWithCarry arithmeticWithCarry) {
+   /**
+    *
+    * @param arithmeticWithCarry
+    * @return the resolved outputs of this operation, if it can be resolved, or
+    * null if it can't.
+    */
+   public List<Operand> resolveNeutralInput() {
       // Check if it is addition
-      if (arithmeticWithCarry.operation != Op.add) {
+      if (operation != Op.add) {
          return null;
       }
 
       // Check if one of the inputs is zero, and get the corresponding operand
       //if it has carry in, if it is zero.
-      Operand nonNeutralOperand = getNonNeutralOperand(arithmeticWithCarry);
+      Operand nonNeutralOperand = getNonNeutralOperand();
       if (nonNeutralOperand == null) {
          return null;
       }
 
+      /*
+      if (arithmeticWithCarry.operation != Op.add) {
+         System.err.println("SubOperation with zero:");
+         System.err.println(arithmeticWithCarry.operation.toString());
+         return null;
+      }
+       *
+       */
 
       // Check if it has carry in, and if carry is neutral
-      if (arithmeticWithCarry.hasCarryIn) {
-         Integer carryInValue = Literal.getInteger(arithmeticWithCarry.getCarryIn());
+      if (hasCarryIn) {
+         Integer carryInValue = Literal.getInteger(getCarryIn());
          // Value of carry in is not known
          if (carryInValue == null) {
             return null;
@@ -436,9 +457,9 @@ public class ArithmeticWithCarry extends Operation {
       resultOperands.add(nonNeutralOperand);
 
       // Check if there is a carry out
-      if (arithmeticWithCarry.hasCarryOut) {
+      if (hasCarryOut) {
          // Use literal 0 instead of carry out
-         int bits = arithmeticWithCarry.getCarryOut().getBits();
+         int bits = getCarryOut().getBits();
          resultOperands.add(new Literal(Literal.LiteralType.integer, "0", bits));
       }
 
@@ -447,9 +468,9 @@ public class ArithmeticWithCarry extends Operation {
 
    }
 
-      private static Operand getNonNeutralOperand(ArithmeticWithCarry op) {
-      Operand in1 = op.getInput1();
-      Operand in2 = op.getInput2();
+      private Operand getNonNeutralOperand() {
+      Operand in1 = getInput1();
+      Operand in2 = getInput2();
 
       // Check if first is Literal and second is Operand
       boolean LD = in1.getType() == OperandType.literal

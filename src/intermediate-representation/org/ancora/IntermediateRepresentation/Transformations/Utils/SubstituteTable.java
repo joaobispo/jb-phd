@@ -53,6 +53,7 @@ public class SubstituteTable {
          }
 
          // Replace operand, if found.
+         //System.err.println("Replaced Operand: "+operation.getInputs().get(i)+" for "+resolvedOperand);
          operation.replaceInput(i, resolvedOperand.copy());
       }
 

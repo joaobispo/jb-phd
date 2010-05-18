@@ -57,7 +57,9 @@ public class InternalData extends Operand  {
 
    @Override
    public InternalData copy() {
-      return new InternalData(name, bits);
+      InternalData newData = new InternalData(name, bits);
+      newData.setPrefix(prefix);
+      return newData;
    }
 
    @Override

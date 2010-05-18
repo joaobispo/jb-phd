@@ -58,7 +58,9 @@ public class Literal extends Operand {
 
    @Override
    public Operand copy() {
-      return new Literal(literalType, value, bits);
+      Literal newLiteral = new Literal(literalType, value, bits);
+      newLiteral.setPrefix(prefix);
+      return newLiteral;
    }
 
    @Override
