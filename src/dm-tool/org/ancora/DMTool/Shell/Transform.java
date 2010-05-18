@@ -19,8 +19,10 @@ package org.ancora.DMTool.Shell;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import org.ancora.DMTool.Shell.System.Executable;
 import org.ancora.IrMapping.DmMapperDispenser;
@@ -32,6 +34,7 @@ import org.ancora.DMTool.Stats.DataProcess;
 import org.ancora.DMTool.Stats.DataProcessDouble;
 import org.ancora.DMTool.Stats.LongTransformDataSingle;
 import org.ancora.DMTool.Stats.LongTransformDataTotal;
+import org.ancora.DMTool.Stats.Transform.TransformStats;
 import org.ancora.IntermediateRepresentation.DmTransformDispenser;
 import org.ancora.Partitioning.Blocks.BlockStream;
 import org.ancora.InstructionBlock.DmBlockUtils;
@@ -40,6 +43,7 @@ import org.ancora.IntermediateRepresentation.MbParser;
 import org.ancora.IrMapping.Tools.Dotty;
 import org.ancora.IrMapping.Mapper;
 import org.ancora.IntermediateRepresentation.Operation;
+import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.SharedLibrary.IoUtils;
 import org.ancora.SharedLibrary.ParseUtils;
 import org.ancora.IntermediateRepresentation.Transformation;
@@ -54,7 +58,7 @@ public class Transform implements Executable {
    public Transform() {
       logger = Logger.getLogger(Transform.class.getName());
 
-
+     transformStats = new TransformStats();
 
    }
 
@@ -66,7 +70,7 @@ public class Transform implements Executable {
       transf = DmTransformDispenser.getCurrentTransformations();
       writeDot = Boolean.parseBoolean(Options.optionsTable.get(OptionName.ir_writedot));
 
-      //input = Options.optionsTable.get(OptionName.general_input);
+      input = Options.optionsTable.get(OptionName.general_input);
    }
 
 
@@ -132,6 +136,9 @@ public class Transform implements Executable {
       LongTransformDataTotal totalAfter = new LongTransformDataTotal();
       //long totalInstructions = 0;
 
+      long totalProcessedOperations = 0l;
+      long totalNops = 0l;
+
       for(File file : inputFiles) {
          logger.info("Processing file '"+file.getName()+"'...");
          String baseFilename = ParseUtils.removeSuffix(file.getName(), IoUtils.DEFAULT_EXTENSION_SEPARATOR);
@@ -142,8 +149,6 @@ public class Transform implements Executable {
          // Start counter
          int counter = 0;
          while(block != null) {
-            //totalInstructions+=block.getInstructions().size();
-            
              String blockName = baseFilename+"-"+counter;
 //            logger.info("Block "+counter+", "+block.getRepetitions()+" repetitions.");
 
@@ -175,19 +180,6 @@ public class Transform implements Executable {
             if(writeDot) {
                File dotFile = DmDottyUtils.getDottyFile(baseFilename, blockName+"-before");
                DmDottyUtils.writeDot(operations, dotFile);
-               /*
-                String outputFolder = Options.optionsTable.get(OptionName.general_outputfolder)
-                       + "/dot/" + baseFilename;
-               File folder = IoUtils.safeFolder(outputFolder);
-               //File folder = IoUtils.safeFolder("dot/"+baseFilename);
-               String extension = IoUtils.DEFAULT_EXTENSION_SEPARATOR +
-                       Options.optionsTable.get(OptionName.extension_dot);
-               
-               //String filename = baseFilename + "-" + counter + "-before.dot";
-               String filename = baseFilename + "-" + counter + "-before"+extension;
-               writeDot(operations, new File(folder, filename));
-                * 
-                */
             }
 
 
@@ -196,10 +188,16 @@ public class Transform implements Executable {
             for(Transformation t : transf) {
                // Show transformations
 //               System.out.println("Transformation:"+t);
-               //operations = t.transform(operations);
                t.transform(operations);
             }
 
+            // Operation Stats
+            totalProcessedOperations += operations.size();
+            for(Operation operation : operations) {
+               if(operation.getType() == OperationType.Nop) {
+                  totalNops++;
+               }
+            }
 
             // Map
             mapper.reset();
@@ -228,17 +226,6 @@ public class Transform implements Executable {
             if(writeDot) {
                File dotFile = DmDottyUtils.getDottyFile(baseFilename, blockName+"-after");
                DmDottyUtils.writeDot(operations, dotFile);
-               /*
-               String outputFolder = Options.optionsTable.get(OptionName.general_outputfolder)
-                       + "/dot/" + baseFilename;
-               File folder = IoUtils.safeFolder(outputFolder);
-               //File folder = IoUtils.safeFolder("dot/"+baseFilename);
-               String extension = IoUtils.DEFAULT_EXTENSION_SEPARATOR +
-                       Options.optionsTable.get(OptionName.extension_dot);
-               //String filename = baseFilename + "-" + counter + "-after.dot";
-               String filename = blockName + "-after"+extension;
-               writeDot(operations, new File(folder, filename));
-                */
             }
             // Increment counter
             counter++;
@@ -246,12 +233,19 @@ public class Transform implements Executable {
          }
       }
 
+      // Collect transformation stats
+                  for(Transformation t : transf) {
+                     transformStats.showStats(t);
+            }
+
       //showStatsAverage(statsAfter.size(), OperationListStats.calcAverage("Avg Before", statsBefore), OperationListStats.calcAverage("Avg After", statsAfter));
       //System.out.println("\nProcessed "+totalInstructions+" instructions.");
-      System.out.println("\nTotals, analysed "+totalAfter.getDataCounter()+" blocks.");
+      System.err.println("\nTotals, analysed "+totalAfter.getDataCounter()+" blocks.");
       DataProcess.showTransformDataChanges(totalBefore.getTotalData(), totalAfter.getTotalData());
-      System.out.println("\nAverage per block:");
+      System.err.println("\nAverage per block:");
       DataProcessDouble.showTransformDataChanges(totalBefore.getAverageData(), totalAfter.getAverageData());
+
+      System.err.println("\nInserted NOPs:"+totalNops +"("+(double)totalNops/(double)totalProcessedOperations+")");
    }
 
 
@@ -380,6 +374,10 @@ public class Transform implements Executable {
       IoUtils.write(dotFile, Dotty.generateDot(ops));
    }
 
+   private void collectStats(Transformation t) {
+      throw new UnsupportedOperationException("Not yet implemented");
+   }
+
    /**
     * INSTANCE VARIABLES
     */
@@ -392,6 +390,9 @@ public class Transform implements Executable {
    //private Transformation[] transf;
    private List<Transformation> transf;
    private boolean writeDot;
+
+   // STATS
+   private TransformStats transformStats;
 
 
 

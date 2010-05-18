@@ -75,15 +75,15 @@ public class DataProcess {
          if (!before[i].equals(after[i])) {
             noChanges = false;
             BigDecimal ratio = (new BigDecimal(after[i])).divide(new BigDecimal(before[i]), MathContext.DECIMAL32);
-            System.out.println(param[i]+":"+before[i]+"->"+after[i]+" ("+ratio+");");
+            System.err.println(param[i]+":"+before[i]+"->"+after[i]+" ("+ratio+");");
             changeCounter++;
          }
       }
 
       if(noChanges) {
-         System.out.println("None");
+         System.err.println("None");
       } else {
-         System.out.println("Changes in "+changeCounter+" parameters out of "+param.length+".");
+         System.err.println("Changes in "+changeCounter+" parameters out of "+param.length+".");
       }
    }
 
