@@ -67,7 +67,8 @@ public class ConditionalExit extends Operation {
 
    @Override
    public boolean hasSideEffects() {
-      return false;
+      return true;
+      //return false;
    }
 
    @Override

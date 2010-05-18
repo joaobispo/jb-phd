@@ -18,15 +18,18 @@
 package org.ancora.IntermediateRepresentation.Transformations;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import org.ancora.IntermediateRepresentation.Operand;
 import org.ancora.IntermediateRepresentation.Operands.Literal;
 import org.ancora.IntermediateRepresentation.Operation;
 import org.ancora.IntermediateRepresentation.Operations.ArithmeticWithCarry;
 import org.ancora.IntermediateRepresentation.Operations.Nop;
 import org.ancora.IntermediateRepresentation.OperationType;
+import org.ancora.IntermediateRepresentation.Operations.UnconditionalExit;
 import org.ancora.IntermediateRepresentation.Transformation;
 
 /**
@@ -34,6 +37,12 @@ import org.ancora.IntermediateRepresentation.Transformation;
  * @author Joao Bispo
  */
 public class PropagateConstants implements Transformation {
+
+   public PropagateConstants() {
+      stats = new EnumMap<OperationType, Integer>(OperationType.class);
+   }
+
+
 
    @Override
    public String toString() {
@@ -43,51 +52,68 @@ public class PropagateConstants implements Transformation {
 
 
    public List<Operation> transform(List<Operation> operations) {
-      Map<String, Integer> literalRegisters = new Hashtable<String, Integer>();
+      Map<String, Operand> resolvedOperandsMap = new HashMap<String, Operand>();
 
       for(int i=0; i<operations.size(); i++) {
          Operation operation = operations.get(i);
-         substituteRegisterForLiterals(operation, literalRegisters);
+         substituteResolvedOperands(operation, resolvedOperandsMap);
 
          // Resolve Operation
-         List<Literal> outputs = resolveOperation(operation);
+         List<Operand> resolvedOperands = resolveOperation(operation);
 
-         if(outputs == null) {
+         if(resolvedOperands == null) {
             continue;
          }
 
-         // Add literals to the table
-         for(int j=0; j<outputs.size(); j++) {
-            Literal literal = outputs.get(j);
-            literalRegisters.put(operation.getOutputs().get(j).toString(), Literal.getInteger(literal));
+         // Check if list is the same size as outputs of operation
+         int opOutSize = operation.getOutputs().size();
+         int resolvedSize = resolvedOperands.size();
+         if(opOutSize != resolvedSize) {
+            Logger.getLogger(PropagateConstants.class.getName()).
+                    warning("Size of resolved operands ("+resolvedSize+") mismatches " +
+                    "size of output operands ("+opOutSize+") after resolving operation '"+
+                    operation.getType()+"'");
          }
 
+         // Add operands to the table
+         for(int j=0; j<resolvedOperands.size(); j++) {
+            //Literal literal = resolvedOperands.get(j);
+            Operand resolvedOperand = resolvedOperands.get(j);
+            //resolvedOperandsMap.put(operation.getOutputs().get(j).toString(), Literal.getInteger(literal));
+            resolvedOperandsMap.put(operation.getOutputs().get(j).toString(), resolvedOperand);
+         }
          
-         // Remove instruction
-         operations.set(i, new Nop(operation));
+         // Remove instruction if it has not side-effects
+         if(!operation.hasSideEffects()) {
+            operations.set(i, new Nop(operation));
+         }
+
+         updateStats(operation);
       }
 
       return operations;
    }
 
-   private void substituteRegisterForLiterals(Operation operation,
-           Map<String, Integer> literalRegisters) {
+   private void substituteResolvedOperands(Operation operation,
+           Map<String, Operand> resolvedOperands) {
 
       // Check inputs, if an input matches an element from the table,
       //substitute it for a literal
       List<Operand> operands = operation.getInputs();
       for(int i=0; i<operands.size(); i++) {
-         Integer literalValue = literalRegisters.get(operands.get(i).toString());
-         if(literalValue != null) {
-            int bits = operands.get(i).getBits();
-            //System.out.println("Register substituted by Literal because of Constant Propagation. Address "+operation.getAddress());
-            //System.out.println("Before:"+operation.getInputs());
-            Literal newLiteral = new Literal(Literal.LiteralType.integer,
-                    literalValue.toString(), bits);
-            //operands.set(i, newLiteral);
-            operation.replaceInput(i, newLiteral);
-            //System.out.println("After:"+operation.getInputs());
+         //Integer literalValue = resolvedOperands.get(operands.get(i).toString());
+         Operand resolvedOperand = resolvedOperands.get(operands.get(i).toString());
+         //if(literalValue != null) {
+         if(resolvedOperand == null) {
+            continue;
          }
+
+//         int bits = operands.get(i).getBits();
+//         Literal newLiteral = new Literal(Literal.LiteralType.integer,
+//                 literalValue.toString(), bits);
+
+         operation.replaceInput(i, resolvedOperand.copy());
+         
       }
 
       // Check if outputs matches an element from the table. In that case,
@@ -96,17 +122,16 @@ public class PropagateConstants implements Transformation {
       for(int i=0; i<outputs.size(); i++) {
 
          String key = outputs.get(i).toString();
-         Integer literalValue = literalRegisters.get(key);
-         if (operation.getAddress() == 2228) {
-            //System.out.println("ENTERED");
-            //System.out.println("Key:" + key);
-            //System.out.println("Table:" + literalRegisters);
-         }
+         // TODO: CHOICE, REMOVE OR INSERT NULL?
+         resolvedOperands.remove(key);
+         //resolvedOperands.put(key, null);
 
-         if(literalValue != null) {
-            Integer previousValue = literalRegisters.remove(key);
+         //Integer literalValue = resolvedOperands.get(key);
+         
+         //if(literalValue != null) {
+         //   Integer previousValue = resolvedOperands.remove(key);
             //System.out.println("Removed key '"+key+"' with value "+previousValue+".");
-         }
+         //}
       }
    }
 
@@ -115,43 +140,33 @@ public class PropagateConstants implements Transformation {
     * @param operation
     * @return
     */
-   private List<Literal> resolveOperation(Operation operation) {
+   private List<Operand> resolveOperation(Operation operation) {
       switch((OperationType)operation.getType()) {
          case IntegerArithmeticWithCarry:
-            return resolveIntegerArithmeticWithCarry((ArithmeticWithCarry)operation);
-
+            //return resolveIntegerArithmeticWithCarry((ArithmeticWithCarry)operation);
+            return ArithmeticWithCarry.resolve((ArithmeticWithCarry)operation);
+         case UnconditionalExit:
+            return resolveUnconditionalExit((UnconditionalExit)operation);
          default:
             return null;
       }
    }
 
-   private List<Literal> resolveIntegerArithmeticWithCarry(ArithmeticWithCarry arithmeticWithCarry) {
-      List<Literal> literals = new ArrayList<Literal>();
+   
 
-      // Calculate value
-      Integer resultValue = arithmeticWithCarry.resolveOutput();
-      if (resultValue == null) {
+   private List<Operand> resolveUnconditionalExit(UnconditionalExit unconditionalExit) {
+      // Check if it performs linking
+      if(unconditionalExit.getOutput1() == null) {
          return null;
       }
-      Literal resultLiteral = new Literal(Literal.LiteralType.integer,
-              resultValue.toString(), arithmeticWithCarry.getOutput().getBits());
-
-      literals.add(resultLiteral);
-
-
-      // Check if it has carry out
-      Integer carryOutValue = arithmeticWithCarry.resolveCarryOut();
-      if (carryOutValue == null) {
-         return literals;
-      }
-      Literal resultCarry = new Literal(Literal.LiteralType.integer,
-              carryOutValue.toString(), arithmeticWithCarry.getCarryOut().getBits());
-
-      literals.add(resultCarry);
-
-
-
-      return literals;
+      
+      List<Operand> operands = new ArrayList<Operand>();
+      int value = unconditionalExit.getLinkingAddress();
+      int bits = unconditionalExit.getOutput1().getBits();
+      Literal literal = new Literal(Literal.LiteralType.integer, Integer.toString(value), bits);
+      
+      operands.add(literal);
+      return operands;
    }
 
    private boolean areImmutable(List<Operand> operands) {
@@ -166,5 +181,26 @@ public class PropagateConstants implements Transformation {
       return true;
    }
 
-    
+   public Map<OperationType, Integer> getStats() {
+      return stats;
+   }
+
+
+
+   private void updateStats(Operation operation) {
+      // Add operation to table
+      Integer value = stats.get((OperationType) operation.getType());
+      if (value == null) {
+         value = 0;
+      }
+      value++;
+      stats.put((OperationType) operation.getType(), value);
+   }
+
+   /**
+    * INSTANCE VARIABLES
+    */
+    private Map<OperationType, Integer> stats;
+
+
 }

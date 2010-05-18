@@ -38,7 +38,7 @@ import org.ancora.IntermediateRepresentation.Operation;
 public class UnconditionalExit extends Operation {
 
    public UnconditionalExit(int address, int baseAddress, 
-           int supposedJumpAddress, int delaySlots, Operand input1) {
+           int supposedJumpAddress, int delaySlots, Operand input1, Operand output1) {
       super(address);
       this.baseAddress = baseAddress;
       this.supposedJumpAddress = supposedJumpAddress;
@@ -46,6 +46,9 @@ public class UnconditionalExit extends Operation {
 //      this.input1 = input1;
 
       connectToInput(input1);
+      if(output1 != null) {
+         connectToOutput(output1);
+      }
    }
 
    @Override
@@ -62,12 +65,26 @@ public class UnconditionalExit extends Operation {
 
    @Override
    public boolean hasSideEffects() {
-      return false;
+//      return false;
+      return true;
    }
 
    public Operand getInput1() {
       //return input1;
       return getInputs().get(0);
+   }
+
+   public Operand getOutput1() {
+      //return input1;
+      if(getOutputs().isEmpty()) {
+         return null;
+      }
+
+      return getOutputs().get(0);
+   }
+
+   public int getLinkingAddress() {
+      return getAddress();
    }
 
    public int getBaseAddress() {

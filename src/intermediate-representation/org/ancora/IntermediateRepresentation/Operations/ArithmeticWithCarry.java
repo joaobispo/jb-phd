@@ -17,9 +17,12 @@
 
 package org.ancora.IntermediateRepresentation.Operations;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.ancora.IntermediateRepresentation.OperationType;
 import java.util.logging.Logger;
 import org.ancora.IntermediateRepresentation.Operand;
+import org.ancora.IntermediateRepresentation.OperandType;
 import org.ancora.IntermediateRepresentation.Operands.Literal;
 import org.ancora.IntermediateRepresentation.Operation;
 
@@ -28,6 +31,10 @@ import org.ancora.IntermediateRepresentation.Operation;
  * @author Joao Bispo
  */
 public class ArithmeticWithCarry extends Operation {
+
+
+
+
 
    public ArithmeticWithCarry(int address, ArithmeticWithCarry.Op operation, Operand input1, Operand input2, Operand output1, Operand carryIn, Operand carryOut) {
       super(address);
@@ -347,6 +354,132 @@ public class ArithmeticWithCarry extends Operation {
         return carryOut;
     }
 
-        private static final long MASK_32_BITS = 0xFFFFFFFFL;
+    public static List<Operand> resolve(ArithmeticWithCarry arithmeticWithCarry) {
+      //List<Literal> literals = new ArrayList<Literal>();
+      List<Operand> resolvedOperands = new ArrayList<Operand>();
+
+      // Check if both literal
+      resolvedOperands = resolveLiterals(arithmeticWithCarry);
+      if(resolvedOperands != null) {
+         return resolvedOperands;
+      }
+
+      // Check if one is neutral element
+      resolvedOperands = resolveNeutral(arithmeticWithCarry);
+      if(resolvedOperands != null) {
+         return resolvedOperands;
+      }
+
+      // Nothing more to do
+      return null;
+
+   }
+
+   private static List<Operand> resolveLiterals(ArithmeticWithCarry arithmeticWithCarry) {
+      // Calculate value
+      Integer resultValue = arithmeticWithCarry.resolveOutput();
+      if (resultValue == null) {
+         return null;
+      }
+
+      List<Operand> resultOperands = new ArrayList<Operand>();
+
+      Literal resultLiteral = new Literal(Literal.LiteralType.integer,
+              resultValue.toString(), arithmeticWithCarry.getOutput().getBits());
+
+      resultOperands.add(resultLiteral);
+
+
+      // Check if it has carry out
+      Integer carryOutValue = arithmeticWithCarry.resolveCarryOut();
+      if (carryOutValue == null) {
+         return resultOperands;
+      }
+
+      Literal resultCarry = new Literal(Literal.LiteralType.integer,
+              carryOutValue.toString(), arithmeticWithCarry.getCarryOut().getBits());
+
+      resultOperands.add(resultCarry);
+
+      return resultOperands;
+   }
+
+
+   private static List<Operand> resolveNeutral(ArithmeticWithCarry arithmeticWithCarry) {
+      // Check if it is addition
+      if (arithmeticWithCarry.operation != Op.add) {
+         return null;
+      }
+
+      // Check if one of the inputs is zero, and get the corresponding operand
+      //if it has carry in, if it is zero.
+      Operand nonNeutralOperand = getNonNeutralOperand(arithmeticWithCarry);
+      if (nonNeutralOperand == null) {
+         return null;
+      }
+
+
+      // Check if it has carry in, and if carry is neutral
+      if (arithmeticWithCarry.hasCarryIn) {
+         Integer carryInValue = Literal.getInteger(arithmeticWithCarry.getCarryIn());
+         // Value of carry in is not known
+         if (carryInValue == null) {
+            return null;
+         }
+         // Value of carry is different than zero
+         if (carryInValue != 0) {
+            return null;
+         }
+      }
+
+      List<Operand> resultOperands = new ArrayList<Operand>();
+      resultOperands.add(nonNeutralOperand);
+
+      // Check if there is a carry out
+      if (arithmeticWithCarry.hasCarryOut) {
+         // Use literal 0 instead of carry out
+         int bits = arithmeticWithCarry.getCarryOut().getBits();
+         resultOperands.add(new Literal(Literal.LiteralType.integer, "0", bits));
+      }
+
+
+      return resultOperands;
+
+   }
+
+      private static Operand getNonNeutralOperand(ArithmeticWithCarry op) {
+      Operand in1 = op.getInput1();
+      Operand in2 = op.getInput2();
+
+      // Check if first is Literal and second is Operand
+      boolean LD = in1.getType() == OperandType.literal
+              && in2.getType() == OperandType.internalData;
+
+      if (LD) {
+         // Swap
+         Operand temp = in1;
+         in1 = in2;
+         in2 = temp;
+      }
+
+
+      // Check if is Operand and other is Literal
+      boolean DL = in1.getType() == OperandType.internalData
+              && in2.getType() == OperandType.literal;
+
+      if (!DL) {
+         return null;
+      }
+
+
+      if (Literal.getInteger(in2) != 0) {
+         return null;
+      }
+
+      return in1;
+
+   }
+
+    private static final long MASK_32_BITS = 0xFFFFFFFFL;
     private static final long MASK_BIT_33 = 0x100000000L;
 }
