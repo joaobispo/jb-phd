@@ -20,8 +20,8 @@ package org.ancora.IrMapping.Tools;
 import org.ancora.IntermediateRepresentation.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -128,6 +128,8 @@ public class Dotty {
       for(Operand op : operands) {
          builder.append(op.hashCode());
          builder.append("[label=\"");
+         //builder.append(getOperandLabel(op));
+         builder.append(op.getPrefix());
          builder.append(op);
          builder.append("\", shape=box];\n");
       }
@@ -147,6 +149,16 @@ public class Dotty {
       }
    }
 
+   public static String getNameWithoutVersion(String operandName) {
+      String separator = ".";
+      int index = operandName.lastIndexOf(separator);
+      if(index == -1) {
+         return null;
+      }
+
+      return operandName.substring(0, index);
+   }
+
     /**
     * Changes input list.
     *
@@ -154,12 +166,12 @@ public class Dotty {
     * @return
     */
    public static List<Operation> connectOperations(List<Operation> operations) {
-      Map<String, Operand> liveIns = new Hashtable<String, Operand>();
-      Map<String, Operand> liveOuts = new Hashtable<String, Operand>();
-      Map<String, Integer> liveOutsLastVersion = new Hashtable<String, Integer>();
+      Map<String, Operand> liveIns = new HashMap<String, Operand>();
+      Map<String, Operand> liveOuts = new HashMap<String, Operand>();
+      Map<String, Integer> liveOutsLastVersion = new HashMap<String, Integer>();
 
       List<Operation> newList = new ArrayList<Operation>();
-      Map<String, Operand> operands = new Hashtable<String, Operand>();
+      Map<String, Operand> operands = new HashMap<String, Operand>();
       //Map<String, Integer> variablesVersion = new Hashtable<String, Integer>();
       //Map<String, Operand> operandsTable = new Hashtable<String, Operand>();
       //Operation start = new Control(-1, Control.Op.start);
@@ -262,21 +274,29 @@ public class Dotty {
 
             // Check last version of this output
             Integer version = getVersion(outputName);
+            String outputNameClean = getNameWithoutVersion(outputName);
             if(version == null) {
                System.out.println("Could not get version from output "+realOutput);
             }
 
 
-            Integer lastVersion = liveOutsLastVersion.get(outputName);
+            //Integer lastVersion = liveOutsLastVersion.get(outputName);
+            Integer lastVersion = liveOutsLastVersion.get(outputNameClean);
+            // There was not a last version
             if(lastVersion == null) {
-               liveOutsLastVersion.put(outputName, version);
-               liveOuts.put(outputName, realOutput);
+               // This version becomes most recent version
+               //liveOutsLastVersion.put(outputName, version);
+               liveOutsLastVersion.put(outputNameClean, version);
+               //liveOuts.put(outputName, realOutput);
+               liveOuts.put(outputNameClean, realOutput);
                continue;
             }
 
             if(version > lastVersion) {
-               liveOutsLastVersion.put(outputName, version);
-               liveOuts.put(outputName, realOutput);
+               //liveOutsLastVersion.put(outputName, version);
+               liveOutsLastVersion.put(outputNameClean, version);
+               //liveOuts.put(outputName, realOutput);
+               liveOuts.put(outputNameClean, realOutput);
             }
 
             /*
@@ -318,8 +338,8 @@ public class Dotty {
     */
    public static List<Operation> versionAndconnectOperations(List<Operation> operations) {
       List<Operation> newList = new ArrayList<Operation>();
-      Map<String, Integer> variablesVersion = new Hashtable<String, Integer>();
-      Map<String, Operand> operandsTable = new Hashtable<String, Operand>();
+      Map<String, Integer> variablesVersion = new HashMap<String, Integer>();
+      Map<String, Operand> operandsTable = new HashMap<String, Operand>();
       Operation start = new Control(-1, Control.Op.start);
       newList.add(start);
 
