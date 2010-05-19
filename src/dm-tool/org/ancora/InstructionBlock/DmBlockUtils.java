@@ -39,12 +39,16 @@ import org.ancora.SharedLibrary.IoUtils;
  */
 public class DmBlockUtils {
 
+   public static BlockStream getBlockStream(File file) {
+      return getBlockPack(file).getBlockStream();
+   }
+
    /**
     * Transforms a File into a BlockStream, using the settings of the program.
     * @param file
     * @return
     */
-   public static BlockStream getBlockStream(File file) {
+   public static DmBlockPack getBlockPack(File file) {
        // Determine file extension and determine type of file
       String filename = file.getName();
       int separatorIndex = filename.lastIndexOf(IoUtils.DEFAULT_EXTENSION_SEPARATOR);
@@ -53,7 +57,7 @@ public class DmBlockUtils {
       String blockExtension = Options.optionsTable.get(OptionName.extension_block);
       if(extension.equals(blockExtension)) {
          InstructionBlock block = BlockIO.fromFile(file);
-         return new SingleBlockStream(block);
+         return new DmBlockPack(new SingleBlockStream(block), null);
       }
 
       InstructionBusReader busReader = null;
@@ -74,7 +78,8 @@ public class DmBlockUtils {
          Partitioner partitioner = Settings.getPartitioner();
          BlockWorkerStream worker = new BlockWorkerStream(partitioner, busReader);
          Settings.setupBlockWorker(worker);
-         return worker;
+         return new DmBlockPack(worker, busReader);
+         //return worker;
       }
 
 

@@ -17,13 +17,9 @@
 
 package org.ancora.DMTool.Stats.Transform;
 
-import java.util.EnumMap;
 import java.util.Map;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Transformation;
-import org.ancora.IntermediateRepresentation.Transformations.RemoveDeadBranches;
-import org.ancora.IntermediateRepresentation.Transformations.ResolveLiteralInputs;
-import org.ancora.IntermediateRepresentation.Transformations.ResolveNeutralInput;
 
 /**
  *
@@ -51,6 +47,8 @@ public class TransformStats {
       if (t.getStats().size() > 0) {
          System.err.println("Transformation '" + t.toString() + "':");
          System.err.println(t.getStats());
+      } else {
+         System.err.println("No operations removed by '" + t.toString() + "'");
       }
      // Check classes
       /*

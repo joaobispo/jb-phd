@@ -150,6 +150,7 @@ public class Transform implements Executable {
          int counter = 0;
          while(block != null) {
              String blockName = baseFilename+"-"+counter;
+//             logger.warning("Processing block '"+blockName);
 //            logger.info("Block "+counter+", "+block.getRepetitions()+" repetitions.");
 
             // Transform Instruction Block into PureIR
