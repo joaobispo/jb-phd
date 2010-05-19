@@ -18,7 +18,7 @@
 package org.ancora.IntermediateRepresentation.Transformations.MicroblazeInstructions;
 
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import org.ancora.IntermediateRepresentation.Operand;
@@ -33,16 +33,14 @@ import org.ancora.IntermediateRepresentation.Transformation;
  *
  * @author Joao Bispo
  */
-public class ParseShiftRight implements Transformation {
+public class ParseShiftRight extends Transformation {
 
    @Override
    public String toString() {
       return "ParseShiftRight";
    }
 
-
-
-   public List<Operation> transform(List<Operation> operations) {
+   public void transform(List<Operation> operations) {
       for(int i=0; i<operations.size(); i++) {
          // Check if MicroBlaze operation
         MbOperation shiftOperation = MbOperation.getMbOperation(operations.get(i));
@@ -73,7 +71,6 @@ public class ParseShiftRight implements Transformation {
         operations.set(i, newOp);
       }
 
-      return operations;
    }
 
    /**
@@ -96,7 +93,7 @@ public class ParseShiftRight implements Transformation {
 
    private static final Map<InstructionName, ShiftProperties> instructionProperties;
    static {
-      Map<InstructionName, ShiftProperties> aMap = new Hashtable<InstructionName, ShiftProperties>();
+      Map<InstructionName, ShiftProperties> aMap = new EnumMap<InstructionName, ShiftProperties>(InstructionName.class);
 
       aMap.put(InstructionName.sra, new ShiftProperties(ShiftRight.Op.shiftRightArithmetic, false));
       aMap.put(InstructionName.src, new ShiftProperties(ShiftRight.Op.shiftRightWithCarry, true));

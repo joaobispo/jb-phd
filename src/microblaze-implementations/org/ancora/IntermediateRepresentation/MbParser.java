@@ -140,7 +140,8 @@ public class MbParser {
 
       // Transform operations in pure IR operations
       for(Transformation transf : microblazeTransformations) {
-         operations = transf.transform(operations);
+         transf.transform(operations);
+         //operations = transf.transform(operations);
       }
 
       // Check that there are no microblaze operations  nor operands

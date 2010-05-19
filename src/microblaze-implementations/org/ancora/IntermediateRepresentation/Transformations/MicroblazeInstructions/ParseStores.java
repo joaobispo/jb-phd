@@ -32,7 +32,7 @@ import org.ancora.IntermediateRepresentation.Transformation;
  *
  * @author Joao Bispo
  */
-public class ParseStores implements Transformation {
+public class ParseStores extends Transformation {
 
    @Override
    public String toString() {
@@ -41,7 +41,7 @@ public class ParseStores implements Transformation {
 
 
 
-   public List<Operation> transform(List<Operation> operations) {
+   public void transform(List<Operation> operations) {
       for (int i = 0; i < operations.size(); i++) {
                   Operation operation = operations.get(i);
 
@@ -72,7 +72,6 @@ public class ParseStores implements Transformation {
         operations.set(i, newOp);
       }
 
-      return operations;
    }
 
    /**

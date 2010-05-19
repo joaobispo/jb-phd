@@ -18,12 +18,11 @@
 package org.ancora.IntermediateRepresentation.Transformations.MicroblazeInstructions;
 
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import org.ancora.IntermediateRepresentation.Operand;
 import org.ancora.IntermediateRepresentation.Operation;
-import org.ancora.IntermediateRepresentation.Operations.Logic;
 import org.ancora.IntermediateRepresentation.Operations.MbOperation;
 import org.ancora.IntermediateRepresentation.Operations.SignExtension;
 import org.ancora.MicroBlaze.InstructionName;
@@ -33,16 +32,14 @@ import org.ancora.IntermediateRepresentation.Transformation;
  *
  * @author Joao Bispo
  */
-public class ParseSignExtension implements Transformation {
+public class ParseSignExtension extends Transformation {
 
    @Override
    public String toString() {
       return "ParseSignExtension";
    }
 
-
-
-   public List<Operation> transform(List<Operation> operations) {
+   public void transform(List<Operation> operations) {
       for(int i=0; i<operations.size(); i++) {
          Operation operation = operations.get(i);
 
@@ -69,7 +66,6 @@ public class ParseSignExtension implements Transformation {
         operations.set(i, newOperation);
       }
 
-      return operations;
    }
 
    /**
@@ -77,7 +73,7 @@ public class ParseSignExtension implements Transformation {
     */
       private static final Map<InstructionName, Integer> instructionProperties;
    static {
-      Map<InstructionName, Integer> aMap = new Hashtable<InstructionName, Integer>();
+      Map<InstructionName, Integer> aMap = new EnumMap<InstructionName, Integer>(InstructionName.class);
 
       aMap.put(InstructionName.sext8, 8);
       aMap.put(InstructionName.sext16, 16);

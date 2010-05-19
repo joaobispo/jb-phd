@@ -23,13 +23,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.ancora.IntermediateRepresentation.Operand;
-import org.ancora.IntermediateRepresentation.Operands.Literal;
 import org.ancora.IntermediateRepresentation.Operation;
 import org.ancora.IntermediateRepresentation.Operations.MbOperation;
 import org.ancora.IntermediateRepresentation.Operations.MockOperation;
 import org.ancora.IntermediateRepresentation.Operations.UnconditionalExit;
 import org.ancora.MicroBlaze.InstructionName;
-import org.ancora.MicroBlaze.Definitions;
 import org.ancora.IntermediateRepresentation.MbTransformUtils;
 import org.ancora.IntermediateRepresentation.Operands.MbImm;
 import org.ancora.IntermediateRepresentation.Transformation;
@@ -38,9 +36,9 @@ import org.ancora.IntermediateRepresentation.Transformation;
  *
  * @author Joao Bispo
  */
-public class ParseUnconditionalBranches implements Transformation {
+public class ParseUnconditionalBranches extends Transformation {
 
-   public List<Operation> transform(List<Operation> operations) {
+   public void transform(List<Operation> operations) {
       //List<Operation> newList = new ArrayList<Operation>();
       //Map<String, Integer> literalRegisters = new Hashtable<String, Integer>();
 
@@ -132,10 +130,8 @@ public class ParseUnconditionalBranches implements Transformation {
         //newList.add(newOperation);
       }
 
-      //return newList;
-      return operations;
    }
-
+/*
    private void substituteRegisterForLiterals(Operation operation,
            Map<String, Integer> literalRegisters) {
       // Check inputs, if an input matches an element from the table,
@@ -173,7 +169,7 @@ public class ParseUnconditionalBranches implements Transformation {
          }
       }
    }
-
+*/
    private boolean checkSpecialCondition(MbOperation branchOp) {
       // Check if is bralid instruction
       if(!(branchOp.getMbType() == InstructionName.bralid)) {

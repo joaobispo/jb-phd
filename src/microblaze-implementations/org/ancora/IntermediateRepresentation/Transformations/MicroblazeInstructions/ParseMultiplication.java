@@ -18,12 +18,11 @@
 package org.ancora.IntermediateRepresentation.Transformations.MicroblazeInstructions;
 
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import org.ancora.IntermediateRepresentation.Operand;
 import org.ancora.IntermediateRepresentation.Operation;
-import org.ancora.IntermediateRepresentation.Operations.Division;
 import org.ancora.IntermediateRepresentation.Operations.MbOperation;
 import org.ancora.IntermediateRepresentation.Operations.Mutiplication;
 import org.ancora.MicroBlaze.InstructionName;
@@ -33,7 +32,7 @@ import org.ancora.IntermediateRepresentation.Transformation;
  *
  * @author Joao Bispo
  */
-public class ParseMultiplication implements Transformation {
+public class ParseMultiplication extends Transformation {
 
    @Override
    public String toString() {
@@ -42,7 +41,7 @@ public class ParseMultiplication implements Transformation {
 
 
 
-   public List<Operation> transform(List<Operation> operations) {
+   public void transform(List<Operation> operations) {
       for(int i=0; i<operations.size(); i++) {
          Operation operation = operations.get(i);
 
@@ -70,7 +69,6 @@ public class ParseMultiplication implements Transformation {
         operations.set(i, newOperation);
       }
 
-      return operations;
    }
 
    /**
@@ -78,7 +76,7 @@ public class ParseMultiplication implements Transformation {
     */
       private static final Map<InstructionName, Integer> instructionProperties;
    static {
-      Map<InstructionName, Integer> aMap = new Hashtable<InstructionName, Integer>();
+      Map<InstructionName, Integer> aMap = new EnumMap<InstructionName, Integer>(InstructionName.class);
 
       aMap.put(InstructionName.mul, 1);
       aMap.put(InstructionName.muli, 2);

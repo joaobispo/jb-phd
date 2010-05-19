@@ -29,9 +29,9 @@ import org.ancora.IntermediateRepresentation.Transformation;
  *
  * @author Joao Bispo
  */
-public class TransformRegistersToInternalData implements Transformation {
+public class TransformRegistersToInternalData extends Transformation {
 
-   public List<Operation> transform(List<Operation> operations) {
+   public void transform(List<Operation> operations) {
       for(int i=0; i<operations.size(); i++) {
          Operation operation = operations.get(i);
 
@@ -63,7 +63,6 @@ public class TransformRegistersToInternalData implements Transformation {
          }
       }
 
-      return operations;
    }
 
 }

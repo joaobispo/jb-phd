@@ -34,22 +34,20 @@ import org.ancora.IntermediateRepresentation.Transformation;
  *
  * @author Joao Bispo
  */
-public class ParseConditionalBranch implements Transformation {
+public class ParseConditionalBranch extends Transformation {
 
-   public List<Operation> transform(List<Operation> operations) {
+   public void transform(List<Operation> operations) {
 
       for(int i=0; i<operations.size(); i++) {
         // Check if MicroBlaze Operation
         MbOperation branchOp = MbOperation.getMbOperation(operations.get(i));
         if(branchOp == null) {
-           //newList.add(operations.get(i));
            continue;
         }
 
         // Check if it is a conditional compare
         ConditionalExit.Op compareOperation = instructionProperties.get(branchOp.getMbType());
         if(compareOperation == null) {
-           //newList.add(operations.get(i));
            continue;
         }
 
@@ -67,13 +65,9 @@ public class ParseConditionalBranch implements Transformation {
 
 
         operations.set(i, cexit);
-        //newList.add(cexit);
-
 
       }
 
-     return operations;
-     //return newList;
    }
 
    @Override

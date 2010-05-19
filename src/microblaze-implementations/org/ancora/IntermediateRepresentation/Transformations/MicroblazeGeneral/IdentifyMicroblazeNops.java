@@ -33,7 +33,7 @@ import org.ancora.IntermediateRepresentation.Transformation;
  *
  * @author Joao Bispo
  */
-public class IdentifyMicroblazeNops implements Transformation {
+public class IdentifyMicroblazeNops extends Transformation {
 
    /**
     * Detects and removes MicroBlaze nops (or r0, r0, r0)
@@ -43,7 +43,7 @@ public class IdentifyMicroblazeNops implements Transformation {
     * @param operations
     * @return
     */
-   public List<Operation> transform(List<Operation> operations) {
+   public void transform(List<Operation> operations) {
    //public void transform(List<Operation> operations) {
       //List<Operation> newList = new ArrayList<Operation>(operations.size());
 System.out.println("This transformation, "+toString()+", was disabled.");
@@ -106,7 +106,6 @@ System.out.println("This transformation, "+toString()+", was disabled.");
 
 //    }
 
-      return operations;
       //return newList;
    }
 

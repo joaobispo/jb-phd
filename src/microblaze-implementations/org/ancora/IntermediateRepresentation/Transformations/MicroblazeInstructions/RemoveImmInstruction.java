@@ -38,7 +38,7 @@ import org.ancora.IntermediateRepresentation.Transformation;
  *
  * @author Joao Bispo
  */
-public class RemoveImmInstruction implements Transformation {
+public class RemoveImmInstruction extends Transformation {
 
    @Override
    public String toString() {
@@ -46,8 +46,7 @@ public class RemoveImmInstruction implements Transformation {
    }
 
 
-   public List<Operation> transform(List<Operation> operations) {
-     //List<Operation> newList = new ArrayList<Operation>(operations.size());
+   public void transform(List<Operation> operations) {
 
      for(int i=0; i<operations.size(); i++) {
         Operation operation = operations.get(i);
@@ -113,9 +112,6 @@ public class RemoveImmInstruction implements Transformation {
      // Add last operation
      //newList.add(operations.get(operations.size()-1));
 
-
-     return operations;
-     //return newList;
    }
 
    /**

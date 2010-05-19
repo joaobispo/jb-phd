@@ -29,11 +29,10 @@ import org.ancora.IntermediateRepresentation.Transformation;
  *
  * @author Joao Bispo
  */
-public class TransformImmToLiterals implements Transformation {
+public class TransformImmToLiterals extends Transformation {
    
    @Override
    public String toString() {
-      //return RegisterZeroToLiteral.class.getName();
       return "TransformImmToLiterals";
    }
 
@@ -45,7 +44,7 @@ public class TransformImmToLiterals implements Transformation {
     * @param operations
     * @return
     */
-   public List<Operation> transform(List<Operation> operations) {
+   public void transform(List<Operation> operations) {
       
       for(int i=0; i<operations.size(); i++) {
          Operation operation = operations.get(i);
@@ -76,28 +75,9 @@ public class TransformImmToLiterals implements Transformation {
             }
          }
       }
-/*
-      for(Operation operation : operations) {
-         transformOperands(operation.getInputs());
-         transformOperands(operation.getOutputs());
-      }
-*/
-      return operations;
-   }
-/*
-   private void transformOperands(List<Operand> operands) {
-      for(int i=0; i<operands.size(); i++) {
-         //if(operands.get(i).getType() == MbOperandType.immediate) {
-         if(operands.get(i).getType() == MicroblazeType.MbImm) {
-            Operand newOperand = MbTransformUtils.transformOperandToLiteral(operands.get(i));
-            if(newOperand != null) {
-               operands.set(i, newOperand);
-            }
-         }
-      }
 
    }
-*/
+
    private Literal getLiteralFromImm(Operand operand) {
       // Check if it is a MicroBlaze immediate value
       Integer immValue = MbImm.getImmValue(operand);
@@ -111,37 +91,6 @@ public class TransformImmToLiterals implements Transformation {
       newLiteral.setPrefix(operand.getPrefix());
       return newLiteral;
    }
-
-/*
-   private boolean hasLiteralsAsOnlyOutput(List<Operand> outputs) {
-      // Check if all outputs are to register 0
-      boolean isZero = false;
-
-      // If it finds one "not zero", returns false.
-      for(Operand operand : outputs) {
-         isZero = isLiteral(operand);
-         if(!isZero) {
-            return false;
-         }
-      }
-
-      return isZero;
-   }
- */
-
-   /*
-   private boolean isLiteral(Operand operand) {
-      // Check for Literals
-      Operand newOperand = MbTransformUtils.transformOperandToLiteral(operand);
-      if (newOperand != null) {
-         return true;
-      } else {
-         return false;
-      }
-   }
-    */
-
-
 
 
 }

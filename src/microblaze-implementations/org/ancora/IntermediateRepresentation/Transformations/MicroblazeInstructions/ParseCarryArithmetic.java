@@ -35,14 +35,14 @@ import org.ancora.IntermediateRepresentation.Transformation;
  *
  * @author Joao Bispo
  */
-public class ParseCarryArithmetic implements Transformation {
+public class ParseCarryArithmetic extends Transformation {
 
    @Override
    public String toString() {
       return "ParseCarryArithmetic";
    }
 
-   public List<Operation> transform(List<Operation> operations) {
+   public void transform(List<Operation> operations) {
      for(int i=0; i<operations.size(); i++) {
 
         // Check if MicroBlaze operation
@@ -81,14 +81,7 @@ public class ParseCarryArithmetic implements Transformation {
         //System.out.println(newOperation);
      }
 
-
-
-     return operations;
    }
-
-  
-
-
 
    /**
     * INSTANCE VARIABLES

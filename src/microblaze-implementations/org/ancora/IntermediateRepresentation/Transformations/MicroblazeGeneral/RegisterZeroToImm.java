@@ -28,7 +28,7 @@ import org.ancora.IntermediateRepresentation.Transformation;
  *
  * @author Joao Bispo
  */
-public class RegisterZeroToImm implements Transformation {
+public class RegisterZeroToImm extends Transformation {
 
    @Override
    public String toString() {
@@ -43,8 +43,7 @@ public class RegisterZeroToImm implements Transformation {
     * @param operations
     * @return
     */
-   public List<Operation> transform(List<Operation> operations) {
-      //List<Operation> newList = new ArrayList<Operation>(operations.size());
+   public void transform(List<Operation> operations) {
 
       for(int i=0; i<operations.size(); i++) {
          Operation operation = operations.get(i);
@@ -76,41 +75,7 @@ public class RegisterZeroToImm implements Transformation {
          }
       }
 
-      /*
-      for(Operation operation : operations) {
-         transformRegister0(operation.getInputs());
-         transformRegister0(operation.getOutputs());
-      }
-       */
-
-      return operations;
    }
-
-   /**
-    * @param inputs
-    * @return true if found register 0.
-    */
-   /*
-   private boolean transformRegister0(List<Operand> operands) {
-      boolean transformed = false;
-
-      for(int i=0; i<operands.size(); i++) {
-         // Check if operand is a MbOperand
-         Operand operand = operands.get(i);
-         if(operand.getType() == MicroblazeType.MbRegister) {
-            Operand newOperand = MbTransformUtils.transformOperandToLiteral(operand);
-            if(newOperand != null) {
-               // Change register to literal
-               operands.set(i, newOperand);
-               transformed = true;
-            }
-         }
-      }
-
-      return transformed;
-   }
-    */
-
 
 
    private Operand getImmZero(Operand operand) {
@@ -131,6 +96,5 @@ public class RegisterZeroToImm implements Transformation {
    }
 
    public static final int BITS_ZERO = 1;
-
 
 }
