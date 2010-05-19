@@ -17,9 +17,12 @@
 
 package org.ancora.IntermediateRepresentation.Transformations;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import org.ancora.IntermediateRepresentation.Operand;
 import org.ancora.IntermediateRepresentation.Operands.Literal;
 import org.ancora.IntermediateRepresentation.OperandType;
@@ -29,12 +32,13 @@ import org.ancora.IntermediateRepresentation.Operations.MemoryStore;
 import org.ancora.IntermediateRepresentation.Operations.Nop;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Transformation;
+import org.ancora.IntermediateRepresentation.Transformations.Utils.MemoryTable;
 
 /**
  *
  * @author Joao Bispo
  */
-public class RemoveInternalLoads extends Transformation {
+public class RemoveInternalLoads2 extends Transformation {
 
    @Override
    public String toString() {
@@ -59,25 +63,30 @@ public class RemoveInternalLoads extends Transformation {
          if(operation.getType() == OperationType.MemoryLoad) {
             totalLoads++;
             MemoryLoad load = (MemoryLoad)operation;
-            Operand internalData = memTable.getOperand(load.getAddress(), load.getInput1(), load.getInput2(), load.getOutput());
+            //Operand internalData = memTable.getOperand(load.getAddress(), load.getInput1(), load.getInput2(), load.getOutput());
+            Operand internalData = memTable.getOperand(load.getInput1(), load.getInput2());
 
             if(internalData == null) {
+               // Can use the output of this load in next loads
+               // TODO: put in another transformation?
+               memTable.updateTable(load.getInput1(), load.getInput2(), load.getOutput(), false);
                continue;
             }
+
             updateStats(operation);
 
             loadCounter++;
             literalRegisters.put(load.getOutput().toString(), internalData);
             operations.set(i, new Nop(operation));
-            System.out.println("Removed operation:"+operation.getFullOperation());
+            //System.out.println("Removed operation:"+operation.getFullOperation());
          }
 
 
          if(operation.getType() == OperationType.MemoryStore) {
             MemoryStore store = (MemoryStore)operation;
-            boolean success = memTable.updateTable(store.getOperand1(), store.getOperand2(), store.getContentsToStore());
+            boolean success = memTable.updateTable(store.getOperand1(), store.getOperand2(), store.getContentsToStore(), true);
             if(success) {
-               updateStats(operation);
+               //updateStats(operation);
                storeCounter++;
             }
 
@@ -90,9 +99,9 @@ public class RemoveInternalLoads extends Transformation {
       if(totalLoads != 0) {
          loadRatio = ((float)loadCounter / (float)totalLoads) * 100;
       }
-      System.out.println("Stored "+storeCounter+" operands.");
-      System.out.println("Can remove "+loadCounter+" loads.");
-      System.out.println("Can remove "+loadRatio+" of loads.");
+      //System.out.println("Stored "+storeCounter+" operands.");
+      //System.out.println("Can remove "+loadCounter+" loads.");
+      //System.out.println("Can remove "+loadRatio+" of loads.");
 
    }
 
@@ -113,81 +122,4 @@ public class RemoveInternalLoads extends Transformation {
 
    }
 
-
-    /**
-     * INNER CLASS
-     */
-   class MemoryTable {
-
-      public MemoryTable() {
-         bases = new HashMap<String, Operand>();
-      }
-
-      public String getAddress(Operand base, Operand offset) {
-         // Check if first is Literal and second is Operand
-         boolean LD = base.getType() == OperandType.literal &&
-                 offset.getType() == OperandType.internalData;
-
-         if(LD) {
-            // Swap
-            Operand temp = base;
-            base = offset;
-            offset = temp;
-         }
-
-         // Check if is Operand and other is Literal
-         boolean DL = base.getType() == OperandType.internalData &&
-                 offset.getType() == OperandType.literal;
-
-         if(DL) {
-            //String address = base.toString() + "-" + Literal.getInteger((Literal)offset);
-            String address = base.toString() + "-" + Literal.getInteger(offset);
-            return address;
-         }
-
-
-         //System.out.println("Don't know this case: base ("+base+") and offset ("+offset+")");
-         return null;
-      }
-
-      public boolean updateTable(Operand base, Operand offset, Operand content) {
-         String address = getAddress(base, offset);
-         
-         if(address == null) {
-            // Store to an unknown position. Flushing tables.
-            bases = new HashMap<String, Operand>();
-//            System.out.println("Store to unknown position ("+base+" + "+offset+"). " +
-//                    "Flushed memory tables.");
-            return false;
-         }
-
-         bases.put(address, content);
-         //System.out.println("Stored '"+content+"'.");
-         return true;
-      }
-
-      public Operand getOperand(int opAddress, Operand base, Operand offset, Operand output) {
-         String address = getAddress(base, offset);
-
-         if(address == null) {
-            //System.out.println("Load from unknown position ("+base+" + "+offset+").");
-            return null;
-         }
-         
-         Operand value = bases.get(address);
-         if(value == null) {
-         //   System.out.println(opAddress+": Load from known position, but value is not in table. Output " +
-         //           "put in table.");
-            updateTable(base, offset, output);
-         }
-
-         return value;
-     
-      }
-
-      /**
-       * INSTANCE VARIABLES
-       */
-      private Map<String, Operand> bases;
-   }
 }
