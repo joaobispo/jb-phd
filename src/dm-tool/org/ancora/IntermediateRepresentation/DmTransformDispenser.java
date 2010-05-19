@@ -70,7 +70,7 @@ public class DmTransformDispenser {
 
       ResolveLiteralInputs("resolve-inputs-lit"),
       ResolveNeutralInputs("resolve-inputs-neutral"),
-      RemoveInternalLoads("remove-loads"),
+      RemoveInternalLoads("remove-redundant-loads"),
       RemoveDeadBranches("remove-dead-branches");
 
       private TransformationName(String transformationName) {

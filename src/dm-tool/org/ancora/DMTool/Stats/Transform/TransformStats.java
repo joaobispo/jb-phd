@@ -47,7 +47,13 @@ public class TransformStats {
     */
 
    public void showStats(Transformation t) {
+
+      if (t.getStats().size() > 0) {
+         System.err.println("Transformation '" + t.toString() + "':");
+         System.err.println(t.getStats());
+      }
      // Check classes
+      /*
       if(t.getClass() == ResolveLiteralInputs.class) {
          showStats(((ResolveLiteralInputs)t).toString(), ((ResolveLiteralInputs)t).getStats());
          return;
@@ -62,7 +68,7 @@ public class TransformStats {
          showStats(((RemoveDeadBranches)t).toString(), ((RemoveDeadBranches)t).getStats());
          return;
       }
-
+*/
 
    }
 
