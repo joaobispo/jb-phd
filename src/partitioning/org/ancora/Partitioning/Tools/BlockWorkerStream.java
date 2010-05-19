@@ -234,6 +234,12 @@ public class BlockWorkerStream implements BlockStream, BlockWorker {
       return busReader.getInstructions();
    }
 
+   public InstructionBusReader getBusReader() {
+      return busReader;
+   }
+
+      
+
    /**
     * INSTANCE VARIABLES
     */
