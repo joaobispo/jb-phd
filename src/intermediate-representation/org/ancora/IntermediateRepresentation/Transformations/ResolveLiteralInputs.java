@@ -35,13 +35,7 @@ import org.ancora.IntermediateRepresentation.Transformations.Utils.SubstituteTab
  *
  * @author Joao Bispo
  */
-public class ResolveLiteralInputs implements Transformation {
-
-   public ResolveLiteralInputs() {
-      stats = new EnumMap<OperationType, Integer>(OperationType.class);
-   }
-
-
+public class ResolveLiteralInputs extends Transformation {
 
    @Override
    public String toString() {
@@ -50,7 +44,7 @@ public class ResolveLiteralInputs implements Transformation {
 
 
 
-   public List<Operation> transform(List<Operation> operations) {
+   public void transform(List<Operation> operations) {
       SubstituteTable resolvedOperandsMap = new SubstituteTable();
       for(int i=0; i<operations.size(); i++) {
          Operation operation = operations.get(i);
@@ -73,7 +67,6 @@ public class ResolveLiteralInputs implements Transformation {
          updateStats(operation);
       }
 
-      return operations;
    }
 
    /**
@@ -112,24 +105,6 @@ public class ResolveLiteralInputs implements Transformation {
       return operands;
    }
 
-   public Map<OperationType, Integer> getStats() {
-      return stats;
-   }
-
-   private void updateStats(Operation operation) {
-      // Add operation to table
-      Integer value = stats.get((OperationType) operation.getType());
-      if (value == null) {
-         value = 0;
-      }
-      value++;
-      stats.put((OperationType) operation.getType(), value);
-   }
-
-   /**
-    * INSTANCE VARIABLES
-    */
-    private Map<OperationType, Integer> stats;
 
 
 }

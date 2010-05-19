@@ -29,18 +29,12 @@ import org.ancora.IntermediateRepresentation.Operations.Nop;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Operations.UnconditionalExit;
 import org.ancora.IntermediateRepresentation.Transformation;
-import org.ancora.IntermediateRepresentation.Transformations.Utils.SubstituteTable;
 
 /**
  *
  * @author Joao Bispo
  */
-public class RemoveDeadBranches implements Transformation {
-
-   public RemoveDeadBranches() {
-      stats = new EnumMap<OperationType, Integer>(OperationType.class);
-   }
-
+public class RemoveDeadBranches extends Transformation {
 
 
    @Override
@@ -50,8 +44,7 @@ public class RemoveDeadBranches implements Transformation {
 
 
 
-   public List<Operation> transform(List<Operation> operations) {
-
+   public void transform(List<Operation> operations) {
 
       for(int i=0; i<operations.size(); i++) {
          Operation operation = operations.get(i);
@@ -68,8 +61,6 @@ public class RemoveDeadBranches implements Transformation {
 
          updateStats(operation);
       }
-
-      return operations;
    }
 
    private boolean isDeadBranch(Operation operation) {
@@ -80,63 +71,5 @@ public class RemoveDeadBranches implements Transformation {
             return false;
       }
    }
-
-   /**
-    * TODO: Add more transformations
-    * @param operation
-    * @return
-    */
-   private List<Operand> resolveOperation(Operation operation) {
-      switch((OperationType)operation.getType()) {
-         case IntegerArithmeticWithCarry:
-            return ((ArithmeticWithCarry)operation).resolveLiterals();
-            //return resolveIntegerArithmeticWithCarry((ArithmeticWithCarry)operation);
-            //return ArithmeticWithCarry.resolve((ArithmeticWithCarry)operation);
-            //return ArithmeticWithCarry.resolveNeutral((ArithmeticWithCarry)operation);
-         case UnconditionalExit:
-            return resolveUnconditionalExit((UnconditionalExit)operation);
-         default:
-            return null;
-      }
-   }
-
    
-
-   private List<Operand> resolveUnconditionalExit(UnconditionalExit unconditionalExit) {
-      // Check if it performs linking
-      if(unconditionalExit.getOutput1() == null) {
-         return null;
-      }
-      
-      List<Operand> operands = new ArrayList<Operand>();
-      int value = unconditionalExit.getLinkingAddress();
-      int bits = unconditionalExit.getOutput1().getBits();
-      Literal literal = new Literal(Literal.LiteralType.integer, Integer.toString(value), bits);
-      
-      operands.add(literal);
-      return operands;
-   }
-
-   public Map<OperationType, Integer> getStats() {
-      return stats;
-   }
-
-   private void updateStats(Operation operation) {
-      // Add operation to table
-      Integer value = stats.get((OperationType) operation.getType());
-      if (value == null) {
-         value = 0;
-      }
-      value++;
-      stats.put((OperationType) operation.getType(), value);
-   }
-
-   /**
-    * INSTANCE VARIABLES
-    */
-    private Map<OperationType, Integer> stats;
-
-
-
-
 }

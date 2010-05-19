@@ -17,15 +17,44 @@
 
 package org.ancora.IntermediateRepresentation;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author Joao Bispo
  */
-public interface Transformation {
+public abstract class Transformation {
 
-  List<Operation> transform(List<Operation> operations);
-   //void transform(List<Operation> operations);
+  //public abstract List<Operation> transform(List<Operation> operations);
+  public abstract void transform(List<Operation> operations);
+    //void transform(List<Operation> operations);
+
+   public Transformation() {
+      stats = new EnumMap<OperationType, Integer>(OperationType.class);
+   }
+
+
+
+   public Map<OperationType, Integer> getStats() {
+      return stats;
+   }
+
+   protected void updateStats(Operation operation) {
+      // Add operation to table
+      Integer value = stats.get((OperationType) operation.getType());
+      if (value == null) {
+         value = 0;
+      }
+      value++;
+      stats.put((OperationType) operation.getType(), value);
+   }
+
+   /**
+    * INSTANCE VARIABLES
+    */
+    private Map<OperationType, Integer> stats;
+
 
 }

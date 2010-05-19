@@ -17,7 +17,7 @@
 
 package org.ancora.IntermediateRepresentation.Transformations;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.ancora.IntermediateRepresentation.Operand;
@@ -34,7 +34,7 @@ import org.ancora.IntermediateRepresentation.Transformation;
  *
  * @author Joao Bispo
  */
-public class RemoveInternalLoads implements Transformation {
+public class RemoveInternalLoads extends Transformation {
 
    @Override
    public String toString() {
@@ -42,9 +42,9 @@ public class RemoveInternalLoads implements Transformation {
    }
 
 
-
-   public List<Operation> transform(List<Operation> operations) {
-      Map<String, Operand> literalRegisters = new Hashtable<String, Operand>();
+// TODO: Use substitute table
+   public void transform(List<Operation> operations) {
+      Map<String, Operand> literalRegisters = new HashMap<String, Operand>();
       MemoryTable memTable = new MemoryTable();
 
       int loadCounter = 0;
@@ -60,10 +60,11 @@ public class RemoveInternalLoads implements Transformation {
             totalLoads++;
             MemoryLoad load = (MemoryLoad)operation;
             Operand internalData = memTable.getOperand(load.getAddress(), load.getInput1(), load.getInput2(), load.getOutput());
-            //System.out.println("Operand:"+load.getInput1());
+
             if(internalData == null) {
                continue;
             }
+            updateStats(operation);
 
             loadCounter++;
             literalRegisters.put(load.getOutput().toString(), internalData);
@@ -76,10 +77,10 @@ public class RemoveInternalLoads implements Transformation {
             MemoryStore store = (MemoryStore)operation;
             boolean success = memTable.updateTable(store.getOperand1(), store.getOperand2(), store.getContentsToStore());
             if(success) {
+               updateStats(operation);
                storeCounter++;
             }
-            //memTable.getOperand(load.getInput1(), load.getInput2());
-            //System.out.println("Operand:"+load.getInput1());
+
          }
 
       }
@@ -93,7 +94,6 @@ public class RemoveInternalLoads implements Transformation {
       System.out.println("Can remove "+loadCounter+" loads.");
       System.out.println("Can remove "+loadRatio+" of loads.");
 
-      return operations;
    }
 
    private void substituteRegisterForLiterals(Operation operation,
@@ -120,7 +120,7 @@ public class RemoveInternalLoads implements Transformation {
    class MemoryTable {
 
       public MemoryTable() {
-         bases = new Hashtable<String, Operand>();
+         bases = new HashMap<String, Operand>();
       }
 
       public String getAddress(Operand base, Operand offset) {
@@ -155,7 +155,7 @@ public class RemoveInternalLoads implements Transformation {
          
          if(address == null) {
             // Store to an unknown position. Flushing tables.
-            bases = new Hashtable<String, Operand>();
+            bases = new HashMap<String, Operand>();
 //            System.out.println("Store to unknown position ("+base+" + "+offset+"). " +
 //                    "Flushed memory tables.");
             return false;

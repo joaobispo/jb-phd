@@ -17,6 +17,7 @@
 
 package org.ancora.IntermediateRepresentation.Transformations;
 
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +32,7 @@ import org.ancora.IntermediateRepresentation.Transformation;
  *
  * @author Joao Bispo
  */
-public class SingleStaticAssignment implements Transformation {
+public class SingleStaticAssignment extends Transformation {
 
    @Override
    public String toString() {
@@ -40,10 +41,10 @@ public class SingleStaticAssignment implements Transformation {
 
 
 
-   public List<Operation> transform(List<Operation> operations) {
+   public void transform(List<Operation> operations) {
       //List<Operation> newList = new ArrayList<Operation>();
 
-      Map<String, Integer> variablesVersion = new Hashtable<String, Integer>();
+      Map<String, Integer> variablesVersion = new HashMap<String, Integer>();
 //      Map<String, InternalData> operandsTable = new Hashtable<String, InternalData>();
 //      Operation start = new Control(-1, Control.Op.start);
 //      newList.add(start);
@@ -111,7 +112,6 @@ public class SingleStaticAssignment implements Transformation {
          operations.set(i, operation);
       }
 
-      return operations;
    }
 
 }
