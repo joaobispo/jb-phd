@@ -44,6 +44,8 @@ public class Options {
       partition_filterbyrepetitions("partition.filterbyrepetitions","false"),
       partition_filteridenticalblocks("partition.filteridenticalblocks","false"),
       partition_megablockmaxpatternsize("partition.megablockmaxpatternsize","32"),
+      partition_daprofusebranchlimit("partition.daprofusebranchlimit","true"),
+      partition_daprofuseoriginalidmethod("partition.daprofuseoriginalidmethod","true"),
 
       extension_block("extension.block","block"),
       extension_trace("extension.trace","trace"),

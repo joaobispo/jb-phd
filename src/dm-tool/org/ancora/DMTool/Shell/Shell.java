@@ -62,7 +62,7 @@ public class Shell {
    private static void runScript(String[] args) {
       File scriptFile = IoUtils.existingFile(args[0]);
       if(scriptFile == null) {
-         logger.info("Script file '"+args[0]+"' not found. Terminating...");
+         logger.warning("Script file '"+args[0]+"' not found. Terminating...");
          return;
       }
 
@@ -72,7 +72,7 @@ public class Shell {
       while(command != null) {
          boolean success = executeCommand(command);
          if(!success) {
-            logger.info("(Problems on line "+lineCounter+")");
+            logger.warning("(Problems on line "+lineCounter+")");
          }
          command = lineReader.nextLine();
          lineCounter++;

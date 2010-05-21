@@ -59,7 +59,9 @@ public class DmPartitionerDispenser {
 
       MbBasicBlock("mb-basicblock"),
       MbSuperBlock("mb-superblock"),
-      MbMegaBlock("mb-megablock");
+      MbMegaBlock("mb-megablock"),
+      Daprof("mb-daprof"),
+      DaprofSimple("daprof-simple");
 
       private PartitionerName(String partitionerName) {
          this.partitionerName = partitionerName;
@@ -86,12 +88,11 @@ public class DmPartitionerDispenser {
             case MbSuperBlock:
                return MbPartitionerDispenser.getMbSuperBlock();
             case MbMegaBlock:
-               MegaBlock mb = MbPartitionerDispenser.getMbMegaBlock();
-               // Get max pattern size
-               String maxPatternString = Options.optionsTable.get(OptionName.partition_megablockmaxpatternsize);
-               int maxPatternSize = ParseUtils.parseInt(maxPatternString);
-               mb.setMaxPatternSize(maxPatternSize);
-               return mb;
+               return getMegablock();
+            case Daprof:
+               return getDaprof();
+            case DaprofSimple:
+               return getDaprofSimple();
             default:
                Logger.getLogger(DmPartitionerDispenser.class.getName()).
                        warning("Case not defined: '" + this);
@@ -99,6 +100,33 @@ public class DmPartitionerDispenser {
          }
       }
       private String partitionerName;
+
+      private Partitioner getDaprof() {
+         MbDaprof daprof = new MbDaprof();
+         Boolean useLimit = Boolean.parseBoolean(Options.optionsTable.get(OptionName.partition_daprofusebranchlimit));
+         daprof.setUseBranchLimit(useLimit);
+         Boolean useOriginalIdMethod = Boolean.parseBoolean(Options.optionsTable.get(OptionName.partition_daprofuseoriginalidmethod));
+         daprof.setUseDaprofId(useOriginalIdMethod);
+         return daprof;
+      }
+
+      private Partitioner getDaprofSimple() {
+         DaprofSimple daprofSimple = new DaprofSimple();
+         Boolean useLimit = Boolean.parseBoolean(Options.optionsTable.get(OptionName.partition_daprofusebranchlimit));
+         daprofSimple.setUseBranchLimit(useLimit);
+         Boolean useOriginalIdMethod = Boolean.parseBoolean(Options.optionsTable.get(OptionName.partition_daprofuseoriginalidmethod));
+         daprofSimple.setUseDaprofId(useOriginalIdMethod);
+         return daprofSimple;
+      }
+
+      private Partitioner getMegablock() {
+         MegaBlock mb = MbPartitionerDispenser.getMbMegaBlock();
+         // Get max pattern size
+         String maxPatternString = Options.optionsTable.get(OptionName.partition_megablockmaxpatternsize);
+         int maxPatternSize = ParseUtils.parseInt(maxPatternString);
+         mb.setMaxPatternSize(maxPatternSize);
+         return mb;
+      }
    }
 
 

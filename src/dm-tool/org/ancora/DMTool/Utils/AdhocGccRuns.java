@@ -58,6 +58,7 @@ public class AdhocGccRuns {
    }
 
    public static final String DEFAULT_FLAGS = "-Wall -g -mxl-barrel-shift -mno-xl-soft-div -mno-xl-soft-mul -xl-mode-executable";
-   public static final String DEFAULT_OPTIMIZATIONS = "-O0 -O1 -O2 -O3";
+   //public static final String DEFAULT_OPTIMIZATIONS = "-O0 -O1 -O2 -O3";
+   public static final String DEFAULT_OPTIMIZATIONS = "-Os";
    public static final String DEFAULT_INPUT_FOLDER = "I:\\Workspace\\Resources\\MicroBlaze Benchmarks\\06 - Test Battery 2 (Adhoc) (C and Elf)\\c";
 }

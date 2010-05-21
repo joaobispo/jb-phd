@@ -18,11 +18,8 @@
 package org.ancora.DMTool.Shell;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 import org.ancora.DMTool.Shell.System.Executable;
 import org.ancora.IrMapping.DmMapperDispenser;
@@ -140,7 +137,8 @@ public class Transform implements Executable {
       long totalNops = 0l;
 
       for(File file : inputFiles) {
-         logger.info("Processing file '"+file.getName()+"'...");
+         //logger.info("Processing file '"+file.getName()+"'...");
+         logger.warning("Processing file '"+file.getName()+"'...");
          String baseFilename = ParseUtils.removeSuffix(file.getName(), IoUtils.DEFAULT_EXTENSION_SEPARATOR);
 
          // Get BlockStream
@@ -150,6 +148,7 @@ public class Transform implements Executable {
          int counter = 0;
          while(block != null) {
              String blockName = baseFilename+"-"+counter;
+             logger.warning("Processing Block '"+blockName);
 //             logger.warning("Processing block '"+blockName);
 //            logger.info("Block "+counter+", "+block.getRepetitions()+" repetitions.");
 

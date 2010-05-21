@@ -67,7 +67,8 @@ public class Simulate implements Executable {
       List<File> inputFiles = Settings.getInputFiles(supportedExtensions);
 
       //logger.info("Found "+inputFiles.size()+" files.");
-      logger.warning("Found "+inputFiles.size()+" files.");
+//      logger.warning("Found "+inputFiles.size()+" files.");
+      logger.warning("Found "+inputFiles.size()+" files. Using partitioner "+Settings.getPartitioner().getName());
 
       processFiles(inputFiles);
 
@@ -76,6 +77,9 @@ public class Simulate implements Executable {
    }
 
    private void processFiles(List<File> inputFiles) {
+
+      double speedupAvg = 0d;
+      long globalNormalCycles = 0l;
       for (File file : inputFiles) {
          //logger.info("Processing file '"+file.getName()+"'...");
          logger.warning("Processing file '" + file.getName() + "'...");
@@ -89,7 +93,10 @@ public class Simulate implements Executable {
          BlockStream blockStream = blockPack.getBlockStream();
          InstructionBlock block = blockStream.nextBlock();
 
+         long totalProcessedInstructions = 0l;
          while (block != null) {
+            totalProcessedInstructions += block.getTotalInstructions();
+
             // Check repetitions of block
             int rep = block.getRepetitions();
             if (rep < repetitionsThreshold) {
@@ -114,24 +121,49 @@ public class Simulate implements Executable {
                mapper.reset();
                mapper.processOperations(operations);
 
-               // Get cycles
-               hwCycles += mapper.getNumberOfLines();
+               long commCost = mapper.getLiveIns() + mapper.getLiveOuts();
 
-               block = blockStream.nextBlock();
+               // Get cycles
+               hwCycles += mapper.getNumberOfLines() * block.getRepetitions();
+               hwCycles += commCost;
+
             }
+            
+               block = blockStream.nextBlock();
          }
 
          // Calculate speed-up of program
-         long totalNormalCycles = blockPack.getInstructionBusReader().getCycles();
-         double cpi = totalNormalCycles / blockPack.getInstructionBusReader().getInstructions();
+         long traceCycles = blockPack.getInstructionBusReader().getCycles();
+         long traceInstructions = blockPack.getInstructionBusReader().getInstructions();
+         double cpi = (double)traceCycles / (double)traceInstructions;
+
+         if(traceInstructions != totalProcessedInstructions) {
+            Logger.getLogger(Simulate.class.getName()).
+                    warning("DTool simulation instructions ("+traceInstructions+") different " +
+                    "from instructions fed to dynamic mapping simulation ("+totalProcessedInstructions+")");
+         }
 
          long processorCycles = (long) Math.ceil((double)processorInstructions * cpi);
          long totalSimCycles = processorCycles + hwCycles;
 
-         double speedup = (double) totalNormalCycles / (double) totalSimCycles;
+         double speedup = (double) traceCycles / (double) totalSimCycles;
+ /*
+         System.err.println("Normal Instructions:"+traceInstructions);
+         System.err.println("Normal Cycles:"+traceCycles);
+         System.err.println("Normal CPI:"+cpi);
+         System.err.println("MB Instructions:"+processorInstructions);
+         System.err.println("MB Cycles:"+processorCycles);
+         System.err.println("HW Cycles:"+hwCycles);
+  * 
+  */
          System.err.println("Speed-up:"+speedup);
-         
+         speedupAvg += speedup;
+
+         globalNormalCycles+=traceCycles;
       }
+
+      System.err.println("\nAverage Speed-up:"+(speedupAvg/inputFiles.size()));
+      System.err.println("Global Normal Cycles:"+globalNormalCycles);
    }
 
    /**
