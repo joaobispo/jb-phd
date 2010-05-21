@@ -70,6 +70,8 @@ public class RemoveInternalLoads2 extends Transformation {
                // Can use the output of this load in next loads
                // TODO: put in another transformation?
                memTable.updateTable(load.getInput1(), load.getInput2(), load.getOutput(), false);
+               String address = memTable.getAddress(load.getInput1(), load.getInput2());
+//               System.err.println("Stored Load with address "+address+" and operand "+load.getOutput());
                continue;
             }
 
@@ -77,6 +79,7 @@ public class RemoveInternalLoads2 extends Transformation {
 
             loadCounter++;
             literalRegisters.put(load.getOutput().toString(), internalData);
+//            System.err.println("Will substitute "+load.getOutput().toString()+"for "+internalData);
             operations.set(i, new Nop(operation));
             //System.out.println("Removed operation:"+operation.getFullOperation());
          }
@@ -85,6 +88,7 @@ public class RemoveInternalLoads2 extends Transformation {
          if(operation.getType() == OperationType.MemoryStore) {
             MemoryStore store = (MemoryStore)operation;
             boolean success = memTable.updateTable(store.getOperand1(), store.getOperand2(), store.getContentsToStore(), true);
+//            System.err.println("Table updated via store: "+store.getOperand1() +","+store.getOperand2() + " -> "+store.getContentsToStore());
             if(success) {
                //updateStats(operation);
                storeCounter++;
@@ -115,7 +119,9 @@ public class RemoveInternalLoads2 extends Transformation {
       for(int i=0; i<operands.size(); i++) {
          Operand operand = literalRegisters.get(operands.get(i).toString());
          if(operand != null) {
+//            System.err.println("Substituted "+operands.get(i)+" for "+operand);
             operands.set(i, operand);
+
             //System.out.println("SUBSTITUTED!");
          }
       }

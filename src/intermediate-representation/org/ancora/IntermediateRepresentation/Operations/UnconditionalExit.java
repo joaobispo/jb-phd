@@ -112,6 +112,18 @@ public class UnconditionalExit extends Operation {
       int calculatedJump = baseAddress + input1Value;
       boolean isDeadBranch = supposedJumpAddress == calculatedJump;
       if (!isDeadBranch) {
+         // Check if jump is to instruction itself
+         if(calculatedJump == getAddress()) {
+            Logger.getLogger(UnconditionalExit.class.getName()).
+                 info("Found unconditional branch to itself. This may indicate " +
+                 "the end of program.");
+            return true;
+         }
+
+
+               //System.err.println("baseAddr:"+baseAddress);
+      //System.err.println("offset:"+input1Value);
+      //System.err.println("supposed Addr:"+supposedJumpAddress);
          Logger.getLogger(UnconditionalExit.class.getName()).
                  warning("Unconditional exit mismatch: Calculated jump address "
                  + "(" + calculatedJump + ") different from next trace address ("

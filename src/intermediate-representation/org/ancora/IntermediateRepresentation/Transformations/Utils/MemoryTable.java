@@ -32,6 +32,7 @@ public class MemoryTable {
    public MemoryTable() {
       bases = new HashMap<String, Operand>();
       lastStoreType = AddressType.INVALID;
+      substituteTable = new SubstituteTable();
    }
 
    public AddressType calculateType(Operand base, Operand offset) {
@@ -154,8 +155,9 @@ public class MemoryTable {
 
          if (addrType != lastStoreType) {
             // Store to a different realm. Flushing tables.
-            bases = new HashMap<String, Operand>();
- //              System.err.println("Changed store realm from "+lastStoreType+" to "+addrType);
+            flushTables();
+//            bases = new HashMap<String, Operand>();
+//              System.err.println("Changed store realm from "+lastStoreType+" to "+addrType);
             lastStoreType = addrType;
             lastBaseId = calculateBaseId(base, offset);
 //         } else if(addrType == AddressType.DL || addrType == AddressType.DD) {
@@ -163,11 +165,13 @@ public class MemoryTable {
          } else if(enterElse) {
             // Check if base is the same
             String newBase = calculateBaseId(base, offset);
+
             if(!lastBaseId.equals(newBase)) {
                // Store inside the same realm, but can't prove it does not overlap.
                // Flushing tables.
-               bases = new HashMap<String, Operand>();
- //              System.err.println("Store to the same realm, but cannot prove "+lastBaseId+" does not overlap "+address);
+               flushTables();
+               //bases = new HashMap<String, Operand>();
+//              System.err.println("Store to the same realm, but cannot prove "+lastBaseId+" does not overlap "+address);
                lastBaseId = newBase;
             }
          }
@@ -180,8 +184,8 @@ public class MemoryTable {
       }
 
 
-
-      bases.put(address, content);
+      updateTables(base, offset, content);
+      //bases.put(address, content);
       //System.out.println("Stored '"+content+"'.");
       return true;
    }
@@ -215,8 +219,33 @@ public class MemoryTable {
    public Operand getOperand(Operand base, Operand offset) {
    //public Operand getOperand(String address) {
       String address = getAddress(base, offset);
+//      System.err.println("Getting operand with address "+address);
+//      System.err.println("Table:");
+//      System.err.println(bases);
       return bases.get(address);
    }
+
+   public SubstituteTable getSubstituteTable() {
+      return substituteTable;
+   }
+
+   private void flushTables() {
+      bases = new HashMap<String, Operand>();
+      substituteTable = new SubstituteTable();
+   }
+
+   private void updateTables(Operand base, Operand offset, Operand content) {
+      String address = getAddress(base, offset);
+      bases.put(address, content);
+      if(lastStoreType == AddressType.INVALID) {
+         // Initialize with type of update
+         lastStoreType = calculateType(base, offset);
+         lastBaseId = calculateBaseId(base, offset);
+      }
+      //System.err.println("Updated table: "+address +"->"+content);
+   }
+
+
    /*
    public Operand getOperand(int opAddress, Operand base, Operand offset, Operand output) {
       String address = getAddress(base, offset);
@@ -240,6 +269,8 @@ public class MemoryTable {
     *
     */
 
+
+
    /**
     * INSTANCE VARIABLES
     */
@@ -247,6 +278,10 @@ public class MemoryTable {
    private AddressType lastStoreType;
    private String lastBaseId;
    private boolean includeDL = false;
+   private SubstituteTable substituteTable;
+
+
+
 
 
    /**
