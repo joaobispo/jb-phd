@@ -17,11 +17,10 @@
 
 package org.ancora.IrMapping;
 
-import org.ancora.IrMapping.Mapper;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import org.ancora.IntermediateRepresentation.*;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +33,7 @@ import org.ancora.IntermediateRepresentation.OperationType;
  * @author Joao Bispo
  */
 public class AsapScenario2 implements Mapper {
+
 
    /**
     * Creates a MicroBlaze ILP Scenario 2 with MicroBlaze Immutable and Memory Tests
@@ -62,6 +62,18 @@ public class AsapScenario2 implements Mapper {
 
       for(Operation operation : operations) {
          if(operation.getType() == OperationType.Nop) {
+            /*
+            System.err.println("NOP:"+operation.getFullOperation());
+            for (Operand operand : operation.getOutputs()) {
+               // Check if operand is immutable
+               if (operand.isImmutable()) {
+                  continue;
+               }
+
+               //Update Liveouts
+               updateLiveouts(operand.toString());
+      }
+*/
             continue;
          }
 
@@ -170,19 +182,26 @@ public class AsapScenario2 implements Mapper {
 
    private void updateLiveouts(String operandRepresentation) {
       // Remove SSA suffix
+      int version = -1;
+
       int separatorIndex = operandRepresentation.lastIndexOf(".");
       if (separatorIndex != -1) {
+         version = Integer.parseInt(operandRepresentation.substring(separatorIndex+1, operandRepresentation.length()));
          operandRepresentation = operandRepresentation.substring(0, separatorIndex);
       }
+       
       liveOuts.add(operandRepresentation);
+      liveOutsVersion.put(operandRepresentation, version);
    }
 
    private void updateLiveins(String operandRepresentation) {
       // Remove SSA suffix
+
       int separatorIndex = operandRepresentation.lastIndexOf(".");
       if (separatorIndex != -1) {
          operandRepresentation = operandRepresentation.substring(0, separatorIndex);
       }
+       
       liveIns.add(operandRepresentation);
    }
 
@@ -191,12 +210,13 @@ public class AsapScenario2 implements Mapper {
       mappedOps = 0;
       usedLines = 0;
       lastLineWithStore = 0;
-      dataLines = new Hashtable<String, Integer>();
+      dataLines = new HashMap<String, Integer>();
 
       liveIns = new HashSet<String>();
       liveOuts = new HashSet<String>();
+      liveOutsVersion = new HashMap<String, Integer>();
 
-      mapping = new Hashtable<Integer, List<Operation>>();
+      mapping = new HashMap<Integer, List<Operation>>();
    }
 
 
@@ -218,7 +238,8 @@ public class AsapScenario2 implements Mapper {
          }
       }
 */
-//      System.out.println("Liveouts:"+liveOuts);
+      //System.out.println("Liveouts:"+liveOuts);
+//      System.err.println("Liveouts:"+liveOutsVersion);
       return liveOuts.size();
    }
 
@@ -285,7 +306,7 @@ public class AsapScenario2 implements Mapper {
    //private Set<Integer> liveOuts;
    private Set<String> liveIns;
    private Set<String> liveOuts;
-
+private Map<String, Integer> liveOutsVersion;
    //private ImmutableTest immutableTest;
    //private MemoryTest memoryTest;
 

@@ -107,11 +107,13 @@ public class Dotty {
       return operands;
    }
 
-      private static void declareOperations(Collection<Operation> operations, StringBuilder builder) {
-      for(Operation op : operations) {
+   private static void declareOperations(Collection<Operation> operations, StringBuilder builder) {
+      //for(int i=0; i<operations.size()-2; i++) {
+      //   Operation op = operations.get(i);
+      for (Operation op : operations) {
          /*
          if(op.getType() == OperationType.Nop) {
-            continue;
+         continue;
          }
           */
 
@@ -120,8 +122,15 @@ public class Dotty {
          //builder.append(op.getType()+"-"+op.getValue());
          //builder.append(op.getValue());
          builder.append(op);
-         builder.append("\"];\n");
+         builder.append("\"");
+         // Check if start or end node
+         if(op.getType() == OperationType.Control) {
+            builder.append(" style=filled fillcolor=\"dodgerblue\"");
+         }
+         builder.append("];\n");
       }
+
+      // Last two operations are usually Start and End node
    }
 
    private static void declareOperands(Collection<Operand> operands, StringBuilder builder) {
@@ -250,6 +259,8 @@ public class Dotty {
 
          List<Operand> outputs = operation.getOutputs();
          for(int j=0; j<outputs.size(); j++) {
+//            System.err.println("Outputs:");
+//            System.err.println(outputs);
             Operand output = outputs.get(j);
 
             // Check if immutable
@@ -279,7 +290,7 @@ public class Dotty {
                System.out.println("Could not get version from output "+realOutput);
             }
 
-
+/*
             //Integer lastVersion = liveOutsLastVersion.get(outputName);
             Integer lastVersion = liveOutsLastVersion.get(outputNameClean);
             // There was not a last version
@@ -298,6 +309,10 @@ public class Dotty {
                //liveOuts.put(outputName, realOutput);
                liveOuts.put(outputNameClean, realOutput);
             }
+  */
+            // Always update with the most recent version, it means it is the
+            // most recent write for that register.
+            liveOuts.put(outputNameClean, realOutput);
 
             /*
              // Update output index from table
