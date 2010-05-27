@@ -68,13 +68,14 @@ public class BlockIO {
 
       int id = ParseUtils.parseInt(parameters.get(Property.id));
       int repetitions = ParseUtils.parseInt(parameters.get(Property.repetitions));
+      long totalInstructions = ParseUtils.parseLong(parameters.get(Property.totalinstructions));
 
 
       // 2. Get Instructions
       List<GenericInstruction> instructions = getInstructions(reader);
 
       // Build Instruction Block
-      return new InstructionBlock(instructions, repetitions, id);
+      return new InstructionBlock(instructions, repetitions, id, totalInstructions);
    }
 
     /**
@@ -123,6 +124,7 @@ public class BlockIO {
 
       newTable.put(Property.id, String.valueOf(instructionBlock.getId()));
       newTable.put(Property.repetitions, String.valueOf(instructionBlock.getRepetitions()));
+      newTable.put(Property.totalinstructions, String.valueOf(instructionBlock.getTotalInstructions()));
 
       return newTable;
    }
@@ -132,7 +134,8 @@ public class BlockIO {
     */
    static public enum Property {
       id,
-      repetitions;
+      repetitions,
+      totalinstructions;
    }
 
    /**

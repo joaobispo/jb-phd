@@ -29,15 +29,17 @@ import org.ancora.InstructionBlock.InstructionBlockListener;
 public class InstructionBlockStats implements InstructionBlockListener {
 
    public InstructionBlockStats() {
-      blockInstructions = new ArrayList<Integer>();
-      blockRepetitions = new ArrayList<Integer>();
+      totalInstructions = 0l;
+      //blockInstructions = new ArrayList<Integer>();
+      //blockRepetitions = new ArrayList<Integer>();
    }
 
 
 
    public void accept(InstructionBlock instructionBlock) {
-      blockInstructions.add(instructionBlock.getInstructions().size());
-      blockRepetitions.add(instructionBlock.getRepetitions());
+      totalInstructions += instructionBlock.getTotalInstructions();
+      //blockInstructions.add(instructionBlock.getInstructions().size());
+      //blockRepetitions.add(instructionBlock.getRepetitions());
    }
 
    public void flush() {
@@ -45,14 +47,19 @@ public class InstructionBlockStats implements InstructionBlockListener {
    }
 
    public long getTotalInstructions() {
+      /*
       long acc = 0;
       for(int i=0; i<blockInstructions.size(); i++) {
          acc += blockInstructions.get(i) * blockRepetitions.get(i);
       }
 
       return acc;
+       *
+       */
+      return totalInstructions;
    }
 
-   private List<Integer> blockInstructions;
-   private List<Integer> blockRepetitions;
+   //private List<Integer> blockInstructions;
+   //private List<Integer> blockRepetitions;
+   private long totalInstructions;
 }

@@ -27,10 +27,11 @@ import java.util.List;
  */
 public class InstructionBlock {
 
-   public InstructionBlock(List<GenericInstruction> instructions, int repetitions, int id) {
+   public InstructionBlock(List<GenericInstruction> instructions, int repetitions, int id, long totalInstructions) {
       this.instructions = instructions;
       this.repetitions = repetitions;
       this.id = id;
+      this.totalInstructions = totalInstructions;
    }
 
 
@@ -38,8 +39,9 @@ public class InstructionBlock {
     * @return the number of instructions in the InstructionBlock, multiplied by
     * the number of repetitions
     */
-   public int getTotalInstructions() {
-      return instructions.size() * repetitions;
+   public long getTotalInstructions() {
+      return totalInstructions;
+      //return instructions.size() * repetitions;
    }
 
    /**
@@ -87,6 +89,7 @@ public class InstructionBlock {
     * INSTANCE VARIABLES
     */
    private List<GenericInstruction> instructions;
+   private long totalInstructions;
    private int repetitions;
    private int id;
 }
