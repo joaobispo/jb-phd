@@ -96,7 +96,7 @@ public class SuperBlock extends Partitioner {
 
       private void completeSuperBlock() {
          // Build new InstructionBlock
-         InstructionBlock newBlock = new InstructionBlock(instructions, 1, hash);
+         InstructionBlock newBlock = new InstructionBlock(instructions, 1, hash, instructions.size());
 
          // Notice Listeners
          noticeListeners(newBlock);

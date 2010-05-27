@@ -249,7 +249,7 @@ public class MegaBlock extends Partitioner {
 
          // Build InstructionBlock
          //InstructionBlock newBlock = new InstructionBlock(instructions, 1, blockId);
-         return new InstructionBlock(instructions, 1, blockId);
+         return new InstructionBlock(instructions, 1, blockId, instructions.size());
          // Send it to listeners
          //noticeListeners(newBlock);
       }

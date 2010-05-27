@@ -123,7 +123,7 @@ public class SuperBlock extends Partitioner {
     */
    private InstructionBlock completeSuperBlock() {
       // Build new InstructionBlock
-      InstructionBlock newBlock = new InstructionBlock(instructions, 1, hash);
+      InstructionBlock newBlock = new InstructionBlock(instructions, 1, hash, instructions.size());
 
       // Notice Listeners
       //noticeListeners(newBlock);

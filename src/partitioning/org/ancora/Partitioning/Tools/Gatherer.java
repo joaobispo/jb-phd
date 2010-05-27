@@ -54,6 +54,7 @@ public class Gatherer implements InstructionBlockListener, InstructionBlockProdu
       // Check if the blocks are the same
       if(instructionBlock.getId() == currentInstructionBlock.getId()) {
          repetitions++;
+         totalInstructions += instructionBlock.getTotalInstructions();
       } else {
          // If not, complete an InstructionBlock and make this current
          completeBlock();
@@ -64,7 +65,7 @@ public class Gatherer implements InstructionBlockListener, InstructionBlockProdu
    private void completeBlock() {
       // Build new InstructionBlock
       InstructionBlock newBlock = new InstructionBlock(currentInstructionBlock.getInstructions(),
-              repetitions, currentInstructionBlock.getId());
+              repetitions, currentInstructionBlock.getId(), totalInstructions);
 
       // Notify producer
       producer.sendBlock(newBlock);
@@ -82,11 +83,13 @@ public class Gatherer implements InstructionBlockListener, InstructionBlockProdu
    private void startNewBlock(InstructionBlock instructionBlock) {
       currentInstructionBlock = instructionBlock;
       repetitions = 1;
+      totalInstructions = instructionBlock.getTotalInstructions();
    }
 
    private void reset() {
       currentInstructionBlock = null;
       repetitions = -1;
+      totalInstructions = 0l;
    }
 
    /**
@@ -94,6 +97,7 @@ public class Gatherer implements InstructionBlockListener, InstructionBlockProdu
     */
    private InstructionBlock currentInstructionBlock;
    private int repetitions;
+   private long totalInstructions;
 
    private GathererProducer producer;
 

@@ -15,12 +15,15 @@
  *  under the License.
  */
 
-package org.ancora.Partitioning;
+package org.ancora.Partitioning.deprecated;
 
+import org.ancora.Partitioning.Partitioner;
+import org.ancora.Partitioning.Tools.InstructionFilter;
 import java.util.ArrayList;
 import java.util.List;
 import org.ancora.InstructionBlock.GenericInstruction;
 import org.ancora.InstructionBlock.InstructionBlock;
+import org.ancora.Partitioning.Partitioner;
 import org.ancora.SharedLibrary.BitUtils;
 
 /**
@@ -28,14 +31,14 @@ import org.ancora.SharedLibrary.BitUtils;
  *
  * @author Joao Bispo
  */
-public abstract class Daprof extends Partitioner {
+public class DaprofSimple extends Partitioner {
 
 
-   public Daprof() {
+   public DaprofSimple() {
       currentInstructions = new ArrayList<GenericInstruction>();
       backwardBranchMaxOffset = DEFAULT_MAX_OFFSET;
-      //useDaprofId = false;
-      useDaprofId = true;
+      useDaprofId = false;
+      //useDaprofId = true;
       lastAddress = -1;
       useBranchLimit = true;
    }
@@ -52,10 +55,6 @@ public abstract class Daprof extends Partitioner {
       this.useDaprofId = useDaprofId;
    }
 
-
-   protected abstract boolean lastInstructionWasJump(GenericInstruction instruction);
-
-   protected abstract void resetJumpInstruction();
    
    /**
     * CAUTION: In architectures with delay slots, the instruction where the
@@ -65,18 +64,13 @@ public abstract class Daprof extends Partitioner {
     * @return true if the this instruction represents a jump in the control flow.
     */
    //protected abstract boolean isShortBackwardBranch(GenericInstruction instruction, int nextInstAddress);
-   private boolean isShortBackwardBranch(GenericInstruction currentInstruction, int lastAddress) {
-     
-      if(!lastInstructionWasJump(currentInstruction)) {
-         return false;
-      }
-      //System.err.println("Current inst:"+currentInstruction.toLine());
-      //System.err.println("Last address:"+lastAddress);
-      int offset = currentInstruction.getAddress() - lastAddress;
+   private boolean isShortBackwardBranch(int currentAddress, int lastInstAddress) {
+      int offset = currentAddress - lastInstAddress;
+      //System.err.println("Current:"+currentAddress);
+      //System.err.println("last:"+lastInstAddress);
       //System.err.println("Offset:"+offset);
-      
-      //if(offset <= 0) {
       if(offset >= 0) {
+      //if(offset <= 0) {
          return false;
       }
 
@@ -106,7 +100,7 @@ public abstract class Daprof extends Partitioner {
 
       // Check if instruction is a branch
       //if(jumpFilter.accept(instruction)) {
-      if(isShortBackwardBranch(instruction, lastAddress)) {
+      if(isShortBackwardBranch(instruction.getAddress(), lastAddress)) {
          completeBasicBlock();
       }
 
@@ -149,7 +143,7 @@ public abstract class Daprof extends Partitioner {
       }
 
       // Build Instruction Block
-      InstructionBlock iBlock = new InstructionBlock(currentInstructions, repetitions, id);
+      InstructionBlock iBlock = new InstructionBlock(currentInstructions, repetitions, id, repetitions*currentInstructions.size());
 
       noticeListeners(iBlock);
 
@@ -162,6 +156,7 @@ public abstract class Daprof extends Partitioner {
    }
 
 
+
    /**
     * INSTANCE VARIABLES
     */
@@ -172,7 +167,6 @@ public abstract class Daprof extends Partitioner {
 
    private boolean useBranchLimit;
 
-   public static final String NAME = "Daprof";
+   public static final String NAME = "DaprofSimple";
    public static final int DEFAULT_MAX_OFFSET = 1024;
-
 }

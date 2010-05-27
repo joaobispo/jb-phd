@@ -95,7 +95,7 @@ public abstract class BasicBlock extends Partitioner {
       int repetitions = 1;
       
       // Build Instruction Block
-      InstructionBlock iBlock = new InstructionBlock(currentInstructions, repetitions, id);
+      InstructionBlock iBlock = new InstructionBlock(currentInstructions, repetitions, id, repetitions*currentInstructions.size());
 
       noticeListeners(iBlock);
 

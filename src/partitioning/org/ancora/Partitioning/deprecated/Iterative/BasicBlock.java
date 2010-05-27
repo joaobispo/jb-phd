@@ -80,7 +80,7 @@ public abstract class BasicBlock extends Partitioner {
       int repetitions = 1;
       
       // Build Instruction Block
-      InstructionBlock iBlock = new InstructionBlock(currentInstructions, repetitions, id);
+      InstructionBlock iBlock = new InstructionBlock(currentInstructions, repetitions, id, currentInstructions.size());
 
       // Clean current instructions
       currentInstructions = new ArrayList<GenericInstruction>();

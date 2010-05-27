@@ -228,7 +228,7 @@ public class MegaBlock extends Partitioner {
          int blockId = calcId(currentIds);
 
          // Build InstructionBlock
-         InstructionBlock newBlock = new InstructionBlock(instructions, 1, blockId);
+         InstructionBlock newBlock = new InstructionBlock(instructions, 1, blockId, instructions.size());
          // Send it to listeners
          noticeListeners(newBlock);
       }

@@ -17,8 +17,6 @@
 
 package org.ancora.Partitioning;
 
-import org.ancora.Partitioning.Partitioner;
-import org.ancora.Partitioning.Tools.InstructionFilter;
 import java.util.ArrayList;
 import java.util.List;
 import org.ancora.InstructionBlock.GenericInstruction;
@@ -30,14 +28,15 @@ import org.ancora.SharedLibrary.BitUtils;
  *
  * @author Joao Bispo
  */
-public class DaprofSimple extends Partitioner {
+public abstract class Warp extends Partitioner {
 
 
-   public DaprofSimple() {
+   public Warp() {
       currentInstructions = new ArrayList<GenericInstruction>();
+      totalInstructions = 0l;
       backwardBranchMaxOffset = DEFAULT_MAX_OFFSET;
-      useDaprofId = false;
-      //useDaprofId = true;
+      //useDaprofId = false;
+      useDaprofId = true;
       lastAddress = -1;
       useBranchLimit = true;
    }
@@ -54,6 +53,10 @@ public class DaprofSimple extends Partitioner {
       this.useDaprofId = useDaprofId;
    }
 
+
+   protected abstract boolean lastInstructionWasJump(GenericInstruction instruction);
+
+   protected abstract void resetJumpInstruction();
    
    /**
     * CAUTION: In architectures with delay slots, the instruction where the
@@ -63,13 +66,18 @@ public class DaprofSimple extends Partitioner {
     * @return true if the this instruction represents a jump in the control flow.
     */
    //protected abstract boolean isShortBackwardBranch(GenericInstruction instruction, int nextInstAddress);
-   private boolean isShortBackwardBranch(int currentAddress, int lastInstAddress) {
-      int offset = currentAddress - lastInstAddress;
-      //System.err.println("Current:"+currentAddress);
-      //System.err.println("last:"+lastInstAddress);
+   private boolean isShortBackwardBranch(GenericInstruction currentInstruction, int lastAddress) {
+     
+      if(!lastInstructionWasJump(currentInstruction)) {
+         return false;
+      }
+      //System.err.println("Current inst:"+currentInstruction.toLine());
+      //System.err.println("Last address:"+lastAddress);
+      int offset = currentInstruction.getAddress() - lastAddress;
       //System.err.println("Offset:"+offset);
-      if(offset >= 0) {
+      
       //if(offset <= 0) {
+      if(offset >= 0) {
          return false;
       }
 
@@ -91,6 +99,7 @@ public class DaprofSimple extends Partitioner {
       // Initial case
       if(lastAddress == -1) {
          currentInstructions.add(instruction);
+         totalInstructions++;
          lastAddress = instruction.getAddress();
          return;
       }
@@ -99,12 +108,13 @@ public class DaprofSimple extends Partitioner {
 
       // Check if instruction is a branch
       //if(jumpFilter.accept(instruction)) {
-      if(isShortBackwardBranch(instruction.getAddress(), lastAddress)) {
+      if(isShortBackwardBranch(instruction, lastAddress)) {
          completeBasicBlock();
       }
 
      // Add instruction to current block of instructions
       currentInstructions.add(instruction);
+      totalInstructions++;
       lastAddress = instruction.getAddress();
    }
 
@@ -122,32 +132,46 @@ public class DaprofSimple extends Partitioner {
       // According to the paper, the Daprof block can be identified by
       // the address of the first instruction and by the number of instructions
       // the block has, but I think there can be ambiguities.
-      int originalId = BitUtils.superFastHash(currentInstructions.get(0).getAddress(), 32);
-      originalId = BitUtils.superFastHash(currentInstructions.size(), originalId);
+      //int originalId = BitUtils.superFastHash(currentInstructions.get(0).getAddress(), 32);
+      GenericInstruction lastInst=currentInstructions.get(currentInstructions.size()-1);
+      GenericInstruction firstInst=currentInstructions.get(0);
+      int offset = lastInst.getAddress()-firstInst.getAddress();
+      int originalId = BitUtils.superFastHash(lastInst.getAddress(), 32);
+      originalId = BitUtils.superFastHash(offset, originalId);
 
 
       // As an alternative, I'm calculating an hash with the values of
       // the addresses of all instructions in the block.
+      /*
       int completeId = 32;
       for(GenericInstruction instruction : currentInstructions) {
          completeId = BitUtils.superFastHash(instruction.getAddress(), completeId);
       }
+       *
+       */
 
       int repetitions = 1;
+      int id = originalId;
+      /*
       int id = 0;
       if(useDaprofId) {
          id = originalId;
       } else {
          id = completeId;
       }
+       *
+       */
 
       // Build Instruction Block
-      InstructionBlock iBlock = new InstructionBlock(currentInstructions, repetitions, id);
-
+      InstructionBlock iBlock = new InstructionBlock(currentInstructions, repetitions, id, totalInstructions);
+if(totalInstructions != currentInstructions.size()) {
+   System.err.println("Warp: Total instructions "+totalInstructions+" != current isntructions size "+currentInstructions.size());
+}
       noticeListeners(iBlock);
 
       // Clean current instructions
       currentInstructions = new ArrayList<GenericInstruction>();
+      totalInstructions = 0l;
    }
 
    public void setUseBranchLimit(boolean useBranchLimit) {
@@ -155,17 +179,18 @@ public class DaprofSimple extends Partitioner {
    }
 
 
-
    /**
     * INSTANCE VARIABLES
     */
    private List<GenericInstruction> currentInstructions;
+   private long totalInstructions;
    private int backwardBranchMaxOffset;
    private boolean useDaprofId;
    private int lastAddress;
 
    private boolean useBranchLimit;
-
-   public static final String NAME = "DaprofSimple";
+   
+   public static final String NAME = "Warp";
    public static final int DEFAULT_MAX_OFFSET = 1024;
+
 }
