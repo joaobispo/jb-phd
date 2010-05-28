@@ -71,7 +71,8 @@ public class TcProcess {
       StringBuilder builder = new StringBuilder();
 
       for(int i=0; i<maxRepetitions; i++) {
-         builder.append(",");
+         //builder.append(",");
+         builder.append(CSV_SEPARATOR);
          builder.append(i);
       }
       builder.append("\n");
@@ -86,7 +87,8 @@ public class TcProcess {
 
       builder.append(name);
       for(int i=0; i<values.length; i++) {
-         builder.append(",");
+         builder.append(CSV_SEPARATOR);
+//         builder.append(",");
          builder.append(values[i]);
       }
       builder.append("\n");
@@ -101,7 +103,8 @@ public class TcProcess {
 
       builder.append(name);
       for(int i=0; i<values.length; i++) {
-         builder.append(",");
+         builder.append(CSV_SEPARATOR);
+//         builder.append(",");
          builder.append(values[i]);
       }
       builder.append("\n");
@@ -109,5 +112,7 @@ public class TcProcess {
       // Append file
       return IoUtils.append(csvFile, builder.toString());
    }
+
+   public static final String CSV_SEPARATOR = "\t";
 
 }

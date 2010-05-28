@@ -40,6 +40,9 @@ import org.ancora.DMTool.Stats.TraceCoverage.TcProcess;
 import org.ancora.Partitioning.DmPartitionerDispenser.PartitionerName;
 
 /**
+ * Reads elf and trace files, applies multiple partitions to each file and
+ * builds CSV files which maps the number of repetitions in the blocks to the
+ * percentage of trace covered.
  *
  * @author Joao Bispo
  */
@@ -92,20 +95,8 @@ public class TraceCoverage implements Executable {
 
       return partitioners;
    }
-   /*
-   private List<Partitioner> getPartitioners(List<String> arguments) {
-      List<Partitioner> partitioners = new ArrayList<Partitioner>();
 
-      for(String argument : arguments) {
-         Partitioner partitioner = DmPartitionerDispenser.getPartitioner(argument);
-         if(partitioner != null) {
-            partitioners.add(partitioner);
-         }
-      }
 
-      return partitioners;
-   }
-*/
 
    private void processPartitioners(List<PartitionerName> partitioners, List<File> inputFiles) {
       // Initialize main table
@@ -117,7 +108,7 @@ public class TraceCoverage implements Executable {
 
       // Calculate maximum number of repetitions
       int maxRep = 0;
-      int maxBlockSize = 0;
+      long maxBlockSize = 0;
 
       // Iterate over files
       for (File file : inputFiles) {
@@ -314,9 +305,5 @@ double ratioAverage[] = new double[maxRepetitions];
     */
    private String traceExtension;
    private String elfExtension;
-
-
-
-
 
 }

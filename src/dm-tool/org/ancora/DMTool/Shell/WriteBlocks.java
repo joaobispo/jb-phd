@@ -32,8 +32,8 @@ import org.ancora.SharedLibrary.IoUtils;
 import org.ancora.SharedLibrary.ParseUtils;
 
 /**
- * Partitions elf and trace files into InstructionBlocks, and writes them to
- * the disk.
+ * Reads elf and trace files, partitions the application into InstructionBlocks
+ * and writes the individual, diferent blocks to .block format.
  *
  * @author Joao Bispo
  */
@@ -44,46 +44,16 @@ public class WriteBlocks implements Executable {
 
    private void setup() {
       blockExtension = Options.optionsTable.get(OptionName.extension_block);
-      elfExtension = Options.optionsTable.get(OptionName.extension_elf);
-      traceExtension = Options.optionsTable.get(OptionName.extension_trace);
       outputFolder = Options.optionsTable.get(OptionName.general_outputfolder);
+
+      Settings.autoSet(WriteBlocks.class.getName(),
+              OptionName.partition_filteridenticalblocks, DEFAULT_FILTER_IDENTICAL);
+      
    }
 
    public boolean execute(List<String> arguments) {
       setup();
 
-      /*
-      if(arguments.size() < 1) {
-         Logger.getLogger(WriteBlocks.class.getName()).
-         info("Too few arguments for '"+Command.extractblocks+"' ("+arguments.size()+"). Minimum is 1:");
-         Logger.getLogger(WriteBlocks.class.getName()).
-         info(Command.extractblocks+" <folder/file>");
-         return false;
-      }
-       *
-       */
-
-/*
-      // Check file/folder
-      File file = new File(arguments.get(0));
-      if(!file.exists()) {
-         Logger.getLogger(WriteBlocks.class.getName()).
-                 info("Path '"+arguments.get(0)+"' does not exist.");
-         return false;
-      }
-
-      // Get files
-      List<File> inputFiles;
-      if(file.isFile()) {
-         inputFiles = new ArrayList<File>(1);
-         inputFiles.add(file);
-      } else {
-         java.util.Set<String> supportedExtensions = new HashSet<String>();
-         supportedExtensions.add(elfExtension);
-         supportedExtensions.add(traceExtension);
-         inputFiles = IoUtils.getFilesRecursive(file, supportedExtensions);
-      }
-      */
       List<File> inputFiles = Settings.getInputFiles();
 
       Logger.getLogger(WriteBlocks.class.getName()).
@@ -116,35 +86,49 @@ public class WriteBlocks implements Executable {
             continue;
          }
 
+//         DottyBlock dottyBlock = new DottyBlock();
+
          // Get BlockStream
          BlockStream blockStream = DmBlockUtils.getBlockStream(file);
-         InstructionBlock block = blockStream.nextBlock();
+         //InstructionBlock block = blockStream.nextBlock();
+         InstructionBlock block = null;
          // Start counter
          int counter = 0;
-         while (block != null) {
+         while ((block = blockStream.nextBlock()) != null) {
+           
+            // Write block to a file
             String blockFilename = baseFilename + "-" + counter
                     + IoUtils.DEFAULT_EXTENSION_SEPARATOR + blockExtension;
             File newBlockFile = new File(baseFolder, blockFilename);
             BlockIO.toFile(newBlockFile, block);
 
+
+            //dottyBlock.addBlock(block);
             // Increment counter
             counter++;
-            block = blockStream.nextBlock();
+            //block = blockStream.nextBlock();
          }
-         
+
+  
+         //String partitionerName = Settings.getPartitioner().getName();
+         //File dotFile = DmDottyUtils.getDottyFile(baseFilename, baseFilename+"-"+partitionerName+"-trace");
+         //IoUtils.write(dotFile, dottyBlock.generateDot());
+
+
+         //System.out.println("Dotty:");
+         //System.out.println(dottyBlock.generateDot());
       }
    }
 
    /**
     * INSTANCE VARIABLES
     */
-      private String traceExtension;
-   private String elfExtension;
    private String blockExtension;
    private String outputFolder;
 
       public static final String DEFAULT_BLOCK_FOLDER = "block";
       public static final String DEFAULT_FOLDER_SEPARATOR = "/";
+      public static final String DEFAULT_FILTER_IDENTICAL = "true";
 
 
 }

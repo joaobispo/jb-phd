@@ -41,9 +41,6 @@ public class Shell {
     public static void main(String[] args) {
        // Configure Logger to capture all output to console
        LoggingUtils.setupConsoleOnly();
-       //Handler handler = LoggingUtils.buildConsoleHandler();
-       //handler.setLevel(Level.WARNING);
-       //LoggingUtils.setLevel(Level.WARNING);
 
        if (args.length > 0) {
           // Try to get script file
@@ -52,11 +49,7 @@ public class Shell {
           // Run the shell
           runShell();
        }
-
-
-
-
-      
+    
     }
 
    private static void runScript(String[] args) {
@@ -133,99 +126,14 @@ public class Shell {
       }
 
       return executable.execute(arguments);
-      /*
-      if(commandEnum == Command.help) {
-         showHelp();
-         return true;
-      }
 
-      if(commandEnum == Command.set) {
-         return executeSet(splitCommand);
-      }
-
-      if(commandEnum == Command.options) {
-         return executeOptions();
-      }
-
-      Executable exec = commandEnum.getExecutable();
-      if(exec != null) {
-         return exec.execute(splitCommand);
-      }
-*/
-      //return false;
    }
-/*
-   private static void showHelp() {
-      logger.info("Supported commands:");
-      for(Command command : Command.values()) {
-         String message = command.name() + " - " + command.helpMessage();
-         logger.info(message);
-      }
-   }
-*/
-   /*
-   
-   private static boolean executeSet(List<String> args) {
-      EnumPreferences prefs = GeneralPreferences.getPreferences();
-
-      if(args.size() < 2) {
-         logger.info("Too few arguments for 'set' ("+args.size()+"). Minimum is 2.");
-         return false;
-      }
-
-      // Get preference
-      String prefString = args.get(0);
-      GeneralPreferences prefEnum = EnumUtils.valueOf(GeneralPreferences.class, prefString);
-      if(prefEnum == null) {
-         logger.info("'"+args.get(0)+"' is not a valid setting. Avaliable:");
-         //logger.info("");
-         for(GeneralPreferences gPref : GeneralPreferences.values()) {
-            logger.info("- "+gPref.name());
-         }
-         return false;
-      }
-
-      // Get value
-      String value = args.get(1);
-
-      // Update preferences
-      prefs.putPreference(prefEnum, value);
-
-      return true;
-   }
-*/
-   /*
-   private static boolean executeOptions() {
-      EnumPreferences prefs = GeneralPreferences.getPreferences();
-
-      logger.info("Current values for program options:");
-      for(GeneralPreferences gPref : GeneralPreferences.values()) {
-         String value = prefs.getPreference(gPref);
-         String message = gPref.name() + " - " + value;
-         logger.info(message);
-      }
-
-      return true;
-   }
-    */
 
    /**
     * INSTANCE VARIABLES
     */
    private static final Logger logger = Logger.getLogger(Shell.class.getName());
-/*
-   private static final Map<Command, Executable> executables;
-   static {
-      Map<Command, Executable> aMap = new EnumMap<Command, Executable>(Command.class);
 
-      aMap.put(Command.set, new Set());
-      aMap.put(Command.transform, new Transform());
-      aMap.put(Command.help, new Help());
-      aMap.put(Command.options, new ShowOptions());
-
-      executables = Collections.unmodifiableMap(aMap);
-   }
-*/
 
    /**
     * ENUM
@@ -239,25 +147,9 @@ public class Shell {
       transform,
       extractblocks,
       tracecoverage,
-      simulate;
-/*
-      public String helpMessage() {
-         switch (this) {
-            case help:
-               return "This help message";
-            case exit:
-               return "Exit the program";
-            case set:
-               return "Set the value of a particular option";
-            case options:
-               return "Show the current value of avaliable options";
-            case transform:
-               return "Study transformation effects on code. Supports traces, elfs and blocks.";
-            default:
-               return "Help message not defined";
-         }
-      }
-*/
+      simulate,
+      dottrace;
+
   
       public Executable getExecutable() {
          switch (this) {
@@ -275,6 +167,8 @@ public class Shell {
                return new TraceCoverage();
             case simulate:
                return new Simulate();
+            case dottrace:
+               return new DotTrace();
             default:
                Logger.getLogger(Command.class.getName()).
                        warning("Executable not defined for '" + this.name() + "'");
@@ -283,9 +177,5 @@ public class Shell {
       }
        
    }
-
-
-
-
 
 }

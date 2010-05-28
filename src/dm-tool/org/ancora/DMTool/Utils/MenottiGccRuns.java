@@ -59,7 +59,8 @@ public class MenottiGccRuns {
    }
 
    public static final String DEFAULT_FLAGS = "-Wall -g -mxl-barrel-shift -mno-xl-soft-div -mno-xl-soft-mul -xl-mode-executable";
-   //public static final String DEFAULT_OPTIMIZATIONS = "-O0 -O1 -O2 -O3";
-   public static final String DEFAULT_OPTIMIZATIONS = "-Os";
-   public static final String DEFAULT_INPUT_FOLDER = "I:\\Workspace\\Resources\\MicroBlaze Benchmarks\\05 - Test Battery 1 (Menotti) (C and Elf)\\c";
+   public static final String DEFAULT_OPTIMIZATIONS = "-O0 -O1 -O2 -O3";
+   //public static final String DEFAULT_OPTIMIZATIONS = "-Os";
+   //public static final String DEFAULT_INPUT_FOLDER = "I:\\Workspace\\Resources\\MicroBlaze Benchmarks\\05 - Test Battery 1 (Menotti) (C and Elf)\\c";
+   public static final String DEFAULT_INPUT_FOLDER = "D:\\WorkSpace\\Resources\\Benchmarks\\Test Battery 1 (Menotti) (C and Elf)\\c";
 }

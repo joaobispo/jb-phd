@@ -45,7 +45,7 @@ public class DmDottyUtils {
       return dotFile;
    }
 
-   public static boolean writeDot(List<Operation> operations, File dotFile) {
+   public static boolean writeBlockDot(List<Operation> operations, File dotFile) {
       // Processing on list ended. Removed nops before printing
       List<Operation> ops = Dotty.removeNops(operations);
 

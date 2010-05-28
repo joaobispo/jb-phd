@@ -43,6 +43,12 @@ public class Settings {
       return DmPartitionerDispenser.getCurrentPartitioner();
    }
 
+   public static void autoSet(String className, OptionName option, String value) {
+      Logger.getLogger(className).
+              warning("AutoSetting '"+option+"' to '"+value+"'");
+      Options.optionsTable.put(option, value);
+   }
+
    public static void setupBlockWorker(BlockWorker worker) {
       
       Map<OptionName, String> options = Options.optionsTable;

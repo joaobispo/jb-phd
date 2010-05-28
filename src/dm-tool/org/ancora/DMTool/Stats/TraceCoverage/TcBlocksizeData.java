@@ -29,14 +29,14 @@ import org.ancora.InstructionBlock.InstructionBlock;
 public class TcBlocksizeData {
 
    public TcBlocksizeData(String filename) {
-      instPerBlockTotalSize = new HashMap<Integer, Long>();
+      instPerBlockTotalSize = new HashMap<Long, Long>();
       totalInstructions = 0;
       this.filename = filename;
    }
 
 
    public void addBlock(InstructionBlock block) {
-      int totalBlockSize = block.getTotalInstructions();
+      long totalBlockSize = block.getTotalInstructions();
       Long blockInst = instPerBlockTotalSize.get(totalBlockSize);
       if(blockInst == null) {
          blockInst = 0l;
@@ -60,7 +60,7 @@ public class TcBlocksizeData {
    }
 
 
-   public Map<Integer, Long> getInstPerBlockTotalSize() {
+   public Map<Long, Long> getInstPerBlockTotalSize() {
       return instPerBlockTotalSize;
    }
 
@@ -69,7 +69,7 @@ public class TcBlocksizeData {
    /**
     * INSTANCE VARIABLES
     */
-   private Map<Integer, Long> instPerBlockTotalSize;
+   private Map<Long, Long> instPerBlockTotalSize;
    private long totalInstructions;
    private String filename;
 }

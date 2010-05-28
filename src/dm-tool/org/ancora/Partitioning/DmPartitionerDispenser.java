@@ -60,8 +60,8 @@ public class DmPartitionerDispenser {
       MbBasicBlock("mb-basicblock"),
       MbSuperBlock("mb-superblock"),
       MbMegaBlock("mb-megablock"),
-      Daprof("mb-daprof"),
-      DaprofSimple("daprof-simple");
+      Warp("mb-warp");
+      //DaprofSimple("daprof-simple");
 
       private PartitionerName(String partitionerName) {
          this.partitionerName = partitionerName;
@@ -89,10 +89,10 @@ public class DmPartitionerDispenser {
                return MbPartitionerDispenser.getMbSuperBlock();
             case MbMegaBlock:
                return getMegablock();
-            case Daprof:
-               return getDaprof();
-            case DaprofSimple:
-               return getDaprofSimple();
+            case Warp:
+               return getWarp();
+            //case DaprofSimple:
+            //   return getDaprofSimple();
             default:
                Logger.getLogger(DmPartitionerDispenser.class.getName()).
                        warning("Case not defined: '" + this);
@@ -101,15 +101,16 @@ public class DmPartitionerDispenser {
       }
       private String partitionerName;
 
-      private Partitioner getDaprof() {
-         MbDaprof daprof = new MbDaprof();
-         Boolean useLimit = Boolean.parseBoolean(Options.optionsTable.get(OptionName.partition_daprofusebranchlimit));
-         daprof.setUseBranchLimit(useLimit);
-         Boolean useOriginalIdMethod = Boolean.parseBoolean(Options.optionsTable.get(OptionName.partition_daprofuseoriginalidmethod));
-         daprof.setUseDaprofId(useOriginalIdMethod);
-         return daprof;
+      private Partitioner getWarp() {
+         MbWarp warp = new MbWarp();
+         Boolean useLimit = Boolean.parseBoolean(Options.optionsTable.get(OptionName.partition_warpusebranchlimit));
+         warp.setUseBranchLimit(useLimit);
+         //Boolean useOriginalIdMethod = Boolean.parseBoolean(Options.optionsTable.get(OptionName.partition_daprofuseoriginalidmethod));
+         //daprof.setUseDaprofId(useOriginalIdMethod);
+         return warp;
       }
 
+      /*
       private Partitioner getDaprofSimple() {
          DaprofSimple daprofSimple = new DaprofSimple();
          Boolean useLimit = Boolean.parseBoolean(Options.optionsTable.get(OptionName.partition_daprofusebranchlimit));
@@ -118,6 +119,8 @@ public class DmPartitionerDispenser {
          daprofSimple.setUseDaprofId(useOriginalIdMethod);
          return daprofSimple;
       }
+       *
+       */
 
       private Partitioner getMegablock() {
          MegaBlock mb = MbPartitionerDispenser.getMbMegaBlock();
@@ -132,16 +135,5 @@ public class DmPartitionerDispenser {
 
    public static Map<String, PartitionerName> partitioners =
            EnumUtilsAppend.buildMap(PartitionerName.values());
-   /*
-    static {
-      Map<String, Partitioner> aMap = new HashMap<String, Partitioner>();
 
-      for(Partitioner part : Partitioner.values()) {
-         aMap.put(part.partitionerName, part);
-      }
-
-      partitioners = Collections.unmodifiableMap(aMap);
-   }
-    *
-    */
 }

@@ -40,11 +40,11 @@ public class TcBlocksizeProcess {
       //long[] results = new long[maxRepetitions];
 
       //Map<Integer, Long> table = stat.getInstPerRepetitions();
-      Map<Integer, Long> table = stat.getInstPerBlockTotalSize();
+      Map<Long, Long> table = stat.getInstPerBlockTotalSize();
 
       // Get keys and order them
       //Collections.so
-      List<Integer> keys = new ArrayList<Integer>(table.keySet());
+      List<Long> keys = new ArrayList<Long>(table.keySet());
       Collections.sort(keys);
 
       //List<Long> basescaleValues = new ArrayList<Long>();
@@ -55,7 +55,7 @@ public class TcBlocksizeProcess {
       int logScale = basescale.get(logKeysIndex);
       long currentValue = stat.getTotalInstructions();
       while(originalKeysIndex < keys.size()) {
-         int originalScale = keys.get(originalKeysIndex);
+         long originalScale = keys.get(originalKeysIndex);
 
          while(logScale < originalScale) {
             basescaleValues[logKeysIndex] = currentValue;
