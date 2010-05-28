@@ -29,11 +29,11 @@ import org.ancora.SharedLibrary.DataStructures.PushingQueue;
  *
  * @author Joao Bispo
  */
-public class MbDaprof extends Warp {
+public class MbWarp extends Warp {
 
 
 
-   public MbDaprof() {
+   public MbWarp() {
       super();
       isDelaySlot = false;
       wasJumpInstruction = false;
