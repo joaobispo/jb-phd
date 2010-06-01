@@ -18,21 +18,22 @@
 package org.ancora.IntermediateRepresentation.Transformations;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import org.ancora.IntermediateRepresentation.IrBlock;
 import org.ancora.IntermediateRepresentation.Operand;
 import org.ancora.IntermediateRepresentation.Operands.InternalData;
 import org.ancora.IntermediateRepresentation.OperandType;
 import org.ancora.IntermediateRepresentation.Operation;
-import org.ancora.IntermediateRepresentation.Transformation;
+import org.ancora.IntermediateRepresentation.Optimization;
 
 /**
  * Changes the name of muttable operands, giving them versions.
  *
  * @author Joao Bispo
  */
-public class SingleStaticAssignment extends Transformation {
+//public class SingleStaticAssignment extends Transformation {
+public class SingleStaticAssignment extends Optimization {
 
    @Override
    public String toString() {
@@ -41,17 +42,15 @@ public class SingleStaticAssignment extends Transformation {
 
 
 
-   public void transform(List<Operation> operations) {
-      //List<Operation> newList = new ArrayList<Operation>();
+   public void transform(IrBlock irBlock) {
+      // Build live-outs table
+      Map<String, String> liveoutsToRegisters = irBlock.getLiveoutsToRegisters();
+      List<Operation> operations = irBlock.getOperations();
 
       Map<String, Integer> variablesVersion = new HashMap<String, Integer>();
-//      Map<String, InternalData> operandsTable = new Hashtable<String, InternalData>();
-//      Operation start = new Control(-1, Control.Op.start);
-//      newList.add(start);
-
       for(int i=0; i<operations.size(); i++) {
          Operation operation = operations.get(i);
-//System.out.println("Operation Before:"+operation.getFullOperation());
+
          // Update inputs
          List<Operand> inputs = operation.getInputs();
 //         System.out.println("Inputs Before:"+inputs);
@@ -92,24 +91,29 @@ public class SingleStaticAssignment extends Transformation {
             }
 
             InternalData iData = (InternalData)output;
+            String registerName = iData.getName();
             // Update version
-            Integer version = variablesVersion.get(iData.getName());
+            Integer version = variablesVersion.get(registerName);
             if(version == null) {
                version = 0;
             }
             version++;
-            variablesVersion.put(iData.getName(), version);
+            variablesVersion.put(registerName, version);
 
             // New name
-            String newName = iData.getName() + "." + version;
+            String ssaName = registerName + "." + version;
             // New InternalData
-            InternalData newData = new InternalData(newName, iData.getBits());
+            InternalData newData = new InternalData(ssaName, iData.getBits());
             // Substitute
             outputs.set(j, newData);
             
+            // Live-out is always the last version written
+            liveoutsToRegisters.put(ssaName, registerName);
          }
 //         System.out.println("Operation After:"+operation.getFullOperation());
          operations.set(i, operation);
+
+
       }
 
    }

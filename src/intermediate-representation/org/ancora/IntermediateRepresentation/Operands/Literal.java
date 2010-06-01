@@ -70,8 +70,15 @@ public class Literal extends Operand {
 
    @Override
    public String toString() {
+      return getName();
+   }
+
+   @Override
+   public String getName() {
       return literalType.name()+"."+value;
    }
+
+
 
    /**
     * Checks if Operand is of type literal. If not, returns null.

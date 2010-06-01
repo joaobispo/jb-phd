@@ -64,7 +64,7 @@ public class InternalData extends Operand  {
 
    @Override
    public String toString() {
-      return name;
+      return getName();
    }
 
    public String getName() {

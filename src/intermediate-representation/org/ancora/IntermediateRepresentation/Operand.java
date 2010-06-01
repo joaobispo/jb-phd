@@ -51,6 +51,8 @@ public abstract class Operand {
 
    public abstract int getBits();
 
+   public abstract String getName();
+
    /**
     *
     * @return true if this object represents an operand which cannot change its
