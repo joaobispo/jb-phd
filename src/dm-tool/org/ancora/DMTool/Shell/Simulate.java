@@ -105,7 +105,8 @@ public class Simulate implements Executable {
             } else {
                // Hw path
                // Transform Instruction Block into PureIR
-               List<Operation> operations = MbParser.mbToPureIr(block);
+               //List<Operation> operations = MbParser.mbToPureIr(block);
+               List<Operation> operations = MbParser.mbToIrBlock(block).getOperations();
 
                if (operations == null) {
                   continue;

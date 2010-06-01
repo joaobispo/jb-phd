@@ -26,6 +26,7 @@ import org.ancora.IrMapping.DmMapperDispenser;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Settings.Settings;
+import org.ancora.DMTool.Stats.BlockSize.BlockSizeCounter;
 import org.ancora.DMTool.Stats.DataProcess;
 import org.ancora.DMTool.Stats.DataProcessDouble;
 import org.ancora.DMTool.Stats.LongTransformDataSingle;
@@ -106,6 +107,9 @@ public class Transform implements Executable {
       long totalProcessedOperations = 0l;
       long totalNops = 0l;
 
+      BlockSizeCounter blockSizeCounterAfter = new BlockSizeCounter();
+      BlockSizeCounter blockSizeCounterBefore = new BlockSizeCounter();
+
       for(File file : inputFiles) {
          logger.warning("Processing file '"+file.getName()+"'...");
          String baseFilename = ParseUtils.removeSuffix(file.getName(), IoUtils.DEFAULT_EXTENSION_SEPARATOR);
@@ -116,12 +120,14 @@ public class Transform implements Executable {
          // Start counter
          int counter = 0;
          while(block != null) {
+
              String blockName = baseFilename+"-"+counter;
              logger.warning("Processing Block '"+blockName);
 //            logger.info("Block "+counter+", "+block.getRepetitions()+" repetitions.");
 
             // Transform Instruction Block into PureIR
-            List<Operation> operations = MbParser.mbToPureIr(block);
+            //List<Operation> operations = MbParser.mbToPureIr(block);
+            List<Operation> operations = MbParser.mbToIrBlock(block).getOperations();
 
             if(operations == null) {
                continue;
@@ -129,13 +135,13 @@ public class Transform implements Executable {
           
             // Get stats before transformations
             // Map
-            mapper.reset();
-            mapper.processOperations(operations);
+           mapper.reset();
+           mapper.processOperations(operations);
 
-            // Get stats after transformation
+            // Get stats before transformation
             LongTransformDataSingle beforeData = DataProcess.collectTransformData(mapper, block.getRepetitions());
 
-
+            blockSizeCounterBefore.processBlock(operations);
 
             // Write DOT Before
             if(writeDot) {
@@ -168,6 +174,8 @@ public class Transform implements Executable {
             totalAfter.addValues(afterData);
 
 
+            blockSizeCounterAfter.processBlock(operations);
+
             // Write DOT After
             if(writeDot) {
                File dotFile = DmDottyUtils.getDottyFile(baseFilename, blockName+"-after");
@@ -190,6 +198,12 @@ public class Transform implements Executable {
       DataProcessDouble.showTransformDataChanges(totalBefore.getAverageData(), totalAfter.getAverageData());
 
       System.err.println("\nInserted NOPs:"+totalNops +"("+(double)totalNops/(double)totalProcessedOperations+")");
+
+      System.err.println("Before Average Block Size:"+blockSizeCounterBefore.getAverageSize());
+      System.err.println("Before Max Block Size:"+blockSizeCounterBefore.getMaxBlockSize());
+
+      System.err.println("After Average Block Size:"+blockSizeCounterAfter.getAverageSize());
+      System.err.println("After Max Block Size:"+blockSizeCounterAfter.getMaxBlockSize());
    }
 
 

@@ -22,6 +22,7 @@ import java.util.List;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.IntermediateRepresentation.Operation;
+import org.ancora.IntermediateRepresentation.Transformations.SingleStaticAssignment;
 import org.ancora.IrMapping.Tools.Dotty;
 import org.ancora.SharedLibrary.IoUtils;
 
@@ -46,6 +47,9 @@ public class DmDottyUtils {
    }
 
    public static boolean writeBlockDot(List<Operation> operations, File dotFile) {
+      // Transform to SSA
+      //(new SingleStaticAssignment()).transform(operations);
+
       // Processing on list ended. Removed nops before printing
       List<Operation> ops = Dotty.removeNops(operations);
 

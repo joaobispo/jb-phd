@@ -121,7 +121,8 @@ public static Map<String, MapperName> mappers =
    public static enum MapperName {
 
       AsapScenario1("asap-scenario1"),
-      AsapScenario2("asap-scenario2");
+      AsapScenario2("asap-scenario2"),
+      MapperWithMoves("asap-moves");
 
       private MapperName(String mapperName) {
          this.mapperName = mapperName;
@@ -143,6 +144,8 @@ public static Map<String, MapperName> mappers =
                return new AsapScenario1();
             case AsapScenario2:
                return new AsapScenario2();
+            case MapperWithMoves:
+               return new MapperWithMoves();
             default:
                Logger.getLogger(DmMapperDispenser.class.getName()).
                        warning("Case not defined: '" + this);
