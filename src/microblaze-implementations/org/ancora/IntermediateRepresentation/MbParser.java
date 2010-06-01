@@ -18,7 +18,9 @@
 package org.ancora.IntermediateRepresentation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import org.ancora.InstructionBlock.GenericInstruction;
 import org.ancora.InstructionBlock.InstructionBlock;
@@ -133,8 +135,13 @@ public class MbParser {
       return null;
    }
 
-   // Transforms an InstructionBlock into a Pure-IR list of Operations.
-   public static List<Operation> mbToPureIr(InstructionBlock block) {
+   /**
+    * Transforms a block of MicroBlaze Instructions into a list of IR Operations.
+    * 
+    * @param block
+    * @return
+    */
+   public static List<Operation> mbToOperations(InstructionBlock block) {
       // Transform block in List of operations
       List<Operation> operations = MbParser.parseMbInstructions(block.getInstructions());
 
@@ -142,15 +149,70 @@ public class MbParser {
       for(Transformation transf : microblazeTransformations) {
          transf.transform(operations);
          //operations = transf.transform(operations);
+         // Update live-outs
       }
 
-      // Check that there are no microblaze operations  nor operands
+      if(!isPureIr(operations)) {
+         return null;
+      }
+
+      return operations;
+   }
+
+   // Transforms an InstructionBlock into a Pure-IR list of Operations (already in SSA).
+   //public static List<Operation> mbToPureIr(InstructionBlock block) {
+   /**
+    * Transforms a block of MicroBlaze Instructions into a IrBlock with IR 
+    * Operations in SSA format.
+    * 
+    * @param block
+    * @return
+    */
+   public static IrBlock mbToIrBlock(InstructionBlock block) {
+      /*
+      // Transform block in List of operations
+      List<Operation> operations = MbParser.parseMbInstructions(block.getInstructions());
+
+      // Transform operations in pure IR operations
+      for(Transformation transf : microblazeTransformations) {
+         transf.transform(operations);
+         //operations = transf.transform(operations);
+         // Update live-outs
+      }
+
+      if(!isPureIr(operations)) {
+         return null;
+      }
+
+       *
+       */
+      List<Operation> operations = mbToOperations(block);
+
+      if(operations == null) {
+         return null;
+      }
+
+      IrBlock irBlock = new IrBlock(operations);
+
+      (new SingleStaticAssignment()).transform(irBlock);
+
+      return irBlock;
+   }
+
+   /**
+    * TODO: Generalize this method and check for IR instead of others.
+    * 
+    * @param operations
+    * @return true if there are no MicroBlaze operations nor operands
+    */
+   public static boolean isPureIr(List<Operation> operations) {
+            // Check that there are no microblaze operations  nor operands
       for(Operation operation : operations) {
          if(MbOperation.getMbOperation(operation) != null) {
             Logger.getLogger(MbParser.class.getName()).
                     warning("Could not transform block of MicroBlaze instructions " +
                     "int a pure intermediate representation, due to operation '"+operation+"'");
-            return null;
+            return false;
          }
 
          for(Operand operand : operation.getInputs()) {
@@ -159,7 +221,7 @@ public class MbParser {
                 Logger.getLogger(MbParser.class.getName()).
                     warning("Could not transform block of MicroBlaze instructions " +
                     "int a pure intermediate representation, due to input operand '"+operand+"'");
-            return null;
+            return false;
             }
          }
 
@@ -169,12 +231,12 @@ public class MbParser {
                 Logger.getLogger(MbParser.class.getName()).
                     warning("Could not transform block of MicroBlaze instructions " +
                     "int a pure intermediate representation, due to output operand '"+operand+"'");
-            return null;
+            return false;
             }
          }
       }
 
-      return operations;
+      return true;
    }
 
    public static final Transformation[] microblazeTransformations = {
@@ -215,7 +277,7 @@ public class MbParser {
 
 
          // Further transform the now pure-ir representation
-         new SingleStaticAssignment()
+         //new SingleStaticAssignment()
       };
 
 

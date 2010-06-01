@@ -75,8 +75,16 @@ public class MbRegister extends Operand {
    @Override
    public String toString() {
       //return "reg."+value;
+      //return name;
+      return getName();
+   }
+
+   @Override
+   public String getName() {
       return name;
    }
+
+
 
    public static Integer getRegValue(Operand operand) {
       // Check if MbRegister

@@ -59,8 +59,14 @@ public class MbImm extends Operand {
 
    @Override
    public String toString() {
+      return getName();
+   }
+
+   @Override
+   public String getName() {
       return "imm."+value;
    }
+
 
 
    public static Integer getImmValue(Operand operand) {
