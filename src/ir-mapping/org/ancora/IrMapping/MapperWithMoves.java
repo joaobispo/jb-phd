@@ -32,65 +32,32 @@ import org.ancora.IntermediateRepresentation.OperationType;
  *
  * @author Joao Bispo
  */
-public class AsapScenario2 implements Mapper {
-
-
-   /**
-    * Creates a MicroBlaze ILP Scenario 2 with MicroBlaze Immutable and Memory Tests
-    */
-   /*
-   public AsapScenario2() {
-      //this(new MbImmutableTest(), new MbMemoryTest());
-      this(new MbMemoryTest());
-   }
-    */
+public class MapperWithMoves implements Mapper {
 
 
 
-//   public AsapScenario2(ImmutableTest immutableTest, MemoryTest memoryTest) {
-   //public AsapScenario2(MemoryTest memoryTest) {
-   public AsapScenario2() {
-//      this.immutableTest = immutableTest;
-      //this.memoryTest = memoryTest;
-      //this.numLoads = numLoads;
+   public MapperWithMoves() {
       this.mapMoves = false;
-
    }
 
    public void processOperations(List<Operation> operations) {
-      //reset();
+
+      // What information can I get from the blocks to be mapped?
+
+      // Count how many times each variable is used
+      //countVariableUse(operations);
 
       for(Operation operation : operations) {
-         if(operation.getType() == OperationType.Nop) {
-            /*
-            System.err.println("NOP:"+operation.getFullOperation());
-            for (Operand operand : operation.getOutputs()) {
-               // Check if operand is immutable
-               if (operand.isImmutable()) {
-                  continue;
-               }
-
-               //Update Liveouts
-               updateLiveouts(operand.toString());
-      }
-*/
-            continue;
-         }
 
          /*
-         if(!mapMoves) {
-            if(operation.getType() == OperationType.Move) {
-               continue;
-            }
+         if(operation.getType() == OperationType.Nop) {
+            continue;
          }
-          */
 
          // Given the inputs, find the lower possible line where the operation
          // can be put.
          int lowestOperandsLine = processInputs(operation.getInputs());
-         //System.out.println("Operation:"+operation);
-         //System.out.println("Inputs:"+operation.getInputs());
-         //System.out.println("Outputs:"+operation.getOutputs());
+
 
          // Calculate operation line, taking into account that it can be a
          // memory operation
@@ -99,19 +66,13 @@ public class AsapScenario2 implements Mapper {
 
          processOutputs(operation.getOutputs(), operationLine);
 
-               // EXP: Check if limiting stores to conditional exits limits this.
-         // Generally, this lowers speed-up on scenario 2, but with O0
-      if(operation.getType() == OperationType.ConditionalExit) {
-//         System.err.println("Changed last store line from "+lastLineWithStore+" to "+(operationLine+1));
-         lastLineWithStore = operationLine+1;
-      }
-
          // Update number of lines
          usedLines = Math.max(usedLines, operationLine);
          // Update mappedOps
          mappedOps++;
          // Add operation to mapping table
          updateMapping(operation, operationLine);
+         */
       }
    }
 
@@ -164,7 +125,6 @@ public class AsapScenario2 implements Mapper {
       if(IrUtils.isStore(operation)) {
          lastLineWithStore = operationLine;
       }
-
       
       return operationLine;
    }
@@ -297,7 +257,36 @@ public class AsapScenario2 implements Mapper {
       this.mapMoves = mapMoves;
    }
 
-   
+   private void countVariableUse(List<Operation> operations) {
+      Map<String, Integer> varUse = new HashMap<String, Integer>();
+      for (Operation operation : operations) {
+         if(operation.getType() == OperationType.Nop) {
+            continue;
+         }
+
+         for(Operand operand : operation.getInputs()) {
+            if(operand.isImmutable()) {
+               continue;
+            }
+            
+            String key = operand.toString();
+            Integer value = varUse.get(key);
+            if(value == null) {
+               value = 0;
+            }
+            value++;
+            varUse.put(key, value);
+         }
+      }
+      System.err.println("Var Use:");
+      for(String key : varUse.keySet()) {
+         Integer value = varUse.get(key);
+         if(value > 1) {
+            System.err.println(key+"="+value);
+         }
+      }
+      
+   }
 
    /**
     * INSTANCE VARIABLES
@@ -319,6 +308,8 @@ private Map<String, Integer> liveOutsVersion;
    //private MemoryTest memoryTest;
 
    private Map<Integer, List<Operation>> mapping;
+
+
 
 
 
