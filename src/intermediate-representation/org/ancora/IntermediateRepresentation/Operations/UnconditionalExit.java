@@ -54,10 +54,14 @@ public class UnconditionalExit extends Operation {
    }
 
    @Override
-   public String toString() {
+   public String getName() {
       return "UnconditionalExit";
    }
 
+   @Override
+   public String toString() {
+      return getName();
+   }
 
 
    @Override

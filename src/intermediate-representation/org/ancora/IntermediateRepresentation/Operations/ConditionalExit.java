@@ -73,9 +73,16 @@ public class ConditionalExit extends Operation {
    }
 
    @Override
-   public String toString() {
+   public String getName() {
       return "conditionalExit."+op.name();
    }
+
+   @Override
+   public String toString() {
+      return getName();
+   }
+
+
 
 public Operand getInput(ConditionalExit.Input input) {
    switch(input) {

@@ -84,10 +84,14 @@ public class Division extends Operation {
    }
 
    @Override
-   public String toString() {
+   public String getName() {
       return operation.name();
    }
 
+   @Override
+   public String toString() {
+      return getName();
+   }
    
 
    /**

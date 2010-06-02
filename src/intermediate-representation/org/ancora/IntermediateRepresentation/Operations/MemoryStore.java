@@ -88,10 +88,14 @@ public class MemoryStore extends Operation {
 
 
    @Override
-   public String toString() {
+   public String getName() {
       return "store "+(bytes*8);
    }
 
+   @Override
+   public String toString() {
+      return getName();
+   }
 
 
    /**

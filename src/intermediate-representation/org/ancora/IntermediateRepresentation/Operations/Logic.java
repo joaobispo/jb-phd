@@ -62,11 +62,16 @@ public class Logic extends Operation {
    }
 
    @Override
-   public String toString() {
+   public String getName() {
       //return "ir-"+operation.name();
       return operation.name();
    }
 
+   @Override
+   public String toString() {
+      return getName();
+   }
+   
    /*
    @Override
    public String getValue() {

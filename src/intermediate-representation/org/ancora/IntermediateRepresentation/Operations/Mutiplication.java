@@ -79,10 +79,14 @@ public class Mutiplication extends Operation {
 
 
    @Override
-   public String toString() {
+   public String getName() {
       return "mul";
    }
 
+   @Override
+   public String toString() {
+      return getName();
+   }
    
 
    /**

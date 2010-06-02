@@ -78,10 +78,14 @@ public class ShiftRight extends Operation {
    }
 
    @Override
-   public String toString() {
+   public String getName() {
       return operation.name();
    }
 
+   @Override
+   public String toString() {
+      return getName();
+   }
 
    @Override
    public boolean hasSideEffects() {

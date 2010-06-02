@@ -54,12 +54,16 @@ public class Nop extends Operation {
    }
 
    @Override
-   public String toString() {
+   public String getName() {
       //return "NOP "+name;
       //return "NOP";
       return "NOP "+operation.getFullOperation();
    }
 
+   @Override
+   public String toString() {
+      return getName();
+   }
 
    private Operation operation;
    //private String name;

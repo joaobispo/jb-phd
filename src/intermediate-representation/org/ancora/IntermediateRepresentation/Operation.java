@@ -36,7 +36,7 @@ public abstract class Operation {
    }
 
    public abstract Enum getType();
-
+   public abstract String getName();
    //public abstract String getValue();
 
    /**

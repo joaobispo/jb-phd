@@ -73,10 +73,17 @@ public class ArithmeticWithCarry extends Operation {
    }
 
    @Override
-   public String toString() {
+   public String getName() {
       //return "ir-"+operation.name();
       return operation.name();
    }
+
+   @Override
+   public String toString() {
+      return getName();
+   }
+
+
 
    @Override
    public boolean hasSideEffects() {

@@ -38,10 +38,15 @@ public class Control extends Operation {
    }
 
    @Override
-   public String toString() {
+   public String getName() {
       return operation.name().toUpperCase();
    }
 
+   @Override
+   public String toString() {
+      return getName();
+   }
+   
    /*
    @Override
    public String getValue() {

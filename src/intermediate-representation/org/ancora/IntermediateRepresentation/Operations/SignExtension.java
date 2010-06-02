@@ -52,10 +52,14 @@ public class SignExtension extends Operation {
    }
 
    @Override
-   public String toString() {
+   public String getName() {
       return "SignExtension "+extensionSizeInBits;
    }
 
+   @Override
+   public String toString() {
+      return getName();
+   }
 
 
    @Override

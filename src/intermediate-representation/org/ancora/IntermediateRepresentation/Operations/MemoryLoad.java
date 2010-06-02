@@ -88,10 +88,14 @@ public class MemoryLoad extends Operation {
    }
 
    @Override
-   public String toString() {
+   public String getName() {
       return "load "+(bytes*8);
    }
 
+   @Override
+   public String toString() {
+      return getName();
+   }
 
 
    /**
