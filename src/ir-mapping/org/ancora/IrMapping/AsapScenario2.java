@@ -100,7 +100,9 @@ public class AsapScenario2 implements Mapper {
          processOutputs(operation.getOutputs(), operationLine);
 
                // EXP: Check if limiting stores to conditional exits limits this.
-         // Generally, this lowers speed-up on scenario 2, but with O0
+         // Generally, this lowers speed-up on scenario 2, but with O0 the speedup rises
+         // Explanation: Sometimes, the ConditionalExit is put on a superior line than lastLineWithStore
+         // this might explain the increase in speed-up.
       if(operation.getType() == OperationType.ConditionalExit) {
 //         System.err.println("Changed last store line from "+lastLineWithStore+" to "+(operationLine+1));
          lastLineWithStore = operationLine+1;
