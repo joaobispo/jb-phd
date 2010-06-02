@@ -32,6 +32,7 @@ import org.ancora.IntermediateRepresentation.Operation;
  * lessOrEqual.
  * <br>supposedJumpAddress - address of the next instruction in the block.
  * <br>delaySlots – number of delay slots of this jump.
+ * <br>numberOfExit – identifies the exit.
  *
  * <b>Description</b>: Input1 is compared to 0, according to a specific
  * operation (equal, greater, etc...). The address of the next instruction
@@ -46,7 +47,7 @@ public class ConditionalExit extends Operation {
 
 
    public ConditionalExit(int address, ConditionalExit.Op op, int nextAddress,
-           int delaySlots, Operand input1, Operand input2) {
+           int delaySlots, int numberOfExit, Operand input1, Operand input2) {
       super(address);
       this.op = op;
       //this.nextTraceInstOffset = nextTraceInstOffset;
@@ -104,6 +105,10 @@ public int getSupposedJumpAddress() {
       return delaySlots;
    }
 
+   public int getNumberOfExit() {
+      return numberOfExit;
+   }
+
 
    /**
     * INSTANCE VARIABLES
@@ -114,6 +119,7 @@ public int getSupposedJumpAddress() {
    private int delaySlots;
    //private Operand input1;
    //private Operand input2;
+   private int numberOfExit;
 
 
 public enum Input {

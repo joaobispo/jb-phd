@@ -32,6 +32,10 @@ public class Literal extends Operand {
       this.bits = bits;
    }
 
+   public static Literal newIntegerLiteral(int value, int bits) {
+      return new Literal(Literal.LiteralType.integer,
+              Integer.toString(value), bits);
+   }
 
    /*
    @Override

@@ -23,5 +23,6 @@ package org.ancora.IntermediateRepresentation;
  */
 public enum OperandType {
    literal,
-   internalData;
+   internalData,
+   livein;
 }
