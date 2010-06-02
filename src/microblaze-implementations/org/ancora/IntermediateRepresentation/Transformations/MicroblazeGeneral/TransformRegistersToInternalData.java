@@ -35,6 +35,7 @@ public class TransformRegistersToInternalData extends Transformation {
       for(int i=0; i<operations.size(); i++) {
          Operation operation = operations.get(i);
 
+         // Process Inputs
          List<Operand> inputs = operation.getInputs();
          for(int j = 0; j<inputs.size(); j++) {
             Operand input = inputs.get(j);
@@ -43,12 +44,13 @@ public class TransformRegistersToInternalData extends Transformation {
                continue;
             }
 
-            String registerName = input.toString();
+            String registerName = input.getName();
             Operand newOperand = new InternalData(registerName, input.getBits());
             newOperand.setPrefix(input.getPrefix());
             inputs.set(j, newOperand);
          }
 
+         // Process Outputs
          List<Operand> outputs = operation.getOutputs();
          for(int j = 0; j<outputs.size(); j++) {
             Operand output = outputs.get(j);
@@ -57,7 +59,7 @@ public class TransformRegistersToInternalData extends Transformation {
                continue;
             }
 
-            String registerName = output.toString();
+            String registerName = output.getName();
             Operand newOperand = new InternalData(registerName, output.getBits());
             outputs.set(j, newOperand);
          }

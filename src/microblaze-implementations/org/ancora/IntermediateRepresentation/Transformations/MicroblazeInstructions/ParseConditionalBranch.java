@@ -38,6 +38,8 @@ public class ParseConditionalBranch extends Transformation {
 
    public void transform(List<Operation> operations) {
 
+      int currentExit = 0;
+
       for(int i=0; i<operations.size(); i++) {
         // Check if MicroBlaze Operation
         MbOperation branchOp = MbOperation.getMbOperation(operations.get(i));
@@ -60,12 +62,12 @@ public class ParseConditionalBranch extends Transformation {
         //int offset = nextAddress - branchOp.getAddress();
 
         ConditionalExit cexit = new ConditionalExit(branchOp.getAddress(),
-                compareOperation, nextAddress, delaySlots, 
+                compareOperation, nextAddress, delaySlots, currentExit,
                 branchOp.getInputs().get(0).copy(), branchOp.getInputs().get(1).copy());
 
 
         operations.set(i, cexit);
-
+        currentExit++;
       }
 
    }

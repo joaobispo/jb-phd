@@ -18,9 +18,7 @@
 package org.ancora.IntermediateRepresentation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 import org.ancora.InstructionBlock.GenericInstruction;
 import org.ancora.InstructionBlock.InstructionBlock;
@@ -273,7 +271,8 @@ public class MbParser {
          // Parse MbOperands and IR Operands
          new RegisterZeroToImm(),
          new TransformImmToLiterals(),
-         new TransformRegistersToInternalData(),
+         //new TransformRegistersToInternalData(),
+         new TransformRegisters(),
 
 
          // Further transform the now pure-ir representation
