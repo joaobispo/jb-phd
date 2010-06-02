@@ -105,6 +105,10 @@ public class AsapScenario2 implements Mapper {
          // this might explain the increase in speed-up.
       if(operation.getType() == OperationType.ConditionalExit) {
 //         System.err.println("Changed last store line from "+lastLineWithStore+" to "+(operationLine+1));
+         if(operationLine+1 < lastLineWithStore) {
+            System.err.println("CondLine:"+(operationLine+1));
+            System.err.println("LastLinewithStore:"+lastLineWithStore);
+         }
          lastLineWithStore = operationLine+1;
       }
 
