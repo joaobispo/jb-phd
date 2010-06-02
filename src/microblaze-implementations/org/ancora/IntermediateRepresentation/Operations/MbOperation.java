@@ -51,8 +51,13 @@ public class MbOperation extends Operation {
    }
 
    @Override
-   public String toString() {
+   public String getName() {
       return "mb-"+instructionName.name();
+   }
+
+   @Override
+   public String toString() {
+      return getName();
    }
 
    /*
@@ -100,6 +105,8 @@ public class MbOperation extends Operation {
     */
    private InstructionName instructionName;
    private MbOperationType type;
+
+
 
 
 
