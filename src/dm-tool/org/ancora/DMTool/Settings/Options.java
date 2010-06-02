@@ -54,6 +54,7 @@ public class Options {
       extension_csv("extension.csv","csv"),
 
       mapping_mapper("mapping.mapper",""),
+      mapping_stream_mapper("mapping.streammapper",""),
 
       ir_writedot("ir.writedot","false"),
       ir_options("ir.options","");
