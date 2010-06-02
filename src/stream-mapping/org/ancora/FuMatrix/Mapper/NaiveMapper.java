@@ -17,7 +17,6 @@
 
 package org.ancora.FuMatrix.Mapper;
 
-import org.ancora.FuMatrix.Mapper.GeneralMapper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,11 +28,11 @@ import org.ancora.IntermediateRepresentation.Operation;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Ssa;
 import org.ancora.FuMatrix.Architecture.Fu;
-import org.ancora.FuMatrix.Architecture.Fu.Area;
+import org.ancora.FuMatrix.Architecture.Area;
 import org.ancora.FuMatrix.Architecture.FuCoor;
-import org.ancora.FuMatrix.Architecture.FuInput;
-import org.ancora.FuMatrix.Architecture.FuOutput;
+import org.ancora.FuMatrix.Architecture.FuOutputSignal;
 import org.ancora.FuMatrix.Utils.AvaliabilityTable;
+import org.ancora.FuMatrix.Utils.RegDefinitionsTable;
 
 /**
  * First version of the mapper, without discerning between arithmetic and
@@ -52,7 +51,8 @@ public class NaiveMapper implements GeneralMapper {
       memoryLines = new AvaliabilityTable(1);
 
       mappedOps = new ArrayList<Fu>();
-      definitions = new HashMap<String, FuOutput>();
+      //definitions = new HashMap<String, FuOutput>();
+      definitions = new RegDefinitionsTable();
 
       lastLineWithStore = -1;
    }
@@ -78,8 +78,12 @@ public class NaiveMapper implements GeneralMapper {
          Logger.getLogger(NaiveMapper.class.getName()).
                  warning("Could not get column:"+col);
       }
+      
+      // Temporary solution?
+      Area area = Area.getArea((OperationType) operation.getType());
+
       // Build Fu Coordinate
-      FuCoor coor = new FuCoor(col, line);
+      FuCoor coor = new FuCoor(col, line, area);
 
       //System.err.println("Line:"+line);
       //System.err.println("Column:"+col);
@@ -87,13 +91,15 @@ public class NaiveMapper implements GeneralMapper {
       // Process outputs
       updateTables(operation, coor);
 
-      
+/*
       Map<FuOutput, FuInput> internalRouting = buildInternalRouting(operation, coor);
       Map<String, FuInput> externalRouting = buildExternalRouting(operation, coor);
       Map<String,FuOutput> currentLiveouts = buildLiveouts(operation, coor);
-      Area area = getArea(operation);
 
-      Fu newFu = new Fu(coor, internalRouting, externalRouting, operation, currentLiveouts, area);
+      Fu newFu = new Fu(coor, internalRouting, externalRouting, operation, currentLiveouts);
+ *
+ */
+      Fu newFu = Fu.buildFu(coor, operation, definitions);
       //System.err.println("Coor Line:"+coor.getLine());
       //System.err.println("Coor Col:"+coor.getCol());
       mappedOps.add(newFu);
@@ -261,7 +267,8 @@ public class NaiveMapper implements GeneralMapper {
          String registerName = Ssa.getOriginalName(operand.getName());
          // Get line
          //Integer outputLine = definitionsLine.get(registerName);
-         Integer outputLine = definitions.get(registerName).getCoordinate().getLine();
+         //Integer outputLine = definitions.get(registerName).getCoordinate().getLine();
+         Integer outputLine = definitions.getLine(registerName);
          if(outputLine == null) {
             Logger.getLogger(NaiveMapper.class.getName()).
                     warning("InternalData '"+operand.getName()+"' not defined yet.");
@@ -281,6 +288,7 @@ public class NaiveMapper implements GeneralMapper {
     * @param coor
     * @return
     */
+  /*
    private Map<FuOutput, FuInput> buildInternalRouting(Operation operation, FuCoor coor) {
       Map<FuOutput, FuInput> internalRoute = new HashMap<FuOutput, FuInput>();
 
@@ -306,7 +314,7 @@ public class NaiveMapper implements GeneralMapper {
 
       return internalRoute;
    }
-
+*/
    public List<Fu> getMappedOps() {
       return mappedOps;
    }
@@ -326,7 +334,8 @@ public class NaiveMapper implements GeneralMapper {
    // Register -> FuOutput
    //private Map<String, FuOutput> liveouts;
    // SSA InternalData Register Number -> FuOutput / Line
-   private Map<String, FuOutput> definitions;
+   //private Map<String, FuOutput> definitions;
+   private RegDefinitionsTable definitions;
    //private Map<String, Integer> definitionsLine;
 
    private int lastLineWithStore;
@@ -341,7 +350,8 @@ public class NaiveMapper implements GeneralMapper {
 
          String registerName = Ssa.getOriginalName(output.getName());
          // Build FuOutput
-         FuOutput fuOutput = new FuOutput(coor, i);
+         //FuOutput fuOutput = new FuOutput(coor, i);
+         FuOutputSignal fuOutput = new FuOutputSignal(coor, i);
 
          // Update definitions
          //definitionsLine.put(registerName, coor.getLine());
@@ -361,7 +371,7 @@ public class NaiveMapper implements GeneralMapper {
       generalLines = new AvaliabilityTable(maxGeneralColSize);
       //this.maxGeneralColSize = maxGeneralColSize;
    }
-
+/*
    private Map<String, FuInput> buildExternalRouting(Operation operation, FuCoor coor) {
       Map<String, FuInput> externalRoute = new HashMap<String, FuInput>();
 
@@ -384,7 +394,8 @@ public class NaiveMapper implements GeneralMapper {
 
       return externalRoute;
    }
-
+*/
+   /*
    private Map<String, FuOutput> buildLiveouts(Operation operation, FuCoor coor) {
       if(operation.getType() != OperationType.ConditionalExit) {
          return null;
@@ -400,7 +411,8 @@ public class NaiveMapper implements GeneralMapper {
 
       return currentLiveouts;
    }
-
+*/
+   /*
    private Area getArea(Operation operation) {
        if (operation.getType() == OperationType.MemoryLoad ||
               operation.getType() == OperationType.MemoryStore) {
@@ -409,6 +421,8 @@ public class NaiveMapper implements GeneralMapper {
 
        return Area.general;
    }
+    * 
+    */
 
 
 

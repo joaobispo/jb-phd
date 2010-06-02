@@ -17,8 +17,16 @@
 
 package org.ancora.FuMatrix.Architecture;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+import org.ancora.FuMatrix.Utils.RegDefinitionsTable;
+import org.ancora.IntermediateRepresentation.Operand;
+import org.ancora.IntermediateRepresentation.OperandType;
+import org.ancora.IntermediateRepresentation.Operands.Literal;
 import org.ancora.IntermediateRepresentation.Operation;
+import org.ancora.IntermediateRepresentation.OperationType;
+import org.ancora.IntermediateRepresentation.Ssa;
 
 /**
  *
@@ -26,19 +34,99 @@ import org.ancora.IntermediateRepresentation.Operation;
  */
 public class Fu {
 
-   public Fu(FuCoor coor, Map<FuOutput, FuInput> internalRouting, Map<String, FuInput> externalRouting, Operation operation, Map<String, FuOutput> liveouts, Area area) {
+   /**
+    * Builds a list the same size as operation inputs, and assigns a Signal to
+    * each input.
+    *
+    * @param coor
+    * @param operation
+    * @param registerDefinitions
+    * @return
+    */
+   private static List<Signal> buildInputs(FuCoor opCoor, Operation operation, 
+           RegDefinitionsTable regDefinitions) {
+     List<Signal> fuInputs = new ArrayList<Signal>();
+
+     List<Operand> operands = operation.getInputs();
+     for(int i=0; i<operands.size(); i++) {
+        Operand operand = operation.getInputs().get(i);
+        
+
+        Signal newSignal = null;
+
+        if(operand.getType() == OperandType.literal) {
+           newSignal = new LiteralSignal(Literal.getInteger(operand));
+        }
+
+        if(operand.getType() == OperandType.livein) {
+           newSignal = new LiveinSignal(operand.getName());
+        }
+
+        if(operand.getType() == OperandType.internalData) {
+            // Check where this signal comes from
+           String registerName = Ssa.getOriginalName(operand.getName());
+           newSignal = regDefinitions.getOutputSignal(registerName);
+        }
+
+        if(newSignal == null) {
+           Logger.getLogger(Fu.class.getName()).
+                   warning("Case not defined:"+operand.getType());
+           continue;
+        }
+
+     }
+
+     return fuInputs;
+
+   }
+
+   /**
+    * Only build live-outs if it is a possible exit.
+    *
+    * @param operation
+    * @param registerDefinitions
+    * @return
+    */
+   private static RegDefinitionsTable buildLiveouts(Operation operation, RegDefinitionsTable registerDefinitions) {
+      if(operation.getType() == OperationType.ConditionalExit) {
+         return registerDefinitions.copy();
+      }
+
+      return null;
+   }
+
+   private Fu(FuCoor coor, List<Signal> inputs, String operationName, //Operation operation,
+           RegDefinitionsTable liveouts) {
       this.coor = coor;
-      this.internalRouting = internalRouting;
-      this.externalRouting = externalRouting;
-      this.operation = operation;
+      this.inputs = inputs;
+      //this.internalRouting = internalRouting;
+      //this.externalRouting = externalRouting;
+      //this.operation = operation;
+      this.operationName = operationName;
       this.liveouts = liveouts;
-      this.area = area;
+   }
+
+   public static Fu buildFu(FuCoor coor, Operation operation,
+           RegDefinitionsTable registerDefinitions) {
+      // Get operation name
+      String operationName = operation.getName();
+      // Build inputs
+      List<Signal> inputs = buildInputs(coor, operation, registerDefinitions);
+      // Get Liveouts
+      RegDefinitionsTable liveouts = buildLiveouts(operation, registerDefinitions);
+
+      return new Fu(coor, inputs, operationName, liveouts);
    }
 
    public FuCoor getCoordinate() {
       return coor;
    }
 
+   public List<Signal> getInputs() {
+      return inputs;
+   }
+
+   /*
    public Map<String, FuInput> getExternalRouting() {
       return externalRouting;
    }
@@ -46,13 +134,16 @@ public class Fu {
    public Map<FuOutput, FuInput> getInternalRouting() {
       return internalRouting;
    }
+*/
 
-   public Map<String, FuOutput> getLiveouts() {
+   
+
+   public RegDefinitionsTable getLiveouts() {
       return liveouts;
    }
 
-   public Operation getOperation() {
-      return operation;
+   public String getOperationName() {
+      return operationName;
    }
 
 
@@ -61,14 +152,14 @@ public class Fu {
     * INSTANCE VARIABLES
     */
    private FuCoor coor;
-   private Map<FuOutput, FuInput> internalRouting;
-   private Map<String, FuInput> externalRouting;
-   private Operation operation;
-   private Map<String, FuOutput> liveouts;
-   private Area area;
-
-   public enum Area {
-      general,
-      memory;
-   }
+   //private Map<FuOutput, FuInput> internalRouting;
+   //private Map<Integer, FuOutput> internalRouting;
+   //private Map<String, FuInput> externalRouting;
+   //private Map<Integer, String> externalRouting;
+   private List<Signal> inputs;
+   //private Operation operation;
+   private String operationName;
+   //private Map<String, FuOutputSignal> liveouts;
+   private RegDefinitionsTable liveouts;
+   //private Area area;
 }

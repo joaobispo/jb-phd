@@ -21,36 +21,40 @@ package org.ancora.FuMatrix.Architecture;
  *
  * @author Joao Bispo
  */
-public class FuCoor {
+public class FuOutputSignal extends Signal {
 
-   public FuCoor(int col, int line, Area area) {
-      this.column = col;
-      this.line = line;
-      this.area = area;
+   public FuOutputSignal(FuCoor coor, int position) {
+      this.coor = coor;
+      this.position = position;
    }
 
-   public int getCol() {
-      return column;
+   
+
+   @Override
+   public SignalType getType() {
+      return SignalType.fuOutput;
    }
 
-   public int getLine() {
-      return line;
+   @Override
+   public String getName() {
+      //return PREFIX+position+SEPARATOR+coor.getLineColString();
+      return coor.getLineColString()+SEPARATOR+position;
    }
 
-   public Area getArea() {
-      return area;
+   public FuCoor getCoordinate() {
+      return coor;
    }
 
-
-
-   public String getLineColString() {
-      return area + SEPARATOR + line + SEPARATOR + column;
+   public int getPosition() {
+      return position;
    }
 
+   /**
+    * INSTANCE VARIABLES
+    */
+   private FuCoor coor;
+   private int position;
 
-   private int column;
-   private int line;
-   private Area area;
-
-   public static final String SEPARATOR = ".";
+   public static final String PREFIX = "FuOut";
+   public static final String SEPARATOR = "-";
 }

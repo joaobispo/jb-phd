@@ -17,40 +17,27 @@
 
 package org.ancora.FuMatrix.Architecture;
 
+import org.ancora.IntermediateRepresentation.OperandType;
+import org.ancora.IntermediateRepresentation.OperationType;
+
 /**
+ * Represents the several areas of the heterogeneous CGRA.
  *
  * @author Joao Bispo
  */
-public class FuCoor {
+public enum Area {
 
-   public FuCoor(int col, int line, Area area) {
-      this.column = col;
-      this.line = line;
-      this.area = area;
+   general,
+   memory;
+
+
+   public static Area getArea(OperationType operationType) {
+      if(operationType == OperationType.MemoryLoad ||
+              operationType == OperationType.MemoryStore) {
+         return memory;
+      }
+
+      return general;
    }
 
-   public int getCol() {
-      return column;
-   }
-
-   public int getLine() {
-      return line;
-   }
-
-   public Area getArea() {
-      return area;
-   }
-
-
-
-   public String getLineColString() {
-      return area + SEPARATOR + line + SEPARATOR + column;
-   }
-
-
-   private int column;
-   private int line;
-   private Area area;
-
-   public static final String SEPARATOR = ".";
 }

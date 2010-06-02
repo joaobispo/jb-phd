@@ -21,23 +21,14 @@ package org.ancora.FuMatrix.Architecture;
  *
  * @author Joao Bispo
  */
-public abstract class FuSignal {
+public abstract class Signal {
 
-   public FuSignal(FuCoor coor, int position) {
-      this.coor = coor;
-      this.position = position;
+   public abstract SignalType getType();
+   public abstract String getName();
+
+   public enum SignalType {
+      livein,
+      fuOutput,
+      literal;
    }
-
-   public FuCoor getCoordinate() {
-      return coor;
-   }
-
-   public int getPosition() {
-      return position;
-   }
-
-
-
-   private FuCoor coor;
-   private int position;
 }

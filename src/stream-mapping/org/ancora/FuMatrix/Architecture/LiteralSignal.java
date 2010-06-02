@@ -21,9 +21,31 @@ package org.ancora.FuMatrix.Architecture;
  *
  * @author Joao Bispo
  */
-public class FuOutput extends FuSignal {
+public class LiteralSignal extends Signal {
 
-   public FuOutput(FuCoor coor, int position) {
-      super(coor, position);
+   public LiteralSignal(int value) {
+      this.value = value;
    }
+   
+
+   @Override
+   public SignalType getType() {
+      return SignalType.literal;
+   }
+
+   @Override
+   public String getName() {
+      return PREFIX+value;
+   }
+
+   public int getValue() {
+      return value;
+   }
+
+   /**
+    * INSTANCE VARIABLES
+    */
+   private int value;
+
+   public static final String PREFIX = "literal.";
 }

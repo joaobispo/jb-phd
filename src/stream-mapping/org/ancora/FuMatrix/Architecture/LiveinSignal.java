@@ -21,36 +21,24 @@ package org.ancora.FuMatrix.Architecture;
  *
  * @author Joao Bispo
  */
-public class FuCoor {
+public class LiveinSignal extends Signal {
 
-   public FuCoor(int col, int line, Area area) {
-      this.column = col;
-      this.line = line;
-      this.area = area;
+   public LiveinSignal(String liveinName) {
+      this.liveinName = liveinName;
    }
 
-   public int getCol() {
-      return column;
+   
+
+   @Override
+   public SignalType getType() {
+      return SignalType.livein;
    }
 
-   public int getLine() {
-      return line;
+   @Override
+   public String getName() {
+      throw new UnsupportedOperationException("Not supported yet.");
    }
 
-   public Area getArea() {
-      return area;
-   }
+   private String liveinName;
 
-
-
-   public String getLineColString() {
-      return area + SEPARATOR + line + SEPARATOR + column;
-   }
-
-
-   private int column;
-   private int line;
-   private Area area;
-
-   public static final String SEPARATOR = ".";
 }
