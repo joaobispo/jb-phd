@@ -106,6 +106,11 @@ public class MbOperation extends Operation {
    private InstructionName instructionName;
    private MbOperationType type;
 
+   @Override
+   public Operation copy() {
+      return new MbOperation(getAddress(), instructionName, getInputs(), getOutputs());
+   }
+
 
 
 
