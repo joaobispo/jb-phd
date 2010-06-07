@@ -38,5 +38,5 @@ public enum OperationType {
    MemoryStore,
    Multiplication,
    ShiftRight,
-   //Move;
+   Move;
 }
