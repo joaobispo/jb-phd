@@ -18,7 +18,6 @@
 package org.ancora.FuMatrix.Mapper;
 
 import java.util.List;
-import java.util.Map;
 import org.ancora.IntermediateRepresentation.Operation;
 import org.ancora.FuMatrix.Architecture.Fu;
 
@@ -29,7 +28,12 @@ import org.ancora.FuMatrix.Architecture.Fu;
 public interface GeneralMapper {
 
 
-   void accept(Operation operation);
+   /**
+    *
+    * @param operation
+    * @return true if operation could be mapped, false otherwise
+    */
+   boolean accept(Operation operation);
 
    public List<Fu> getMappedOps();
    //int getNumberOfOps();

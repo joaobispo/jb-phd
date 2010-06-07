@@ -51,10 +51,9 @@ public class RegDefinitionsTable {
    }
 
    /**
-    * Returns the line where the following register was defined last.
-    * 
     * @param registerName
-    * @return
+    * @return the line where the following register was defined last, or -1 if
+    * if there was no definition
     */
    public int getLine(String registerName) {
       FuOutputSignal output = getOutputSignal(registerName);

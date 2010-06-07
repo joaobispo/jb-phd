@@ -17,9 +17,10 @@
 
 package org.ancora.FuMatrix.Utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  *
@@ -38,17 +39,36 @@ public class AvaliabilityTable {
       lastFullLine = -1;
    }
 
+   public AvaliabilityTable copy() {
+      AvaliabilityTable newTable = new AvaliabilityTable(maxColumnSize);
+
+      newTable.lastFullLine = lastFullLine;
+
+      Map<Integer, Integer> newMap = new HashMap<Integer, Integer>();
+      for(Integer key : generalLines.keySet()) {
+         newTable.generalLines.put(key, generalLines.get(key));
+      }
+      newTable.generalLines = newMap;
+
+      return newTable;
+   }
+
+   public int getLastFullLine() {
+      return lastFullLine;
+   }
+
+   
+
    /**
     * Adds another column to the given line.
     *
     * @param line
-    * @return the number of the column if could be added to line, or -1 if
-    * it could not
+    * @return the number of the column if could be added to line, or -1 
+    * otherwise
     */
    public int addColToLine(int line) {
       boolean hasSpace = lineHasSpace(line);
       if(!hasSpace) {
-         System.err.println("NO SPACE!");
          return -1;
       }
 
@@ -202,6 +222,66 @@ public class AvaliabilityTable {
       }
    }
 
+   /**
+    * Given a range of lines, returns the lines which have avaliable columns.
+    *
+    * @param startLine
+    * @param numberOfLines
+    * @return
+    */
+   public List<Integer> getAvaliableLines(int startLine, int numberOfLines) {
+      List<Integer> lines = new ArrayList<Integer>();
 
+      for(int i=0; i<numberOfLines; i++) {
+
+
+         int probeLine = startLine+i;
+      //            System.err.println("Range-line:"+probeLine);
+      //            System.err.println("Range-column:"+getLastUsedColumn(probeLine));
+         if(lineHasSpace(probeLine)) {
+            lines.add(probeLine);
+         }
+      }
+      //System.err.println("Range-Result:"+lines);
+      return lines;
+   }
+
+   /**
+    * Given a list of lines, returns the line which has the least number of
+    * columns occupied. If two lines have the same number of columns occupied,
+    * it is given priority to the line with the highest number (which comes last).
+    *
+    * @param avaliableLines
+    * @return the line which has the least columns. If two or more lines have
+    * the same number of columns, returns the highest line.
+    */
+   public int lessOccupiedLine(List<Integer> avaliableLines) {
+      int smallerColumnSize = Integer.MAX_VALUE;
+      int chosenLine = -1;
+
+      for(Integer line : avaliableLines) {
+//         System.err.println("Size:"+generalLines.size());
+//         System.err.println("Line:"+line);
+
+         int currentColumnSize = getLastUsedColumn(line);
+         if(currentColumnSize <= smallerColumnSize) {
+            chosenLine = line;
+         }
+      }
+
+      return chosenLine;
+   }
+
+   /*
+   public int getColSize(int line) {
+      Integer columnSize = generalLines.get(line);
+      if (columnSize == null) {
+         return 0;
+      }
+
+      return columnSize;
+   }
+    *
+    */
 
 }
