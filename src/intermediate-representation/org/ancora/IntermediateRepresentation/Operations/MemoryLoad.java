@@ -105,4 +105,10 @@ public class MemoryLoad extends Operation {
    //private Operand input2;
    //private Operand output;
    private int bytes;
+
+   @Override
+   public Operation copy() {
+      return new MemoryLoad(getAddress(), getInput1().copy(), getInput2().copy(),
+              getOutput().copy(), bytes);
+   }
 }

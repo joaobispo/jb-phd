@@ -39,17 +39,16 @@ import org.ancora.IntermediateRepresentation.Operation;
  */
 public class MemoryStore extends Operation {
 
-   public MemoryStore(int address, Operand input1, Operand input2, Operand input3, int bytes) {
+   public MemoryStore(int address, Operand contentsToStore, Operand operand1,
+           Operand operand2, int bytes) {
       super(address);
 
-      //this.input1 = input1;
-      //this.input2 = input2;
-      //this.input3 = input3;
+
       this.bytes = bytes;
 
-      connectToInput(input1);
-      connectToInput(input2);
-      connectToInput(input3);
+      connectToInput(contentsToStore);
+      connectToInput(operand1);
+      connectToInput(operand2);
    }
 
 
@@ -105,4 +104,10 @@ public class MemoryStore extends Operation {
    //private Operand input2;
    //private Operand input3;
    private int bytes;
+
+   @Override
+   public Operation copy() {
+      return new MemoryStore(getAddress(), getContentsToStore().copy(),
+              getOperand1().copy(), getOperand2().copy(), bytes);
+   }
 }

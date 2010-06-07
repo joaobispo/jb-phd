@@ -115,6 +115,12 @@ public class Logic extends Operation {
    //private Operand input2;
    //private Operand output1;
    private Logic.Op operation;
+
+   @Override
+   public Operation copy() {
+      return new Logic(getAddress(), getInput1().copy(), getInput2().copy(),
+              getOutput1().copy(), operation);
+   }
    //private boolean signed;
 
 

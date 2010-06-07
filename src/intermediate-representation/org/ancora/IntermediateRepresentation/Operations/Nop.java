@@ -66,6 +66,11 @@ public class Nop extends Operation {
    }
 
    private Operation operation;
+
+   @Override
+   public Operation copy() {
+      return new Nop(operation);
+   }
    //private String name;
 
 }

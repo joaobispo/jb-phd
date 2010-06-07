@@ -65,6 +65,11 @@ public class MockOperation extends Operation {
     */
    private String name;
 
+   @Override
+   public Operation copy() {
+      return new MockOperation(getAddress(), name);
+   }
+
 
 
 }

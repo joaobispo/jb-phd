@@ -101,6 +101,12 @@ public class Division extends Operation {
    //private Operand input2;
    //private Operand output;
    private Division.Op operation;
+
+   @Override
+   public Operation copy() {
+      return new Division(getAddress(), getInput1().copy(), getInput2().copy(),
+              getOutput().copy(), operation);
+   }
    //private boolean signed;
 
 

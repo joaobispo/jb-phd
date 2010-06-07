@@ -124,6 +124,20 @@ public class ShiftRight extends Operation {
       //return carryOut;
    }
 
+   @Override
+   public Operation copy() {
+            Operand newCarryIn = null;
+      if(getCarryIn() != null) {
+         newCarryIn = getCarryIn().copy();
+      }
+      Operand newCarryOut = null;
+      if(getCarryOut() != null) {
+         newCarryOut = getCarryOut().copy();
+      }
+      return new ShiftRight(getAddress(), operation, getInput().copy(), getOutput().copy(),
+              newCarryIn, newCarryOut);
+   }
+
    
 
    public enum Op {

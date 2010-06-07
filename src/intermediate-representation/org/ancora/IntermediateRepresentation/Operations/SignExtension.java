@@ -96,4 +96,10 @@ public class SignExtension extends Operation {
    //private Operand input1;
    //private Operand output;
    private int extensionSizeInBits;
+
+   @Override
+   public Operation copy() {
+      return new SignExtension(getAddress(), getInput1().copy(), getOutput().copy(),
+              extensionSizeInBits);
+   }
 }

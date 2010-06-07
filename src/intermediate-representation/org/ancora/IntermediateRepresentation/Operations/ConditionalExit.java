@@ -128,6 +128,13 @@ public int getSupposedJumpAddress() {
    //private Operand input2;
    private int numberOfExit;
 
+   @Override
+   public Operation copy() {
+      return new ConditionalExit(getAddress(), op, supposedJumpAddress, delaySlots,
+              numberOfExit, getInput(Input.valueToBeComparedToZero).copy(),
+              getInput(Input.offset).copy());
+   }
+
 
 public enum Input {
    valueToBeComparedToZero,

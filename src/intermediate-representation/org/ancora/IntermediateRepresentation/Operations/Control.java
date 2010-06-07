@@ -61,6 +61,11 @@ public class Control extends Operation {
       return false;
    }
 
+   @Override
+   public Operation copy() {
+      return new Control(getAddress(), operation);
+   }
+
    public enum Op {
       start,
       end;

@@ -260,6 +260,20 @@ public class ArithmeticWithCarry extends Operation {
       return null;
    }
 
+   @Override
+   public Operation copy() {
+      Operand newCarryIn = null;
+      if(getCarryIn() != null) {
+         newCarryIn = getCarryIn().copy();
+      }
+      Operand newCarryOut = null;
+      if(getCarryOut() != null) {
+         newCarryOut = getCarryOut().copy();
+      }
+      return new ArithmeticWithCarry(getAddress(), operation, getInput1().copy(),
+              getInput2().copy(), getOutput().copy(), newCarryIn, newCarryOut);
+   }
+
 
 
 

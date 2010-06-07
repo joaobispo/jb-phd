@@ -87,6 +87,12 @@ public class Mutiplication extends Operation {
    public String toString() {
       return getName();
    }
+
+   @Override
+   public Operation copy() {
+      return new Mutiplication(getAddress(), getInput1().copy(), getInput2().copy(),
+              getOutput().copy());
+   }
    
 
    /**

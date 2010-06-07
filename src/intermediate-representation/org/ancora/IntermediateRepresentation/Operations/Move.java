@@ -73,4 +73,9 @@ public class Move extends Operation {
       return getOutputs().get(0);
    }
 
+   @Override
+   public Operation copy() {
+      return new Move(getAddress(), getInput1().copy(), getOutput().copy());
+   }
+
 }

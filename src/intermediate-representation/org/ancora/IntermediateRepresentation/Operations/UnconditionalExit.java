@@ -147,4 +147,15 @@ public class UnconditionalExit extends Operation {
    private int supposedJumpAddress;
    private int delaySlots;
 
+   @Override
+   public Operation copy() {
+      Operand newOutput = null;
+      if(getOutput1() != null) {
+         newOutput = getOutput1().copy();
+      }
+
+      return new UnconditionalExit(getAddress(), baseAddress, supposedJumpAddress,
+              delaySlots, getInput1().copy(), newOutput);
+   }
+
 }

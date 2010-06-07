@@ -39,4 +39,28 @@ public enum OperationType {
    Multiplication,
    ShiftRight,
    Move;
+
+      public boolean isMemoryOperation() {
+      if (this.equals(MemoryLoad) || this.equals(MemoryStore)) {
+         return true;
+      }
+
+      return false;
+   }
+
+   public boolean isLoad() {
+      if(this.equals(MemoryLoad)) {
+         return true;
+      } else {
+         return false;
+      }
+   }
+
+   public boolean isStore() {
+      if(this.equals(MemoryStore)) {
+         return true;
+      } else {
+         return false;
+      }
+   }
 }
