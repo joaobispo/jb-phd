@@ -15,7 +15,7 @@
  *  under the License.
  */
 
-package org.ancora.DMTool.Shell.System;
+package org.ancora.DMTool.System.Interfaces;
 
 import java.util.List;
 

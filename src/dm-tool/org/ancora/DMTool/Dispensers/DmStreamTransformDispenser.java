@@ -15,7 +15,7 @@
  *  under the License.
  */
 
-package org.ancora.StreamTransform;
+package org.ancora.DMTool.Dispensers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +23,10 @@ import java.util.Map;
 import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
-import org.ancora.DMTool.Utils.ShellUtils;
-import org.ancora.Shared.EnumUtilsAppend;
+import org.ancora.DMTool.System.Services.ShellUtils;
+import org.ancora.SharedLibrary.EnumUtils;
+import org.ancora.StreamTransform.SingleStaticAssignment;
+import org.ancora.StreamTransform.StreamTransformation;
 
 /**
  *
@@ -61,7 +63,7 @@ public class DmStreamTransformDispenser {
    }
 
    public static Map<String, TransformationName> transformations =
-           EnumUtilsAppend.buildMap(TransformationName.values());
+           EnumUtils.buildMap(TransformationName.values());
 
 
    /**

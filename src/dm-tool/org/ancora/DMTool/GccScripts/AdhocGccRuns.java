@@ -15,11 +15,12 @@
  *  under the License.
  */
 
-package org.ancora.DMTool.Utils;
+package org.ancora.DMTool.GccScripts;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import org.ancora.SharedLibrary.DataStructures.MbGccRun;
 import org.ancora.SharedLibrary.IoUtils;
 
 /**
@@ -28,7 +29,7 @@ import org.ancora.SharedLibrary.IoUtils;
  */
 public class AdhocGccRuns {
 
-   public static List<GccRun> getRuns() {
+   public static List<MbGccRun> getRuns() {
       // Prepare flags
       String[] flagsArray = DEFAULT_FLAGS.split(" ");
       // Prepare optimizations
@@ -37,7 +38,7 @@ public class AdhocGccRuns {
       File[] files = (new File(DEFAULT_INPUT_FOLDER)).listFiles();
       //List<File> files = IoUtils.getFilesRecursive(new File(DEFAULT_INPUT_FOLDER));
 
-      List<GccRun> runs = new ArrayList<GccRun>();
+      List<MbGccRun> runs = new ArrayList<MbGccRun>();
       for(File file : files) {
          for(String optimization : optArray) {
             String[] inputFiles = new String[1];
@@ -50,7 +51,7 @@ public class AdhocGccRuns {
             //String outputFile = baseFilename + optimization + ".elf";
             String outputFile = outputFolder + baseFilename + optimization + ".elf";
 
-            runs.add(new GccRun(outputFile, inputFiles, optimization, flagsArray, DEFAULT_INPUT_FOLDER));
+            runs.add(new MbGccRun(outputFile, inputFiles, optimization, flagsArray, DEFAULT_INPUT_FOLDER));
          }
       }
 

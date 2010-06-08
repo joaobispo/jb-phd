@@ -15,7 +15,7 @@
  *  under the License.
  */
 
-package org.ancora.IrMapping;
+package org.ancora.DMTool.Dispensers;
 
 import java.util.Map;
 import java.util.logging.Logger;
@@ -23,8 +23,12 @@ import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.IrMapping.Mapper;
 import org.ancora.IrMapping.AsapScenario1;
+import org.ancora.IrMapping.AsapScenario1;
 import org.ancora.IrMapping.AsapScenario2;
-import org.ancora.Shared.EnumUtilsAppend;
+import org.ancora.IrMapping.AsapScenario2;
+import org.ancora.IrMapping.Mapper;
+import org.ancora.IrMapping.MapperWithMoves;
+import org.ancora.SharedLibrary.EnumUtils;
 
 /**
  *
@@ -112,7 +116,7 @@ public class DmMapperDispenser {
     */
 
 public static Map<String, MapperName> mappers =
-           EnumUtilsAppend.buildMap(MapperName.values());
+           EnumUtils.buildMap(MapperName.values());
 
 
    /**

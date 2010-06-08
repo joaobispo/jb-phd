@@ -15,13 +15,17 @@
  *  under the License.
  */
 
-package org.ancora.Partitioning;
+package org.ancora.DMTool.Dispensers;
 
 import java.util.Map;
 import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
-import org.ancora.Shared.EnumUtilsAppend;
+import org.ancora.Partitioning.MbPartitionerDispenser;
+import org.ancora.Partitioning.MbWarp;
+import org.ancora.Partitioning.MegaBlock;
+import org.ancora.Partitioning.Partitioner;
+import org.ancora.SharedLibrary.EnumUtils;
 import org.ancora.SharedLibrary.ParseUtils;
 
 /**
@@ -134,6 +138,6 @@ public class DmPartitionerDispenser {
 
 
    public static Map<String, PartitionerName> partitioners =
-           EnumUtilsAppend.buildMap(PartitionerName.values());
+           EnumUtils.buildMap(PartitionerName.values());
 
 }

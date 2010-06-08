@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Options.OptionName;
-import org.ancora.Partitioning.DmPartitionerDispenser;
+import org.ancora.DMTool.Dispensers.DmPartitionerDispenser;
 import org.ancora.Partitioning.Partitioner;
 import org.ancora.Partitioning.Tools.BlockWorker;
 import org.ancora.SharedLibrary.IoUtils;

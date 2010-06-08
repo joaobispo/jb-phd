@@ -15,13 +15,14 @@
  *  under the License.
  */
 
-package org.ancora.DMTool.Utils;
+package org.ancora.DMTool.GccScripts;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.ancora.SharedLibrary.DataStructures.MbGccRun;
 import org.ancora.SharedLibrary.IoUtils;
 
 /**
@@ -30,7 +31,7 @@ import org.ancora.SharedLibrary.IoUtils;
  */
 public class DtoolGccRuns {
 
-   public static List<GccRun> getRuns() {
+   public static List<MbGccRun> getRuns() {
       // Prepare flags
       String[] flagsArray = DEFAULT_FLAGS.split(" ");
       // Prepare optimizations
@@ -42,7 +43,7 @@ public class DtoolGccRuns {
 
       //List<List<File>> programs = getPrograms();
 
-      List<GccRun> runs = new ArrayList<GccRun>();
+      List<MbGccRun> runs = new ArrayList<MbGccRun>();
       
       for(File programFolder : programFolders) {
       //for(List<File> fileArray : programs) {
@@ -59,7 +60,7 @@ public class DtoolGccRuns {
             String outputFile = outputFolder + baseFilename + optimization + ".elf";
             //System.out.println("Program Folder:"+programFolder.getName());
             //System.out.println("Program Folder:"+programFolder.getAbsolutePath());
-            runs.add(new GccRun(outputFile, inputFiles, optimization, flagsArray, programFolder.getAbsolutePath()));
+            runs.add(new MbGccRun(outputFile, inputFiles, optimization, flagsArray, programFolder.getAbsolutePath()));
          }
       }
 

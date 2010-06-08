@@ -17,6 +17,7 @@
 
 package org.ancora.DMTool.Shell;
 
+import org.ancora.DMTool.System.Interfaces.Executable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -25,14 +26,13 @@ import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Settings.Settings;
-import org.ancora.DMTool.Shell.System.Executable;
-import org.ancora.FuMatrix.Mapper.DmStreamMapperDispenser;
+import org.ancora.DMTool.Dispensers.DmStreamMapperDispenser;
 import org.ancora.FuMatrix.Mapper.GeneralMapper;
 import org.ancora.FuMatrix.Stats.MapperData;
-import org.ancora.InstructionBlock.DmBlockPack;
-import org.ancora.InstructionBlock.DmBlockUtils;
+import org.ancora.DMTool.System.DataStructures.DmBlockPack;
+import org.ancora.DMTool.System.Services.DmBlockUtils;
 import org.ancora.InstructionBlock.InstructionBlock;
-import org.ancora.IntermediateRepresentation.DmTransformDispenser;
+import org.ancora.DMTool.Dispensers.DmTransformDispenser;
 import org.ancora.IntermediateRepresentation.MbParser;
 import org.ancora.IntermediateRepresentation.Operation;
 import org.ancora.IntermediateRepresentation.Transformation;

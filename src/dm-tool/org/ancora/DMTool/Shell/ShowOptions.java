@@ -17,12 +17,12 @@
 
 package org.ancora.DMTool.Shell;
 
+import org.ancora.DMTool.System.Interfaces.Executable;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
-import org.ancora.DMTool.Shell.System.Executable;
 
 /**
  *

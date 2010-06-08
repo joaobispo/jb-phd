@@ -17,12 +17,12 @@
 
 package org.ancora.DMTool.Shell;
 
+import org.ancora.DMTool.System.Interfaces.Executable;
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
-import org.ancora.DMTool.Shell.System.Executable;
-import org.ancora.IrMapping.DmMapperDispenser;
+import org.ancora.DMTool.Dispensers.DmMapperDispenser;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Settings.Settings;
@@ -32,9 +32,9 @@ import org.ancora.DMTool.Stats.DataProcessDouble;
 import org.ancora.DMTool.Stats.LongTransformDataSingle;
 import org.ancora.DMTool.Stats.LongTransformDataTotal;
 import org.ancora.DMTool.Stats.Transform.TransformStats;
-import org.ancora.IntermediateRepresentation.DmTransformDispenser;
+import org.ancora.DMTool.Dispensers.DmTransformDispenser;
 import org.ancora.Partitioning.Blocks.BlockStream;
-import org.ancora.InstructionBlock.DmBlockUtils;
+import org.ancora.DMTool.System.Services.DmBlockUtils;
 import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.IntermediateRepresentation.MbParser;
 import org.ancora.IrMapping.Mapper;
@@ -43,7 +43,7 @@ import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.SharedLibrary.IoUtils;
 import org.ancora.SharedLibrary.ParseUtils;
 import org.ancora.IntermediateRepresentation.Transformation;
-import org.ancora.IrMapping.DmDottyUtils;
+import org.ancora.DMTool.System.Services.DmDottyUtils;
 
 /**
  *

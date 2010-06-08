@@ -17,6 +17,7 @@
 
 package org.ancora.DMTool.Shell;
 
+import org.ancora.DMTool.System.Interfaces.Executable;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -24,10 +25,9 @@ import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Settings.Settings;
-import org.ancora.DMTool.Shell.System.Executable;
 import org.ancora.DMTool.Shell.Shell.Command;
-import org.ancora.DMTool.Utils.ShellUtils;
-import org.ancora.Shared.EnumUtilsAppend;
+import org.ancora.DMTool.System.Services.ShellUtils;
+import org.ancora.SharedLibrary.EnumUtils;
 import org.ancora.SharedLibrary.LoggingUtils;
 
 /**
@@ -38,7 +38,7 @@ public class Set implements Executable {
 
    public Set() {
       optionsValues = Options.optionsTable;
-      optionsNames = EnumUtilsAppend.buildMap(OptionName.values());
+      optionsNames = EnumUtils.buildMap(OptionName.values());
    }
 
 

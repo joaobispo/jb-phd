@@ -15,25 +15,32 @@
  *  under the License.
  */
 
-package org.ancora.Shared;
+package org.ancora.DMTool.System.DataStructures;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import org.ancora.InstructionBlock.InstructionBusReader;
+import org.ancora.Partitioning.Blocks.BlockStream;
 
 /**
  *
  * @author Joao Bispo
  */
-public class EnumUtilsAppend {
+public class DmBlockPack {
 
-   public static <K extends Enum> Map<String, K> buildMap(K[] values) {
-      Map<String, K> aMap = new HashMap<String, K>();
-
-      for(K enume : values) {
-         aMap.put(enume.toString(), enume);
-      }
-
-      return Collections.unmodifiableMap(aMap);
+   public DmBlockPack(BlockStream blockStream, InstructionBusReader instructionBusReader) {
+      this.blockStream = blockStream;
+      this.instructionBusReader = instructionBusReader;
    }
+
+   public BlockStream getBlockStream() {
+      return blockStream;
+   }
+
+   public InstructionBusReader getInstructionBusReader() {
+      return instructionBusReader;
+   }
+
+   
+
+   private BlockStream blockStream;
+   private InstructionBusReader instructionBusReader;
 }

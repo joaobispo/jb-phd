@@ -17,13 +17,13 @@
 
 package org.ancora.DMTool.Shell;
 
-import org.ancora.DMTool.Shell.System.Executable;
+import org.ancora.DMTool.System.Interfaces.Executable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Logger;
-import org.ancora.DMTool.Utils.ShellUtils;
+import org.ancora.DMTool.System.Services.ShellUtils;
 import org.ancora.SharedLibrary.EnumUtils;
 import org.ancora.SharedLibrary.IoUtils;
 import org.ancora.SharedLibrary.LineReader;

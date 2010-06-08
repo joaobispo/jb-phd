@@ -19,7 +19,7 @@ package org.ancora.DMTool.Settings;
 
 import java.util.EnumMap;
 import java.util.Map;
-import org.ancora.Partitioning.DmPartitionerDispenser;
+import org.ancora.DMTool.Dispensers.DmPartitionerDispenser;
 
 /**
  * Options supported by the program.

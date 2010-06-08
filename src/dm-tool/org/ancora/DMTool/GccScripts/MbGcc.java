@@ -15,14 +15,18 @@
  *  under the License.
  */
 
-package org.ancora.DMTool.Utils;
+package org.ancora.DMTool.GccScripts;
 
+import org.ancora.DMTool.GccScripts.MenottiGccRuns;
+import org.ancora.DMTool.GccScripts.DtoolGccRuns;
+import org.ancora.DMTool.GccScripts.AdhocGccRuns;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.logging.Logger;
+import org.ancora.SharedLibrary.DataStructures.MbGccRun;
 
 /**
  *
@@ -39,7 +43,7 @@ public class MbGcc {
       //buildAdhocElfs();
       //buildDtooElfs();
    }
-
+/*
    public static int runProcess(List<String> command, String workingDir) {
    //public static int runProcess(String program, String args, String workingDir) {
       int returnValue = -1;
@@ -67,15 +71,7 @@ public class MbGcc {
          String errline = null;
          String stdline = null;
 
-/*
-         while ((line = stdError.readLine()) != null) {
-            System.out.println(line);
-         }
 
-         while ((line = stdInput.readLine()) != null) {
-            System.out.println(line);
-         }
-*/
          while ((errline = stdError.readLine()) != null ||
                  (stdline = stdInput.readLine()) != null) {
             if(errline!= null) {
@@ -111,21 +107,21 @@ public class MbGcc {
 
       return builder.toString();
    }
-
+*/
    private static void buildMenottiElfs() {
-      for(GccRun run : MenottiGccRuns.getRuns()) {
+      for(MbGccRun run : MenottiGccRuns.getRuns()) {
          run.run();
        }
    }
 
    private static void buildAdhocElfs() {
-      for(GccRun run : AdhocGccRuns.getRuns()) {
+      for(MbGccRun run : AdhocGccRuns.getRuns()) {
          run.run();
        }
    }
 
    private static void buildDtooElfs() {
-       for(GccRun run : DtoolGccRuns.getRuns()) {
+       for(MbGccRun run : DtoolGccRuns.getRuns()) {
          run.run();
        }
    }

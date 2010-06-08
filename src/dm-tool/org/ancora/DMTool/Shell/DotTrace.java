@@ -17,17 +17,17 @@
 
 package org.ancora.DMTool.Shell;
 
+import org.ancora.DMTool.System.Interfaces.Executable;
 import java.io.File;
 import java.util.List;
 import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Settings.Settings;
-import org.ancora.DMTool.Shell.System.Executable;
 import org.ancora.Partitioning.Blocks.BlockStream;
-import org.ancora.InstructionBlock.DmBlockUtils;
+import org.ancora.DMTool.System.Services.DmBlockUtils;
 import org.ancora.InstructionBlock.InstructionBlock;
-import org.ancora.IrMapping.DmDottyUtils;
+import org.ancora.DMTool.System.Services.DmDottyUtils;
 import org.ancora.Partitioning.Tools.DottyBlock;
 import org.ancora.SharedLibrary.IoUtils;
 import org.ancora.SharedLibrary.ParseUtils;
