@@ -19,7 +19,6 @@ package org.ancora.FuMatrix.Mapper;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -33,6 +32,7 @@ import org.ancora.FuMatrix.Architecture.Area;
 import org.ancora.FuMatrix.Architecture.FuCoor;
 import org.ancora.FuMatrix.Architecture.FuOutputSignal;
 import org.ancora.FuMatrix.Utils.AvaliabilityTable;
+import org.ancora.FuMatrix.Utils.MoveService;
 import org.ancora.FuMatrix.Utils.RegDefinitionsTable;
 import org.ancora.IntermediateRepresentation.Operands.InternalData;
 import org.ancora.IntermediateRepresentation.Operations.Move;
@@ -50,33 +50,32 @@ public class NaiveMapper implements GeneralMapper {
     * and infine columns for general lines
     */
    public NaiveMapper() {
+      // Initialize avaliability tables
       avaliabilityTables = new EnumMap<Area, AvaliabilityTable>(Area.class);
       for(int i=0; i<defaultAreas.length; i++) {
          Area area = defaultAreas[i];
          avaliabilityTables.put(area, new AvaliabilityTable(defaultAreasSize[i]));
       }
-      //generalLines = new AvaliabilityTable(-1);
-      //memoryLines = new AvaliabilityTable(1);
 
       mappedOps = new ArrayList<Fu>();
-      //definitions = new HashMap<String, FuOutput>();
       definitions = new RegDefinitionsTable();
 
       lastLineWithStore = -1;
-      commMaxDistance = 0;
+      maxCommDistance = DEFAULT_MAX_COMM_DISTANCE;
 
-      replacedInputs = new HashMap<Integer, Operand>();
+//      replacedInputs = new HashMap<Integer, Operand>();
    }
 
 
 
    public boolean accept(Operation operation) {
+   // Copy operation
+      operation = operation.copy();
 
       // Ignore nops
       if(operation.getType() == OperationType.Nop) {
          return true;
       }
-
 
       // Temporary solution?
       Area area = Area.getArea((OperationType) operation.getType());
@@ -87,31 +86,7 @@ public class NaiveMapper implements GeneralMapper {
          return false;
       }
 
-      /*
-      int line = calculateLine(operation);
-      if(line < 0) {
-         Logger.getLogger(NaiveMapper.class.getName()).
-                 warning("Mapping failed: could not found an avaliable line.");
-         return false;
-      }
-
-      //int col = reserveColumn(operation, line);
-      int col = reserveColumn(area, line);
-      if(col < 0) {
-         Logger.getLogger(NaiveMapper.class.getName()).
-                 warning("Mapping failed: could not get column for line '"+line+"'.");
-         return false;
-      }
-      
-
-
-      // Build Fu Coordinate
-      FuCoor coor = new FuCoor(col, line, area);
-*/
-      // Can insert moves?
-      //calcMoves(operation, line);
-
-      //boolean success = insertMoves(operation, line);
+     
       boolean success = insertMoves(operation, coor.getLine());
       if(!success) {
          Logger.getLogger(NaiveMapper.class.getName()).
@@ -121,18 +96,7 @@ public class NaiveMapper implements GeneralMapper {
 
 
       insertOperation(operation, coor);
-      /*
-      //System.err.println("Line:"+line);
-      //System.err.println("Column:"+col);
-
-      // Process outputs
-      registerOutputs(operation, coor);
-
-      Fu newFu = Fu.buildFu(coor, operation, definitions);
-      //System.err.println("Coor Line:"+coor.getLine());
-      //System.err.println("Coor Col:"+coor.getCol());
-      mappedOps.add(newFu);
-*/
+      
       return true;
    }
    
@@ -170,20 +134,9 @@ public class NaiveMapper implements GeneralMapper {
     * @param line
     * @return
     */
-   //private int reserveColumn(Operation operation, int line) {
    private int reserveColumn(Area area, int line) {
       int column = -1;
-/*
-      // Calculate col if memory operation
-      if (operation.getType() == OperationType.MemoryLoad
-              || operation.getType() == OperationType.MemoryStore) {
-         column = memoryLines.addColToLine(line);
-      } else {
-         // Calculate line if any other operation
-         //int firstAvaliableLine = generalLines.getFirstAvaliableFrom(line);
-         column = generalLines.addColToLine(line);
-      }
-*/
+
       column = avaliabilityTables.get(area).addColToLine(line);
 
       if(column == -1) {
@@ -275,29 +228,16 @@ public class NaiveMapper implements GeneralMapper {
     * @param operation
     * @param line
     */
-   //private Operation insertMoves(Operation operation, int line) {
    private boolean insertMoves(Operation operation, int line) {
-   //private Map<Integer, Operand> insertMoves(Operation operation, int line) {
-      replacedInputs = new HashMap<Integer, Operand>();
-      //List<Fu> moveOperations = new ArrayList<Fu>();
-      if(isMaxCommDistanceInfinite()) {
+//      replacedInputs = new HashMap<Integer, Operand>();
+      if(MoveService.isMaxCommDistanceInfinite(maxCommDistance)) {
          return true;
-         //return replacedInputs;
       }
-      // Copy general table
-      //AvaliabilityTable testTable = generalLines.copy();
-      //AvaliabilityTable testTable = avaliabilityTables.get(Area.general).copy();
 
-      // For now, Moves can only put moves on GeneralTable
-      // !! This functionality was moved to method 'buildPath'
-      //Area moveArea = Area.general;
       int moveAddress = operation.getAddress();
 
-      //AvaliabilityTable generalTable = avaliabilityTables.get(moveArea);
 
       // For each input, verify if there is a path from the output to the input
-      //for(Operand input : operation.getInputs()) {
-
       for(int i=0; i<operation.getInputs().size(); i++) {
          Operand input = operation.getInputs().get(i);
          if(input.getType() != OperandType.internalData) {
@@ -305,26 +245,25 @@ public class NaiveMapper implements GeneralMapper {
          }
 
          int bits = input.getBits();
-         String moveOpName = Ssa.buildSsaName("moveReg"+i, 0);
+         //String moveOpName = Ssa.buildSsaName("moveReg"+i, 0);
+         String moveOpName = Ssa.buildSsaName(MoveService.MOVE_REG_PREFIX+i, 0);
 
          // Get position of register definition producer
          String registerName = Ssa.getOriginalName(input.getName());
          int sourceLine = definitions.getLine(registerName);
 
          // Check if there is a path from sourceline to line
-         //int distance = line-sourceLine;
-         if(isCommReachable(sourceLine, line)) {
+         if(MoveService.canLinesCommunicate(sourceLine, line, maxCommDistance)) {
             continue;
          }
 
-         //List<Integer> moveLines = buildPath(sourceLine, line, generalTable);
-         List<FuCoor> moveCoordinates = buildPath(sourceLine, line, avaliabilityTables);
+         List<FuCoor> moveCoordinates = MoveService.buildPath(sourceLine, line,
+                 maxCommDistance, avaliabilityTables);
 
          if(moveCoordinates == null) {
             Logger.getLogger(NaiveMapper.class.getName()).
                     warning("Cannot insert moves");
             return false;
-            //return null;
          }
 
          // For each move, insert an operation
@@ -344,50 +283,59 @@ public class NaiveMapper implements GeneralMapper {
          // Change input of operation to move
 
          operation.replaceInput(i, moveOperand);
-         replacedInputs.put(i, input);
-         // Generate Move Operations
-         //List<Fu> localMoveOperations = buildMoveOperations(input, moveLines);
-         //moveOperations.addAll(localMoveOperations);
+//         replacedInputs.put(i, input);
       }
 
       return true;
-      //return replacedInputs;
+   }
+
+ private void insertOperation(Operation operation, FuCoor coor) {
+      //System.err.println("Inserting Operation:");
+      //System.err.println(operation.getFullOperation());
+      // Process outputs
+      registerOutputs(operation, coor);
+
+      // Generate FU
+      Fu newFu = Fu.buildFu(coor, operation, definitions);
+
+      // Add FU to list
+      mappedOps.add(newFu);
+/*
+      // Restore inputs of operation that were replaced with moves.
+      for(Integer key : replacedInputs.keySet()) {
+         operation.replaceInput(key, replacedInputs.get(key));
+      }
+ * 
+ */
    }
 
    /**
-    * Input position -> line correspondent to its output
     *
     * @param operation
-    * @return
+    * @param area
     */
-   /*
-   private Map<Integer, Integer> getInputLines(Operation operation) {
-      Map<Integer, Integer> lines = new HashMap<Integer, Integer>();
-      for (int i=0; i<operation.getInputs().size(); i++) {
-         Operand operand = operation.getInputs().get(i);
-
-         // Ignore other types other than internal data
-         if (operand.getType() != OperandType.internalData) {
-            continue;
-         }
-
-         // Check distance between input/output
-         // Get register
-         String registerName = Ssa.getOriginalName(operand.getName());
-         // Get line
-         Integer outputLine = definitions.getLine(registerName);
-         if(outputLine == null) {
-            Logger.getLogger(NaiveMapper.class.getName()).
-                    warning("InternalData '"+operand.getName()+"' not defined yet.");
-            continue;
-         }
-
-         lines.put(i, outputLine);
+   private FuCoor getCoordinate(Operation operation, Area area) {
+      int line = calculateLine(operation);
+      if(line < 0) {
+         Logger.getLogger(NaiveMapper.class.getName()).
+                 warning("Mapping failed: could not found an avaliable line.");
+         return null;
       }
 
-      return lines;
+      //int col = reserveColumn(operation, line);
+      int col = reserveColumn(area, line);
+      if(col < 0) {
+         Logger.getLogger(NaiveMapper.class.getName()).
+                 warning("Mapping failed: could not get column for line '"+line+"'.");
+         return null;
+      }
+
+
+
+      // Build Fu Coordinate
+      FuCoor coor = new FuCoor(col, line, area);
+      return coor;
    }
-   */
 
    /**
     * Input position -> line correspondent to its output
@@ -425,28 +373,11 @@ public class NaiveMapper implements GeneralMapper {
       return mappedOps;
    }
 
-   
-   /**
-    * INSTANCE VARIABLES
-    */
-   private List<Fu> mappedOps;
-   // For each line, indicates which is the last occupied column
-   private Map<Area, AvaliabilityTable> avaliabilityTables;
-   // The areas considered for this mapper
-   private static final Area[] defaultAreas = {Area.general, Area.memory};
-   private static final int[] defaultAreasSize = {-1, 1};
-   //private AvaliabilityTable generalLines;
-   // Line, last occupied column
-   //private AvaliabilityTable memoryLines;
-   // SSA InternalData Register Number -> FuOutput / Line
-   private RegDefinitionsTable definitions;
-   private int commMaxDistance;
+   public void setAvaliabilityTableSize(int maxColumnSize, Area area) {
+      avaliabilityTables.put(area, new AvaliabilityTable(maxColumnSize));
+   }
 
-   private int lastLineWithStore;
-
-   private Map<Integer, Operand> replacedInputs;
-
-   /**
+      /**
     * Each output of the type 'internalData' need to be registred in the
     * definitions table.
     *
@@ -472,221 +403,57 @@ public class NaiveMapper implements GeneralMapper {
       }
    }
 
-   public void setAvaliabilityTableSize(int maxColumnSize, Area area) {
-      avaliabilityTables.put(area, new AvaliabilityTable(maxColumnSize));
-   }
-/*
-   public void setMaxMemoryColSize(int maxMemoryColSize) {
-      memoryLines = new AvaliabilityTable(maxMemoryColSize);
-      //this.maxMemoryColSize = maxMemoryColSize;
+   public RegDefinitionsTable getDefinitions() {
+      return definitions;
    }
 
-   public void setMaxGeneralColSize(int maxGeneralColSize) {
-      generalLines = new AvaliabilityTable(maxGeneralColSize);
-      //this.maxGeneralColSize = maxGeneralColSize;
-   }
-*/
-  /*
-   private List<Fu> calcMoves(Operation operation, int line) {
-      List<Fu> moveOperations = new ArrayList<Fu>();
-      if(isMaxCommDistanceInfinite()) {
-         return moveOperations;
-      }
-      // Copy general table
-      //AvaliabilityTable testTable = generalLines.copy();
-      AvaliabilityTable testTable = avaliabilityTables.get(Area.general).copy();
-      // For each input, verify if there is a path from the output to the input
-      for(Operand input : operation.getInputs()) {
-         if(input.getType() != OperandType.internalData) {
+   public int getLiveouts() {
+      int liveouts = 0;
+
+      for(String key : definitions.getDefinitions().keySet()) {
+         if(key.startsWith(MoveService.MOVE_REG_PREFIX)) {
             continue;
          }
-         
-         // Get position of register definition producer
-         String registerName = Ssa.getOriginalName(input.getName());
-         int sourceLine = definitions.getLine(registerName);
-         
-         // Check if there is a path from sourceline to line
-         //int distance = line-sourceLine;
-         if(isCommReachable(sourceLine, line)) {
-            continue;
-         }
-         
-         //if(distance <= commMaxDistance) {
-         //   continue;
-         //}
-         
-         //System.err.println("Needs Moves:");
-         //System.err.println("Source Line:"+sourceLine);
-         //System.err.println("Destination Line:"+line);
-         //System.err.println("BEGIN-------------------");
-         List<Integer> moveLines = buildPath(sourceLine, line, testTable);
-         //System.err.println("END-------------------");
-         //System.err.println("Moves:"+moveLines);
-         if(moveLines == null) {
-            Logger.getLogger(NaiveMapper.class.getName()).
-                    warning("Cannot insert moves");
-            return null;
-         }
-
-         // Generate Move Operations
-         List<Fu> localMoveOperations = buildMoveOperations(input, moveLines);
-         moveOperations.addAll(localMoveOperations);
+         liveouts++;
       }
 
-      return moveOperations;
-   }
-*/
-   private boolean isMaxCommDistanceInfinite() {
-      if(commMaxDistance < 1) {
-         return true;
-      } else {
-         return false;
-      }
+      return liveouts;
    }
 
-   /*
-   private boolean isCommReachable(int distance) {
-      if(isMaxCommDistanceInfinite()) {
-         return true;
-      }
-
-      if (distance < commMaxDistance) {
-         return true;
-      } else {
-         return false;
-      }
+   public void setMaxCommDistance(int maxCommDistance) {
+      this.maxCommDistance = maxCommDistance;
    }
-    * 
-    */
+
+
 
    /**
-    *
-    * @param sourceLine
-    * @param destinationLine
-    * @param testTable
-    * @return a list of lines where MOVEs should be put, or null if a path could
-    * not be done.
+    * INSTANCE VARIABLES
     */
-   private List<FuCoor> buildPath(int sourceLine, int destinationLine, Map<Area,AvaliabilityTable> tables) {
-      // Currently, MOVES only go along the general area
-      // TODO: Generalize for all areas?
-      Area defaultArea = Area.general;
-      AvaliabilityTable testTable = tables.get(defaultArea);
+   private List<Fu> mappedOps;
+   // For each line, indicates which is the last occupied column
+   private Map<Area, AvaliabilityTable> avaliabilityTables;
+   // The areas considered for this mapper
+   private static final Area[] defaultAreas = {Area.general, Area.memory};
+   private static final int[] defaultAreasSize = {-1, 1};
+   private static final int DEFAULT_MAX_COMM_DISTANCE = 1;
 
-      List<Integer> moveLines = new ArrayList<Integer>();
-      List<Integer> moveColumns = new ArrayList<Integer>();
+   // SSA InternalData Register Number -> FuOutput / Line
+   private RegDefinitionsTable definitions;
+   private int maxCommDistance;
 
-      //int distance = destinationLine - sourceLine - 1;
-      int currentSource = sourceLine;
-      int firstCandidateLine = sourceLine+1;
-      //int distance = destinationLine - firstCandidateLine;
-      //System.err.println("InitialDistance:"+distance);
-      while(!isCommReachable(currentSource, destinationLine)) {
-         //System.err.println("Current Source:"+currentSource);
-         //System.err.println("First Candidate Line:"+firstCandidateLine);
-         //System.err.println("Destination Line:"+destinationLine);
-         // Get possible lines for the given max comm
-         List<Integer> avaliableLines = testTable.getAvaliableLines(firstCandidateLine, commMaxDistance);
-         if(avaliableLines.isEmpty()) {
-            return null;
-         }
+   private int lastLineWithStore;
 
-         // Choose the line which has the least communication
-         //System.err.println("Candidate Lines:"+avaliableLines);
-         currentSource = testTable.lessOccupiedLine(avaliableLines);
-         //System.err.println("New Source:"+currentSource);
-
-         // Line for MOVE chosen. Add to test table and update current source and distance
-         
-         // DO NOT ADD TO TEST TABLE YET
-         //testTable.addColToLine(currentSource);
-         moveLines.add(currentSource);
-         int moveColumn = testTable.addColToLine(currentSource);
-         moveColumns.add(moveColumn);
-         firstCandidateLine = currentSource+1;
-         //distance = destinationLine - currentSource - 1;
-         
-      }
-
-      // Build Coordinates
-      List<FuCoor> fuCoordinates = new ArrayList<FuCoor>(moveLines.size());
-      for(int i=0; i<moveLines.size(); i++) {
-         fuCoordinates.add(new FuCoor(moveColumns.get(i), moveLines.get(i), defaultArea));
-      }
-
-      //return moveLines;
-      return fuCoordinates;
+   public void setMaxColGeneral(int maxColumns) {
+      setAvaliabilityTableSize(maxColumns, Area.general);
    }
 
-   /**
-    * 
-    * 
-    * @param sourceLine
-    * @param destinationLine
-    * @return
-    */
-   private boolean isCommReachable(int sourceLine, int destinationLine) {
-      if(isMaxCommDistanceInfinite()) {
-         return true;
-      }
-
-      int maxLine = sourceLine + commMaxDistance;
-      if(maxLine >= destinationLine) {
-         return true;
-      } else {
-         return false;
-      }
-      //int distance = destinationLine - sourceLine;
-      // MaxComm indicates to how many lines can the sourceLine communicate
+   public void setMaxColMemory(int maxColumns) {
+      setAvaliabilityTableSize(maxColumns, Area.memory);
    }
 
-   private List<Fu> buildMoveOperations(Operand input, List<Integer> moveLines) {
-      throw new UnsupportedOperationException("Not yet implemented");
-   }
-
-   private void insertOperation(Operation operation, FuCoor coor) {
-      //System.err.println("Inserting Operation:");
-      //System.err.println(operation.getFullOperation());
-      // Process outputs
-      registerOutputs(operation, coor);
-
-      // Generate FU
-      Fu newFu = Fu.buildFu(coor, operation, definitions);
-
-      // Add FU to list
-      mappedOps.add(newFu);
-
-      // Restore inputs of operation that were replaced with moves.
-      for(Integer key : replacedInputs.keySet()) {
-         operation.replaceInput(key, replacedInputs.get(key));
-      }
-   }
-
-   /**
-    *
-    * @param operation
-    * @param area
-    */
-   private FuCoor getCoordinate(Operation operation, Area area) {
-      int line = calculateLine(operation);
-      if(line < 0) {
-         Logger.getLogger(NaiveMapper.class.getName()).
-                 warning("Mapping failed: could not found an avaliable line.");
-         return null;
-      }
-
-      //int col = reserveColumn(operation, line);
-      int col = reserveColumn(area, line);
-      if(col < 0) {
-         Logger.getLogger(NaiveMapper.class.getName()).
-                 warning("Mapping failed: could not get column for line '"+line+"'.");
-         return null;
-      }
+   //private Map<Integer, Operand> replacedInputs;
 
 
 
-      // Build Fu Coordinate
-      FuCoor coor = new FuCoor(col, line, area);
-      return coor;
-   }
+   
 }

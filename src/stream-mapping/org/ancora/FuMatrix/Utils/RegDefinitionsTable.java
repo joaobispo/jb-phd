@@ -79,6 +79,12 @@ public class RegDefinitionsTable {
       return newTable;
    }
 
+   public Map<String, FuOutputSignal> getDefinitions() {
+      return definitions;
+   }
+
+
+
    /**
     * INSTANCE VARIABLES
     */

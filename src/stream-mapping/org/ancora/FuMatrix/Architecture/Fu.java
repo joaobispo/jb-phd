@@ -95,7 +95,8 @@ public class Fu {
       return null;
    }
 
-   private Fu(FuCoor coor, List<Signal> inputs, String operationName, //Operation operation,
+   //private Fu(FuCoor coor, List<Signal> inputs, String operationName, //Operation operation,
+   private Fu(FuCoor coor, List<Signal> inputs, String operationName, OperationType operationType, //Operation operation,
            RegDefinitionsTable liveouts) {
       this.coor = coor;
       this.inputs = inputs;
@@ -103,6 +104,7 @@ public class Fu {
       //this.externalRouting = externalRouting;
       //this.operation = operation;
       this.operationName = operationName;
+      this.operationType = operationType;
       this.liveouts = liveouts;
    }
 
@@ -110,12 +112,13 @@ public class Fu {
            RegDefinitionsTable registerDefinitions) {
       // Get operation name
       String operationName = operation.getName();
+      OperationType operationType = (OperationType) operation.getType();
       // Build inputs
       List<Signal> inputs = buildInputs(coor, operation, registerDefinitions);
       // Get Liveouts
       RegDefinitionsTable liveouts = buildLiveouts(operation, registerDefinitions);
 
-      return new Fu(coor, inputs, operationName, liveouts);
+      return new Fu(coor, inputs, operationName, operationType, liveouts);
    }
 
    public FuCoor getCoordinate() {
@@ -138,13 +141,21 @@ public class Fu {
 
    
 
-   public RegDefinitionsTable getLiveouts() {
+   public RegDefinitionsTable getDefinitionsTable() {
       return liveouts;
    }
 
+   public OperationType getOperationType() {
+      return operationType;
+   }
+
+   
    public String getOperationName() {
       return operationName;
    }
+    
+    
+
 
 
 
@@ -159,6 +170,7 @@ public class Fu {
    private List<Signal> inputs;
    //private Operation operation;
    private String operationName;
+   private OperationType operationType;
    //private Map<String, FuOutputSignal> liveouts;
    private RegDefinitionsTable liveouts;
    //private Area area;

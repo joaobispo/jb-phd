@@ -36,6 +36,11 @@ public interface GeneralMapper {
    boolean accept(Operation operation);
 
    public List<Fu> getMappedOps();
+   public int getLiveouts();
+
+   public void setMaxCommDistance(int maxCommDistance);
+   public void setMaxColGeneral(int maxColumns);
+   public void setMaxColMemory(int maxColumns);
    //int getNumberOfOps();
    //int getNumberOfLines();
    //int getLiveIns();
