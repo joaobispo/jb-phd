@@ -149,7 +149,8 @@ public class Shell {
       tracecoverage,
       simulate,
       dottrace,
-      streamtransform;
+      streamtransform,
+      streamsimulate;
 
   
       public Executable getExecutable() {
@@ -172,6 +173,8 @@ public class Shell {
                return new DotTrace();
             case streamtransform:
                return new StreamTransform();
+            case streamsimulate:
+               return new StreamSimulate();
             default:
                Logger.getLogger(Command.class.getName()).
                        warning("Executable not defined for '" + this.name() + "'");

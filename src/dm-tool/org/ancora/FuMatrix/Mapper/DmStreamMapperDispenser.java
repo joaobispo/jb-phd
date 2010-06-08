@@ -32,16 +32,22 @@ public class DmStreamMapperDispenser {
 
    public static GeneralMapper getCurrentMapper() {
 
-      String mapperName = Options.optionsTable.get(OptionName.mapping_stream_mapper);
-      MapperName mapper = mappers.get(mapperName);
+      String mapperNameString = Options.optionsTable.get(OptionName.mapping_stream_mapper);
+      MapperName mapperName = mappers.get(mapperNameString);
 
-      if(mapper == null) {
+      if(mapperName == null) {
          Logger.getLogger(DmStreamMapperDispenser.class.getName()).
-                 warning("Mapper '" + mapperName + "' not found.");
+                 warning("Mapper '" + mapperNameString + "' not found.");
          return null;
       }
 
-      return mapper.getMapper();
+      // Configure Mapper
+      GeneralMapper mapper = mapperName.getMapper();
+      mapper.setMaxColGeneral(Integer.parseInt(Options.optionsTable.get(OptionName.mapping_max_col_general)));
+      mapper.setMaxColMemory(Integer.parseInt(Options.optionsTable.get(OptionName.mapping_max_col_memory)));
+      mapper.setMaxCommDistance(Integer.parseInt(Options.optionsTable.get(OptionName.mapping_max_comm_distance)));
+ 
+      return mapper;
 
    }
 

@@ -42,6 +42,9 @@ import org.ancora.IrMapping.DmDottyUtils;
 import org.ancora.FuMatrix.Mapper.DmStreamMapperDispenser;
 import org.ancora.FuMatrix.Architecture.Fu;
 import org.ancora.FuMatrix.Architecture.FuCoor;
+import org.ancora.FuMatrix.Architecture.FuOutputSignal;
+import org.ancora.FuMatrix.Architecture.Signal;
+import org.ancora.FuMatrix.Architecture.Signal.SignalType;
 import org.ancora.FuMatrix.Mapper.GeneralMapper;
 import org.ancora.StreamTransform.DmStreamTransformDispenser;
 import org.ancora.StreamTransform.SingleStaticAssignment;
@@ -142,13 +145,21 @@ public class StreamTransform implements Executable {
             // Map
            //mapper.reset();
             GeneralMapper beforeMapper = DmStreamMapperDispenser.getCurrentMapper();
+            boolean beforeMapperSucess;
             for(Operation operation : operations) {
-               beforeMapper.accept(operation);
+               beforeMapperSucess = beforeMapper.accept(operation);
+               if(!beforeMapperSucess) {
+                  Logger.getLogger(StreamTransform.class.getName()).
+                          warning("Could not map block '"+blockName+"' before " +
+                          "transformations.");
+                  break;
+               }
             }
 
             // Show Mapping
-            showFus(beforeMapper.getMappedOps());
-
+            //showFus(beforeMapper.getMappedOps());
+            System.err.println("Testing Mapping Before Transformations:");
+            testMapping(beforeMapper.getMappedOps());
 
             // Get stats before transformation
 //            LongTransformDataSingle beforeData = DataProcess.collectTransformData(mapper, block.getRepetitions());
@@ -181,9 +192,20 @@ public class StreamTransform implements Executable {
 
             // Map
             GeneralMapper afterMapper = DmStreamMapperDispenser.getCurrentMapper();
+            boolean afterMapperSucess = true;
             for(Operation operation : operations) {
-               afterMapper.accept(operation);
+               afterMapperSucess = afterMapper.accept(operation);
+               if (!afterMapperSucess) {
+                  Logger.getLogger(StreamTransform.class.getName()).
+                          warning("Could not map block '"+blockName+"' after " +
+                          "transformations.");
+                  break;
+               }
             }
+
+            System.err.println("Testing Mapping After Transformations:");
+            testMapping(beforeMapper.getMappedOps());
+
             /*
             mapper.reset();
             mapper.processOperations(operations);
@@ -247,9 +269,9 @@ public class StreamTransform implements Executable {
    //private List<Transformation> transf;
    private boolean writeDot;
 
-   private void showFus(List<Fu> mappedOps) {
+   public static void showFus(List<Fu> mappedOps) {
          // Build matrix
-         List<List<Operation>> matrix = new ArrayList<List<Operation>>();
+         List<List<String>> matrix = new ArrayList<List<String>>();
 
          int maxCol = 0;
          for (int i = 0; i < mappedOps.size(); i++) {
@@ -258,10 +280,10 @@ public class StreamTransform implements Executable {
             FuCoor coor = fu.getCoordinate();
             int line = coor.getLine();
             if(line == matrix.size()) {
-               matrix.add(new ArrayList<Operation>());
+               matrix.add(new ArrayList<String>());
             }
             
-            List<Operation> operationLine = matrix.get(line);
+            List<String> operationLine = matrix.get(line);
             /*
             if(operationLine == null) {
                operationLine = new ArrayList<Operation>();
@@ -274,34 +296,71 @@ public class StreamTransform implements Executable {
             }
              *
              */
-            operationLine.add(fu.getOperation());
+            operationLine.add(fu.getOperationName());
             maxCol = Math.max(maxCol, operationLine.size());
             //System.err.println(buildMatrixString(matrix));
          }
 
 
-//         System.err.println("Mapping:");
-//         System.err.println(buildMatrixString(matrix));
+         System.err.println("Mapping:");
+         System.err.println(buildMatrixString(matrix));
          System.err.println("Max Lines:"+matrix.size());
          System.err.println("Max Cols:"+maxCol);
-         System.err.println("Max Area Size:"+(maxCol*matrix.size()));
+//         System.err.println("Max Area Size:"+(maxCol*matrix.size()));
    }
 
-   private String buildMatrixString(List<List<Operation>> matrix) {
+   public static String buildMatrixString(List<List<String>> matrix) {
       StringBuilder builder = new StringBuilder();
       for(int i=0; i<matrix.size(); i++) {
          builder.append("Line ");
          builder.append(i);
          builder.append(":");
 
-         for(Operation operation : matrix.get(i)) {
-            builder.append(" ");
+         for(String operation : matrix.get(i)) {
+            builder.append(" '");
             builder.append(operation.toString());
+            builder.append("'");
          }
          builder.append("\n");
       }
 
       return builder.toString();
+   }
+
+   private void testMapping(List<Fu> mappedOps) {
+      // TEST 1: Communications in the same line
+      for(Fu fu : mappedOps) {
+         int fuLine = fu.getCoordinate().getLine();
+         for(Signal signal : fu.getInputs()) {
+            if(signal.getType() == SignalType.fuOutput) {
+               int inputLine = ((FuOutputSignal)signal).getCoordinate().getLine();
+               if(inputLine >= fuLine) {
+                  Logger.getLogger(StreamTransform.class.getName()).
+                          warning("Failed test 1. Fu '"+fu+"' on line "+fuLine+" " +
+                          "receives input from Fu on line '"+inputLine+"'");
+                  return;
+               }
+            }
+         }
+      }
+
+      // TEST 2: Every load must come after the last store (most conservative assumption)
+      int lineOfLastStore = -1;
+      for(Fu fu : mappedOps) {
+         OperationType opType = fu.getOperationType();
+         if(opType.isStore()) {
+            lineOfLastStore = fu.getCoordinate().getLine();
+         } else if(opType.isLoad()) {
+            int loadLine = fu.getCoordinate().getLine();
+            if(loadLine <= lineOfLastStore) {
+               Logger.getLogger(StreamTransform.class.getName()).
+                       warning("Failed test 2. Fu '" + fu + "' on line " + loadLine + " "
+                       + "loads after store on line '" + lineOfLastStore + "'");
+               return;
+            }
+         }
+      }
+
    }
 
    // STATS

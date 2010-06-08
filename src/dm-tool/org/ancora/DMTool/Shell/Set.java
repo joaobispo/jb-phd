@@ -44,9 +44,11 @@ public class Set implements Executable {
 
 
    public boolean execute(List<String> args) {
-      if(args.size() < 2) {
+      int minimumArgs = 1;
+      if(args.size() < minimumArgs) {
          Logger.getLogger(Set.class.getName()).
-                 info("Too few arguments for 'set' ("+args.size()+"). Minimum is 2.");
+                 warning("Too few arguments for 'set' ("+args.size()+"). Minimum is "+
+                 minimumArgs+".");
          return false;
       }
 
@@ -56,13 +58,19 @@ public class Set implements Executable {
 
       if(optionName == null) {
           Logger.getLogger(Set.class.getName()).
-                  info("'"+args.get(0)+"' is not a valid setting. Type "+
+                  warning("'"+args.get(0)+"' is not a valid setting. Type "+
                   Command.help+" "+Help.HelpArgument.setoptions+" to see avaliable settings.");
          
          return false;
       }
 
-      String value = args.get(1);
+      String value = null;
+      if(args.size() == 1) {
+         value = "";
+      } else {
+         value = args.get(1);
+      }
+      
       // Concatenate remainging arguments into a single string
       if(args.size() > 2) {
          StringBuilder builder = new StringBuilder();

@@ -37,6 +37,7 @@ public class Options {
        general_input("general.input",""),
        general_loggerlevel("general.loggerlevel","ALL"),
        general_csvfilebasename("general.csvfilebasename","csvfile"),
+       general_optimizationstring("general.optimizationstring",""),
 
       partition_partitioner("partition.partitioner",DmPartitionerDispenser.PartitionerName.MbBasicBlock.getDmPartitionerName()),
       partition_repetitionthreshold("partition.repetitionthreshold","2"),
@@ -55,6 +56,9 @@ public class Options {
 
       mapping_mapper("mapping.mapper",""),
       mapping_stream_mapper("mapping.streammapper",""),
+      mapping_max_comm_distance("mapping.maxcommdistance","0"),
+      mapping_max_col_general("mapping.maxcolgeneral","-1"),
+      mapping_max_col_memory("mapping.maxcolmemory","1"),
 
       ir_writedot("ir.writedot","false"),
       ir_options("ir.options","");
