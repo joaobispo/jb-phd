@@ -37,34 +37,22 @@ public class TransformationChanges {
    }
 
    public void addOperationFrequency(String transformationName, OperationFrequency frequencies) {
-      //System.err.println("Contains transformation (inside)?"+this.operationFrequency.containsKey(transformationName));
       OperationFrequency currentFrequencies = this.operationFrequency.get(transformationName);
-      //System.err.println("Current Frequencies (inside)"+currentFrequencies);
-      //System.err.println("Total Frequencies Before:"+operationFrequency);
+
       if(currentFrequencies == null) {
          currentFrequencies = new OperationFrequency();
-         //System.err.println("!!! IS NULL!!!");
       }
-      //System.err.println("Current Frequencies (inside2)"+currentFrequencies);
-      //System.err.println("CurrentFrequencies Before:"+currentFrequencies);
       currentFrequencies.addOperations(frequencies);
-      //System.err.println("Current Frequencies (inside3)"+currentFrequencies);
-      //System.err.println("CurrentFrequencies After:"+currentFrequencies);
 
       operationFrequency.put(transformationName, currentFrequencies);
-      //System.err.println("Total Frequencies After:"+operationFrequency);
    }
 
    public void addOperationFrequency(TransformationChanges anotherTotal) {
       Map<String, OperationFrequency> partialAcc = anotherTotal.getTotalFrequencies();
-      //System.err.println("Table Before:"+this.operationFrequency);
       for(String key : partialAcc.keySet()) {
-         //System.err.println("Adding Transformation:"+key);
-         //System.err.println("Contains transformation?"+this.operationFrequency.containsKey(key));
          OperationFrequency partialFrequency = partialAcc.get(key);
          addOperationFrequency(key, partialFrequency);
       }
-      //System.err.println("Table After:"+this.operationFrequency);
    }
 
    public String buildStatsString() {
