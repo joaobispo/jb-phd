@@ -18,9 +18,12 @@
 package org.ancora.Partitioning.Blocks;
 
 import org.ancora.InstructionBlock.InstructionBlock;
+import org.ancora.InstructionBlock.InstructionBusReader;
+import org.ancora.Partitioning.Partitioner;
 
 /**
- * Returns InstructionBlocks, until it reaches the end of the stream.
+ * Using an InstructionBusReader to read instructions and a Partitioner, forms
+ * InstructionBlocks, until it reaches the end of the stream.
  *
  * @author Joao Bispo
  */
@@ -35,4 +38,7 @@ public interface BlockStream {
    String getPartitionerName();
 
    long getTotalInstructions();
+
+   Partitioner getPartitioner();
+   InstructionBusReader getInstructionBusReader();
 }

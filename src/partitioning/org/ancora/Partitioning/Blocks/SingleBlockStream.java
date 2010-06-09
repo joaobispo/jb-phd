@@ -18,9 +18,14 @@
 package org.ancora.Partitioning.Blocks;
 
 import org.ancora.InstructionBlock.InstructionBlock;
+import org.ancora.InstructionBlock.InstructionBusReader;
+import org.ancora.Partitioning.Partitioner;
 
 /**
  * Block Stream with a single InstructionBlock.
+ *
+ * TODO: Check situations where only one instruction block is used and do not
+ * implement BlockStream; treat the single block diferently.
  *
  * @author Joao Bispo
  */
@@ -51,5 +56,12 @@ public class SingleBlockStream implements BlockStream {
       return block.getTotalInstructions();
    }
 
+   public Partitioner getPartitioner() {
+      return null;
+   }
+
+   public InstructionBusReader getInstructionBusReader() {
+      return null;
+   }
 
 }

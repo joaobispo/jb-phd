@@ -17,7 +17,10 @@
 
 package org.ancora.Partitioning.Tools;
 
+import org.ancora.Partitioning.Partitioner;
+
 /**
+ * Partitions instructions according to a Partitioner class.
  *
  * @author Joao Bispo
  */
@@ -32,4 +35,6 @@ public interface BlockWorker {
    void setSelectorRepThreshold(int selectorThreshold);
 
    void init();
+
+   Partitioner getPartitioner();
 }

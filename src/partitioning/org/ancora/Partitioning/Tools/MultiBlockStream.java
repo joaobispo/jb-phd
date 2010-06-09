@@ -34,12 +34,14 @@ public class MultiBlockStream implements BlockStream {
    public MultiBlockStream(List<Partitioner> partitioners, InstructionBusReader busReader) {
       //this.partitioners = partitioners;
       this.busReader = busReader;
+      currentPartitionerName = null;
       currentPartitioner = null;
 
       blocks = new ArrayList<InstructionBlock>();
       flushed = false;
 
       partitionerNames = new ArrayList<String>();
+      usedPartitioners = new ArrayList<Partitioner>();
 
       workers = new ArrayList<ManualBlockWorker>();
       for(Partitioner partitioner : partitioners) {
@@ -92,7 +94,7 @@ public class MultiBlockStream implements BlockStream {
    }
 
    public String getPartitionerName() {
-      return currentPartitioner;
+      return currentPartitionerName;
    }
 
    public List<ManualBlockWorker> getWorkers() {
@@ -106,6 +108,7 @@ public class MultiBlockStream implements BlockStream {
       // For each block added, add a partitioner name
       for(int i=0; i<newBlocks.size(); i++) {
          partitionerNames.add(worker.getPartitionerName());
+         usedPartitioners.add(worker.getPartitioner());
       }
    }
 
@@ -114,7 +117,8 @@ public class MultiBlockStream implements BlockStream {
          return null;
       }
 
-      currentPartitioner = partitionerNames.remove(0);
+      currentPartitionerName = partitionerNames.remove(0);
+      currentPartitioner = usedPartitioners.remove(0);
       return blocks.remove(0);
    }
 
@@ -139,9 +143,19 @@ public class MultiBlockStream implements BlockStream {
 
    private List<InstructionBlock> blocks;
    private List<String> partitionerNames;
-   private String currentPartitioner;
+   private List<Partitioner> usedPartitioners;
+   private String currentPartitionerName;
+   private Partitioner currentPartitioner;
 
    private boolean flushed;
+
+   public Partitioner getPartitioner() {
+      return currentPartitioner;
+   }
+
+   public InstructionBusReader getInstructionBusReader() {
+      throw new UnsupportedOperationException("Not supported yet.");
+   }
 
 
 

@@ -263,6 +263,14 @@ public class BlockWorkerStream implements BlockStream, BlockWorker {
 
    private boolean flushed;
 
+   public Partitioner getPartitioner() {
+      return partitioner;
+   }
+
+   public InstructionBusReader getInstructionBusReader() {
+      return busReader;
+   }
+
 
 
 

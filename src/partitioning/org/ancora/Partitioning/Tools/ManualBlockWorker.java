@@ -215,6 +215,10 @@ public class ManualBlockWorker implements BlockWorker {
 
    private boolean flushed;
 
+   public Partitioner getPartitioner() {
+      return partitioner;
+   }
+
 
 
 }
