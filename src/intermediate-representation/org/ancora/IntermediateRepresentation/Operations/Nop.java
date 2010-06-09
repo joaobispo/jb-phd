@@ -34,6 +34,10 @@ public class Nop extends Operation {
       //this.name = name;
    }
 
+   public Operation getOperation() {
+      return operation;
+   }
+
    /*
    public Nop(int address, String name) {
       super(address);

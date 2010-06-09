@@ -132,7 +132,8 @@ public class ArithmeticWithCarry extends Operation {
 
    public Operand getCarryOut() {
       if(hasCarryOut) {
-         return getInputs().get(1);
+         //return getInputs().get(1);
+         return getOutputs().get(1);
       } else {
          return null;
       }

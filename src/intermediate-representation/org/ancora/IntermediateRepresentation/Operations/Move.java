@@ -17,6 +17,9 @@
 
 package org.ancora.IntermediateRepresentation.Operations;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Operand;
 import org.ancora.IntermediateRepresentation.Operation;
@@ -35,11 +38,26 @@ import org.ancora.IntermediateRepresentation.Operation;
 public class Move extends Operation {
 
    public Move(int address, Operand input1, Operand output1) {
-
       super(address);
 
       connectToInput(input1);
       connectToOutput(output1);
+   }
+
+   public Move(int address, List<Operand> inputs, List<Operand> outputs) {
+      super(address);
+
+      if(inputs.size() != outputs.size()) {
+         Logger.getLogger(Move.class.getName()).
+                 warning("Inputs size ("+inputs.size()+") different from outputs size ("+outputs.size()+")");
+      }
+
+      for(Operand input : inputs) {
+         connectToInput(input);
+      }
+      for(Operand output : outputs) {
+         connectToOutput(output);
+      }
    }
 
    @Override
@@ -63,19 +81,33 @@ public class Move extends Operation {
       return false;
    }
 
+
    public Operand getInput1() {
       //return input1;
       return getInputs().get(0);
    }
 
-   public Operand getOutput() {
+   public Operand getOutput1() {
       //return output;
       return getOutputs().get(0);
    }
 
    @Override
    public Operation copy() {
-      return new Move(getAddress(), getInput1().copy(), getOutput().copy());
+      List<Operand> originalInputs = getInputs();
+      List<Operand> inputs = new ArrayList<Operand>();
+      for(Operand originalInput : originalInputs) {
+         inputs.add(originalInput.copy());
+      }
+      
+      List<Operand> originalOutputs = getOutputs();
+      List<Operand> outputs = new ArrayList<Operand>();
+      for(Operand originalOutput : originalOutputs) {
+         outputs.add(originalOutput.copy());
+      }
+
+      //return new Move(getAddress(), getInput1().copy(), getOutput1().copy());
+      return new Move(getAddress(), inputs, outputs);
    }
 
 }
