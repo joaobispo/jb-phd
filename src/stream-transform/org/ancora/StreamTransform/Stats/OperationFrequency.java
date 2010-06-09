@@ -50,17 +50,17 @@ public class OperationFrequency {
 
    public void addOperations(OperationFrequency operationFrequency) {
       Map<OperationType, Integer> alienStats = operationFrequency.stats;
-      for(OperationType key : alienStats.keySet()) {
-         Integer plusValue = alienStats.get(key);
-         Integer currentValue = stats.get(key);
-
+      for(OperationType opType : alienStats.keySet()) {
+         Integer plusValue = alienStats.get(opType);
+         Integer currentValue = stats.get(opType);
          if(currentValue == null) {
             currentValue = 0;
          }
 
          currentValue += plusValue;
 
-         stats.put(key, plusValue);
+         //stats.put(opType, plusValue);
+         stats.put(opType, currentValue);
       }
    }
 
@@ -68,6 +68,10 @@ public class OperationFrequency {
       return stats;
    }
 
+   @Override
+   public String toString() {
+      return stats.toString();
+   }
 
 
    /**

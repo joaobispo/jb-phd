@@ -50,11 +50,13 @@ public class SingleStaticAssignment extends StreamTransformation {
 
 
    @Override
-   public void transform(Operation operation) {
+   public Operation transform(Operation operation) {
 
       processInputs(operation);
       processOutputs(operation);
 // TODO: It would be interesting to have stats about the max number of versions.
+
+      return operation;
    }
 
    private void processInputs(Operation operation) {
@@ -90,8 +92,6 @@ public class SingleStaticAssignment extends StreamTransformation {
             
             // Substitute
             inputs.set(j, newData);
-            System.out.println("Old data:"+iData);
-            System.out.println("New data:"+newData);
          }
    }
 

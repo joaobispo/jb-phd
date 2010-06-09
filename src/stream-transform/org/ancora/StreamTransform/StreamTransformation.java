@@ -26,7 +26,7 @@ import org.ancora.StreamTransform.Stats.OperationFrequency;
  */
 public abstract class StreamTransformation {
 
-  public abstract void transform(Operation operation);
+  public abstract Operation transform(Operation operation);
 
   public abstract String getName();
 
