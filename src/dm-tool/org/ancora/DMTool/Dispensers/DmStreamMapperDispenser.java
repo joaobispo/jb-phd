@@ -17,12 +17,14 @@
 
 package org.ancora.DMTool.Dispensers;
 
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.FuMatrix.Mapper.GeneralMapper;
 import org.ancora.FuMatrix.Mapper.NaiveMapper;
+import org.ancora.IntermediateRepresentation.Operation;
 import org.ancora.SharedLibrary.EnumUtils;
 
 
@@ -51,6 +53,24 @@ public class DmStreamMapperDispenser {
  
       return mapper;
 
+   }
+
+   /**
+    *
+    * @param operations
+    * @return a GeneralMapper after mapping the given operations, or null if there
+    * was an error while mapping.
+    */
+   public static GeneralMapper applyCurrentMapper(List<Operation> operations) {
+      GeneralMapper mapper = DmStreamMapperDispenser.getCurrentMapper();
+      boolean sucess = true;
+      for (Operation operation : operations) {
+         sucess = mapper.accept(operation);
+         if (!sucess) {
+            return null;
+         }
+      }
+      return mapper;
    }
 
 public static Map<String, MapperName> mappers =

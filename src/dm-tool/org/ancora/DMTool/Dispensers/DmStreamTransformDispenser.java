@@ -24,8 +24,11 @@ import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.System.Services.ShellUtils;
+import org.ancora.IntermediateRepresentation.Operation;
 import org.ancora.SharedLibrary.EnumUtils;
+import org.ancora.StreamTransform.RemoveR0Or;
 import org.ancora.StreamTransform.SingleStaticAssignment;
+import org.ancora.StreamTransform.Stats.TransformationChanges;
 import org.ancora.StreamTransform.StreamTransformation;
 
 /**
@@ -51,7 +54,7 @@ public class DmStreamTransformDispenser {
          TransformationName transformation = transformations.get(transf);
          if(transformation == null) {
             Logger.getLogger(DmStreamTransformDispenser.class.getName()).
-                    info("Could not find transformation '"+transf+"'.");
+                    warning("Could not find transformation '"+transf+"'.");
             continue;
          }
 
@@ -62,6 +65,22 @@ public class DmStreamTransformDispenser {
 
    }
 
+   public static TransformationChanges applyCurrentTransformations(List<Operation> operations) {
+      TransformationChanges totalFrequencies = new TransformationChanges();
+
+      List<StreamTransformation> transf = DmStreamTransformDispenser.getCurrentTransformations();
+      for (StreamTransformation t : transf) {
+         for (int i = 0; i < operations.size(); i++) {
+            operations.set(i, t.transform(operations.get(i)));
+         }
+         totalFrequencies.addOperationFrequency(t.getName(), t.getOperationFrequency());
+      }
+
+      return totalFrequencies;
+   }
+
+
+
    public static Map<String, TransformationName> transformations =
            EnumUtils.buildMap(TransformationName.values());
 
@@ -70,7 +89,7 @@ public class DmStreamTransformDispenser {
     * TRANSFORMATIONS
     */
    public static enum TransformationName {
-      dummy("dummy");
+      removeR0Or("remove-or");
 /*
       ResolveLiteralInputs("resolve-inputs-lit"),
       ResolveNeutralInputs("resolve-inputs-neutral"),
@@ -96,6 +115,8 @@ public class DmStreamTransformDispenser {
       }
       public StreamTransformation getTransformation() {
          switch (this) {
+            case removeR0Or:
+               return new RemoveR0Or();
             /*
             case ResolveLiteralInputs:
                return new ResolveLiteralInputs();

@@ -19,6 +19,8 @@ package org.ancora.DMTool.Stats;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import org.ancora.FuMatrix.Mapper.GeneralMapper;
+import org.ancora.FuMatrix.Stats.MapperData;
 import org.ancora.IrMapping.Mapper;
 
 /**
@@ -42,7 +44,25 @@ public class DataProcess {
 
       return data;
    }
+   /*
+   public static LongTransformDataSingle collectTransformData(GeneralMapper mapper, int repetitions) {
+      // Create Data object
+      LongTransformDataSingle data = new LongTransformDataSingle();
 
+      MapperData mapperData = MapperData.build(mapper);
+      mapperData.
+      // Gather data
+      data.addValue(TransformParam.mappedOperations, mapper.getNumberOfOps());
+      data.addValue(TransformParam.executedOperations, mapper.getNumberOfOps()*repetitions);
+      data.addValue(TransformParam.mappedLines, mapper.getNumberOfLines());
+      data.addValue(TransformParam.executedLines, mapper.getNumberOfLines()*repetitions);
+      data.addValue(TransformParam.liveIns, mapper.getLiveIns());
+      data.addValue(TransformParam.liveOuts, mapper.getLiveOuts());
+      data.addValue(TransformParam.cycles, repetitions);
+
+      return data;
+   }
+*/
    public static void showTransformDataChanges(LongTransformDataSingle beforeTransf, LongTransformDataSingle afterTransf) {
        //String[] param = {"CommCosts", "Cpl", "Ilp", "Mapped Operations", "Executed Operations"};
        String[] param = {"CommCosts", "Mapped Lines", "Executed Lines", "Ilp", "Mapped Operations", "Executed Operations"};

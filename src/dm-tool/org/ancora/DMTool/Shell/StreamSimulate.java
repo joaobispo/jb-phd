@@ -33,6 +33,9 @@ import org.ancora.DMTool.System.DataStructures.DmBlockPack;
 import org.ancora.DMTool.System.Services.DmBlockUtils;
 import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.DMTool.Dispensers.DmTransformDispenser;
+import org.ancora.DMTool.Simulation.DmSimulateFile;
+import org.ancora.DMTool.Simulation.SimulationCalcs;
+import org.ancora.DMTool.Simulation.SimulationData;
 import org.ancora.IntermediateRepresentation.MbParser;
 import org.ancora.IntermediateRepresentation.Operation;
 import org.ancora.IntermediateRepresentation.Transformation;
@@ -74,10 +77,59 @@ public class StreamSimulate implements Executable {
 //      logger.warning("Found "+inputFiles.size()+" files.");
       logger.warning("Found "+inputFiles.size()+" files. Using partitioner "+Settings.getPartitioner().getName());
 
-      processFiles(inputFiles);
+      //processFiles(inputFiles);
+      processFiles2(inputFiles);
 
 
       return true;
+   }
+
+   private void processFiles2(List<File> inputFiles) {
+      // Optimization
+      String optimizationLevel = Options.optionsTable.get(OptionName.general_optimizationstring);
+      String transformations = "NoTrans";
+      if(DmTransformDispenser.getCurrentTransformations().size() > 0) {
+         transformations = "WithTransf";
+      }
+
+      String runName = optimizationLevel+"-"+transformations;
+      List<Double> speedups = new ArrayList<Double>();
+
+      double speedupAcc = 0d;
+      long globalNormalCycles = 0l;
+      for (File file : inputFiles) {
+         logger.warning("Processing file '" + file.getName() + "'...");
+
+         // Get BlockStream and BusReader
+         DmBlockPack blockPack = DmBlockUtils.getBlockPack(file);
+         BlockStream blockStream = blockPack.getBlockStream();
+
+         DmSimulateFile simulator = new DmSimulateFile(blockStream);
+         simulator.runSimulation();
+         SimulationData simData = simulator.getSimulationData();
+         SimulationCalcs simCalcs = new SimulationCalcs(simData, blockStream.getInstructionBusReader());
+
+
+         double speedup = simCalcs.getSpeedUp();
+         //System.err.println("Speed-up:"+speedup);
+         speedupAcc += speedup;
+
+         globalNormalCycles+=blockStream.getInstructionBusReader().getCycles();
+         int failedMappings = simData.getFailedMappings();
+         if(failedMappings > 0) {
+            System.err.println("Failed "+failedMappings+" mappings.");
+         }
+
+         speedups.add(speedup);
+      }
+
+      System.err.println("Run:"+runName);
+      System.err.println("\nAverage Speed-up:" + (speedupAcc / inputFiles.size()));
+      System.err.println("Global Normal Cycles:" + globalNormalCycles);
+      double avgSpeedup = speedupAcc / inputFiles.size();
+      speedups.add(avgSpeedup);
+
+      //writeToCsv(runName, speedups, inputFiles);
    }
 
    private void processFiles(List<File> inputFiles) {
@@ -99,6 +151,7 @@ public class StreamSimulate implements Executable {
 
          // Get BlockStream and BusReader
          DmBlockPack blockPack = DmBlockUtils.getBlockPack(file);
+
          long processorInstructions = 0l;
          long hwCycles = 0l;
          int repetitionsThreshold = 2;
@@ -164,8 +217,8 @@ public class StreamSimulate implements Executable {
 
                   double ilpWithoutMoves = (double)ops / (double)lines;
                   double ilpWithMoves = (double)(ops+moves) / (double)lines;
-                  System.err.println("ILP sem Moves:"+ilpWithoutMoves);
-                  System.err.println("ILP com Moves:"+ilpWithMoves);
+                  //System.err.println("ILP sem Moves:"+ilpWithoutMoves);
+                  //System.err.println("ILP com Moves:"+ilpWithMoves);
                } else {
                   // Processor path
                   processorInstructions += block.getTotalInstructions();

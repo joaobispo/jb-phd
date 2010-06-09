@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.System.Services.ShellUtils;
+import org.ancora.IntermediateRepresentation.Operation;
 import org.ancora.IntermediateRepresentation.Transformation;
 import org.ancora.IntermediateRepresentation.Transformations.RemoveDeadBranches;
 import org.ancora.IntermediateRepresentation.Transformations.RemoveDeadCode;
@@ -59,6 +60,14 @@ public class DmTransformDispenser {
 
       return transfs;
 
+   }
+
+   public static void applyCurrentTransformations(List<Operation> operations) {
+      List<Transformation> transf = DmTransformDispenser.getCurrentTransformations();
+      // Transform
+      for (Transformation t : transf) {
+         t.transform(operations);
+      }
    }
 
    public static Map<String, TransformationName> transformations =

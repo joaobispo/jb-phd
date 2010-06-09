@@ -47,8 +47,10 @@ import org.ancora.FuMatrix.Architecture.Signal;
 import org.ancora.FuMatrix.Architecture.Signal.SignalType;
 import org.ancora.FuMatrix.Mapper.GeneralMapper;
 import org.ancora.DMTool.Dispensers.DmStreamTransformDispenser;
+import org.ancora.DMTool.Stats.LongTransformDataSingle;
+import org.ancora.IntermediateRepresentation.Operations.Nop;
 import org.ancora.StreamTransform.SingleStaticAssignment;
-import org.ancora.StreamTransform.Stats.TotalOperationFrequency;
+import org.ancora.StreamTransform.Stats.TransformationChanges;
 import org.ancora.StreamTransform.StreamTransformation;
 
 /**
@@ -113,7 +115,7 @@ public class StreamTransform implements Executable {
 
 
       // Stats
-      TotalOperationFrequency totalFrequencies = new TotalOperationFrequency();
+      TransformationChanges totalFrequencies = new TransformationChanges();
 
       for(File file : inputFiles) {
          logger.warning("Processing file '"+file.getName()+"'...");
@@ -127,7 +129,11 @@ public class StreamTransform implements Executable {
          while(block != null) {
 
              String blockName = baseFilename+"-"+counter;
-             logger.warning("Processing Block '"+blockName);
+             logger.warning("Processing Block '"+blockName+"'");
+             if(blockName.equals("fir_original-O0-1")) {
+                //System.err.println("Showing Block:");
+                //System.err.println(block.toString());
+             }
 //            logger.info("Block "+counter+", "+block.getRepetitions()+" repetitions.");
 
             // Transform Instruction Block into PureIR
@@ -143,7 +149,16 @@ public class StreamTransform implements Executable {
           
             // Get stats before transformations
             // Map
+            GeneralMapper beforeMapper = DmStreamMapperDispenser.applyCurrentMapper(operations);
+            if (beforeMapper == null) {
+               Logger.getLogger(StreamTransform.class.getName()).
+                       warning("Could not map block '" + blockName + "' before "
+                       + "transformations.");
+               break;
+            }
+
            //mapper.reset();
+            /*
             GeneralMapper beforeMapper = DmStreamMapperDispenser.getCurrentMapper();
             boolean beforeMapperSucess;
             for(Operation operation : operations) {
@@ -155,14 +170,16 @@ public class StreamTransform implements Executable {
                   break;
                }
             }
+             * 
+             */
 
             // Show Mapping
             //showFus(beforeMapper.getMappedOps());
-            System.err.println("Testing Mapping Before Transformations:");
+            //System.err.println("Testing Mapping Before Transformations:");
             testMapping(beforeMapper.getMappedOps());
 
             // Get stats before transformation
-//            LongTransformDataSingle beforeData = DataProcess.collectTransformData(mapper, block.getRepetitions());
+           //LongTransformDataSingle beforeData = DataProcess.collectTransformData(beforeMapper, block.getRepetitions());
 
             blockSizeCounterBefore.processBlock(operations);
 
@@ -174,6 +191,14 @@ public class StreamTransform implements Executable {
 
 
             // Transform
+            TransformationChanges blockTotalFrequencies = DmStreamTransformDispenser.applyCurrentTransformations(operations);
+            totalFrequencies.addOperationFrequency(blockTotalFrequencies);
+
+            //System.err.println("Added:");
+            //System.err.println(blockTotalFrequencies.buildStatsString());
+            //System.err.println("Totals:");
+            //System.err.println(totalFrequencies.buildStatsString());
+            /*
             List<StreamTransformation> transf = DmStreamTransformDispenser.getCurrentTransformations();
             for (StreamTransformation t : transf) {
                for(Operation operation : operations) {
@@ -181,16 +206,27 @@ public class StreamTransform implements Executable {
                }
                totalFrequencies.addOperationFrequency(t.getName(), t.getOperationFrequency());
             }
+             *
+             */
 
             // Operation Stats
             totalProcessedOperations += operations.size();
             for(Operation operation : operations) {
                if(operation.getType() == OperationType.Nop) {
+                  //System.err.println("Nopped:"+((Nop)operation).getOperation().getFullOperation());
                   totalNops++;
                }
             }
 
             // Map
+            GeneralMapper afterMapper = DmStreamMapperDispenser.applyCurrentMapper(operations);
+            if (afterMapper == null) {
+               Logger.getLogger(StreamTransform.class.getName()).
+                       warning("Could not map block '" + blockName + "' after "
+                       + "transformations.");
+               break;
+            }
+            /*
             GeneralMapper afterMapper = DmStreamMapperDispenser.getCurrentMapper();
             boolean afterMapperSucess = true;
             for(Operation operation : operations) {
@@ -202,9 +238,12 @@ public class StreamTransform implements Executable {
                   break;
                }
             }
+             *
+             */
 
-            System.err.println("Testing Mapping After Transformations:");
-            testMapping(beforeMapper.getMappedOps());
+            //System.err.println("Testing Mapping After Transformations:");
+            testMapping(afterMapper.getMappedOps());
+            //testMapping(beforeMapper.getMappedOps());
 
             /*
             mapper.reset();
@@ -233,6 +272,7 @@ public class StreamTransform implements Executable {
       }
 
       // Show transformation stats
+      System.err.println("Transformations Stats:");
       System.err.println(totalFrequencies.toString());
       /*
       for (Transformation t : transf) {
