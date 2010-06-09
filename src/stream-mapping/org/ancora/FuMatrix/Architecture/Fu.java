@@ -153,6 +153,11 @@ public class Fu {
    public String getOperationName() {
       return operationName;
    }
+
+   @Override
+   public String toString() {
+      return getOperationName();
+   }
     
     
 

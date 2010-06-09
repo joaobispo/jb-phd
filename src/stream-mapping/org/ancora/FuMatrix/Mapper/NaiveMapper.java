@@ -69,7 +69,7 @@ public class NaiveMapper implements GeneralMapper {
 
 
    public boolean accept(Operation operation) {
-   // Copy operation
+   // Copy operation     
       operation = operation.copy();
 
       // Ignore nops
@@ -359,6 +359,7 @@ public class NaiveMapper implements GeneralMapper {
          // Get line
          int outputLine = definitions.getLine(registerName);
          if(outputLine == -1) {
+            //System.err.println("Op:"+operation.getFullOperation());
             continue;
          }
 

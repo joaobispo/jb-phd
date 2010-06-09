@@ -17,9 +17,12 @@
 
 package org.ancora.FuMatrix.Stats;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.ancora.FuMatrix.Architecture.Fu;
+import org.ancora.FuMatrix.Architecture.FuCoor;
 import org.ancora.FuMatrix.Architecture.Signal;
 import org.ancora.FuMatrix.Architecture.Signal.SignalType;
 import org.ancora.FuMatrix.Mapper.GeneralMapper;
@@ -31,12 +34,17 @@ import org.ancora.IntermediateRepresentation.OperationType;
  */
 public class MapperData {
 
+
+
    private MapperData(int liveIns, int liveOuts, int lines, int ops, int moves) {
       this.liveIns = liveIns;
       this.liveOuts = liveOuts;
       this.lines = lines;
       this.ops = ops;
       this.moves = moves;
+      movesMax = 0;
+      movesMin = Integer.MAX_VALUE;
+      lineSizeMax = 0;
    }
 
 public static MapperData build(GeneralMapper mapper) {
@@ -45,7 +53,7 @@ public static MapperData build(GeneralMapper mapper) {
    int ops = 0;
    int moves = 0;
 
-      int liveOuts = mapper.getLiveouts();
+   int liveOuts = mapper.getLiveouts();
 
    Set<String> liveInsNames = new HashSet<String>();
    for (Fu fu : mapper.getMappedOps()) {
@@ -70,8 +78,77 @@ public static MapperData build(GeneralMapper mapper) {
     lines++;
     liveIns = liveInsNames.size();
 
-    return new MapperData(liveIns, liveOuts, lines, ops, moves);
+    MapperData mapperData = new MapperData(liveIns, liveOuts, lines, ops, moves);
+
+    calculateMaxMin(mapperData, mapper.getMappedOps());
+
+    return mapperData;
 }
+
+   private static void calculateMaxMin(MapperData mapperData, List<Fu> mappedOps) {
+      // Build Matrix
+      List<List<Fu>> matrix = buildFuMatrix(mappedOps);
+      // Calculate the max and min, according to lines
+      for(List<Fu> fuList : matrix) {
+         // Get line size
+         mapperData.lineSizeMax = Math.max(mapperData.lineSizeMax, fuList.size());
+
+         // Count number of moves
+         int numMoves = 0;
+         for(Fu fu : fuList) {
+            if(fu.getOperationType() == OperationType.Move) {
+               numMoves++;
+            }
+
+         }
+         mapperData.movesMax = Math.max(mapperData.movesMax, numMoves);
+         mapperData.movesMin = Math.min(mapperData.movesMin, numMoves);
+      }
+   }
+
+   public static List<List<Fu>> buildFuMatrix(List<Fu> mappedOps) {
+               // Build matrix
+         List<List<Fu>> matrix = new ArrayList<List<Fu>>();
+
+         for (int i = 0; i < mappedOps.size(); i++) {
+
+            Fu fu = mappedOps.get(i);
+            //System.err.println("FU:"+fu);
+            //System.err.println("Coor:"+fu.getCoordinate());
+            // Get line
+            FuCoor coor = fu.getCoordinate();
+            int line = coor.getLine();
+            if(line == matrix.size()) {
+               matrix.add(new ArrayList<Fu>());
+            }
+
+            List<Fu> operationLine = matrix.get(line);
+
+            //System.err.println("Putting coordinate "+coor+" onto line "+line+" which has size "+operationLine.size());
+            // Check column
+
+            /**
+             * THIS TESTS CURRENTLY DOES NOT WORK BECAUSE OF THE DIFFERENT AREAS
+             */
+            if(coor.getCol() != operationLine.size()) {
+ //              Logger.getLogger(MapperData.class.getName()).
+  //                     warning("Column '"+coor.getCol()+"' diferent from matrix line size '"+operationLine.size()+"'");
+            }
+
+
+            operationLine.add(fu);
+         }
+
+         return matrix;
+   }
+
+   public int getMovesMax() {
+      return movesMax;
+   }
+
+   public int getMovesMin() {
+      return movesMin;
+   }
 
    public int getLines() {
       return lines;
@@ -100,4 +177,7 @@ public static MapperData build(GeneralMapper mapper) {
    private int lines;
    private int ops;
    private int moves;
+   private int movesMax;
+   private int movesMin;
+   private int lineSizeMax;
 }

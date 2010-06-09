@@ -47,6 +47,10 @@ public class FuCoor {
       return area + SEPARATOR + line + SEPARATOR + column;
    }
 
+   @Override
+   public String toString() {
+      return "col "+column +"; line "+line;
+   }
 
    private int column;
    private int line;
