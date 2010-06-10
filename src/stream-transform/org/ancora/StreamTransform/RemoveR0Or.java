@@ -17,18 +17,12 @@
 
 package org.ancora.StreamTransform;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-import org.ancora.IntermediateRepresentation.Operand;
-import org.ancora.IntermediateRepresentation.Operands.InternalData;
 import org.ancora.IntermediateRepresentation.OperandType;
 import org.ancora.IntermediateRepresentation.Operation;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Operations.Logic;
 import org.ancora.IntermediateRepresentation.Operations.Nop;
-import org.ancora.IntermediateRepresentation.Ssa;
 
 /**
  * MicroBlaze inserts nops instructions in the format or r0, r0, r0. This
@@ -51,6 +45,13 @@ public class RemoveR0Or extends StreamTransformation {
       return getName();
    }
 
+   public static void transform(List<Operation> operations) {
+      // Create Remove R0 Or StreamTransform
+      StreamTransformation orTransf = new RemoveR0Or();
+      for(Operation operation : operations) {
+         orTransf.transform(operation);
+      }
+   }
 
    @Override
    public Operation transform(Operation operation) {
