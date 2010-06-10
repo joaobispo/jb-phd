@@ -54,7 +54,7 @@ public class ParseShiftRight extends Transformation {
            continue;
         }
 
-        ShiftRight.Op op = props.operation;
+        ShiftRight.ShiftRightOp op = props.operation;
         Operand input = shiftOperation.getInputs().get(0).copy();
         Operand output = shiftOperation.getOutputs().get(0).copy();
         Operand carryOut = MbTransformUtils.createCarryOperand();
@@ -66,7 +66,7 @@ public class ParseShiftRight extends Transformation {
         }
 
         ShiftRight newOp = new ShiftRight(shiftOperation.getAddress(),
-                ShiftRight.Op.shiftRightLogical, input, output, carryIn, carryOut);
+                ShiftRight.ShiftRightOp.shiftRightLogical, input, output, carryIn, carryOut);
 
         operations.set(i, newOp);
       }
@@ -79,7 +79,7 @@ public class ParseShiftRight extends Transformation {
 
    static class ShiftProperties {
 
-      public ShiftProperties(ShiftRight.Op operation, boolean hasCarryIn) {
+      public ShiftProperties(ShiftRight.ShiftRightOp operation, boolean hasCarryIn) {
          this.operation = operation;
          this.hasCarryIn = hasCarryIn;
       }
@@ -87,7 +87,7 @@ public class ParseShiftRight extends Transformation {
       /**
        * INSTANCE VARIABLES
        */
-      private ShiftRight.Op operation;
+      private ShiftRight.ShiftRightOp operation;
       private boolean hasCarryIn;
    }
 
@@ -95,9 +95,9 @@ public class ParseShiftRight extends Transformation {
    static {
       Map<InstructionName, ShiftProperties> aMap = new EnumMap<InstructionName, ShiftProperties>(InstructionName.class);
 
-      aMap.put(InstructionName.sra, new ShiftProperties(ShiftRight.Op.shiftRightArithmetic, false));
-      aMap.put(InstructionName.src, new ShiftProperties(ShiftRight.Op.shiftRightWithCarry, true));
-      aMap.put(InstructionName.srl, new ShiftProperties(ShiftRight.Op.shiftRightLogical, false));
+      aMap.put(InstructionName.sra, new ShiftProperties(ShiftRight.ShiftRightOp.shiftRightArithmetic, false));
+      aMap.put(InstructionName.src, new ShiftProperties(ShiftRight.ShiftRightOp.shiftRightWithCarry, true));
+      aMap.put(InstructionName.srl, new ShiftProperties(ShiftRight.ShiftRightOp.shiftRightLogical, false));
 
 
       instructionProperties = Collections.unmodifiableMap(aMap);

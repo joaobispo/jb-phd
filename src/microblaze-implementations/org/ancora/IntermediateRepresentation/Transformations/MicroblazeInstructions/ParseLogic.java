@@ -52,7 +52,7 @@ public class ParseLogic extends Transformation {
         }
 
         // Check if it is an unconditional compare
-        Logic.Op logicOperation =
+        Logic.LogicOperation logicOperation =
                 instructionProperties.get(logicOp.getMbType());
         if(logicOperation == null) {
            continue;
@@ -74,26 +74,26 @@ public class ParseLogic extends Transformation {
    /**
     * INSTANCE VARIABLES
     */
-      private static final Map<InstructionName, Logic.Op> instructionProperties;
+      private static final Map<InstructionName, Logic.LogicOperation> instructionProperties;
    static {
-      Map<InstructionName, Logic.Op> aMap = new EnumMap<InstructionName, Logic.Op>(InstructionName.class);
+      Map<InstructionName, Logic.LogicOperation> aMap = new EnumMap<InstructionName, Logic.LogicOperation>(InstructionName.class);
 
-      aMap.put(InstructionName.and, Logic.Op.and);
-      aMap.put(InstructionName.andi, Logic.Op.and);
-      aMap.put(InstructionName.andn, Logic.Op.andn);
-      aMap.put(InstructionName.andni, Logic.Op.andn);
-      aMap.put(InstructionName.cmp, Logic.Op.mbCompareSigned);
-      aMap.put(InstructionName.cmpu, Logic.Op.mbCompareUnsigned);
-      aMap.put(InstructionName.or, Logic.Op.or);
-      aMap.put(InstructionName.ori, Logic.Op.or);
-      aMap.put(InstructionName.xor, Logic.Op.xor);
-      aMap.put(InstructionName.xori, Logic.Op.xor);
-      aMap.put(InstructionName.bsrl, Logic.Op.barrelShiftRightLogical);
-      aMap.put(InstructionName.bsra, Logic.Op.barrelShiftRightArithmetical);
-      aMap.put(InstructionName.bsll, Logic.Op.barrelShiftLeftLogical);
-      aMap.put(InstructionName.bsrli, Logic.Op.barrelShiftRightLogical);
-      aMap.put(InstructionName.bsrai, Logic.Op.barrelShiftRightArithmetical);
-      aMap.put(InstructionName.bslli, Logic.Op.barrelShiftLeftLogical);
+      aMap.put(InstructionName.and, Logic.LogicOperation.and);
+      aMap.put(InstructionName.andi, Logic.LogicOperation.and);
+      aMap.put(InstructionName.andn, Logic.LogicOperation.andn);
+      aMap.put(InstructionName.andni, Logic.LogicOperation.andn);
+      aMap.put(InstructionName.cmp, Logic.LogicOperation.mbCompareSigned);
+      aMap.put(InstructionName.cmpu, Logic.LogicOperation.mbCompareUnsigned);
+      aMap.put(InstructionName.or, Logic.LogicOperation.or);
+      aMap.put(InstructionName.ori, Logic.LogicOperation.or);
+      aMap.put(InstructionName.xor, Logic.LogicOperation.xor);
+      aMap.put(InstructionName.xori, Logic.LogicOperation.xor);
+      aMap.put(InstructionName.bsrl, Logic.LogicOperation.barrelShiftRightLogical);
+      aMap.put(InstructionName.bsra, Logic.LogicOperation.barrelShiftRightArithmetical);
+      aMap.put(InstructionName.bsll, Logic.LogicOperation.barrelShiftLeftLogical);
+      aMap.put(InstructionName.bsrli, Logic.LogicOperation.barrelShiftRightLogical);
+      aMap.put(InstructionName.bsrai, Logic.LogicOperation.barrelShiftRightArithmetical);
+      aMap.put(InstructionName.bslli, Logic.LogicOperation.barrelShiftLeftLogical);
 
       instructionProperties = Collections.unmodifiableMap(aMap);
    }

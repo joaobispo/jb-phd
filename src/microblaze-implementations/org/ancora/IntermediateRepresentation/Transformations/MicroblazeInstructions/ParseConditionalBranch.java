@@ -17,7 +17,7 @@
 
 package org.ancora.IntermediateRepresentation.Transformations.MicroblazeInstructions;
 
-import static org.ancora.IntermediateRepresentation.Operations.ConditionalExit.Op.*;
+import static org.ancora.IntermediateRepresentation.Operations.ConditionalExit.ZeroCondition.*;
 
 import java.util.Collections;
 import java.util.EnumMap;
@@ -48,7 +48,7 @@ public class ParseConditionalBranch extends Transformation {
         }
 
         // Check if it is a conditional compare
-        ConditionalExit.Op compareOperation = instructionProperties.get(branchOp.getMbType());
+        ConditionalExit.ZeroCondition compareOperation = instructionProperties.get(branchOp.getMbType());
         if(compareOperation == null) {
            continue;
         }
@@ -80,9 +80,9 @@ public class ParseConditionalBranch extends Transformation {
    /**
     * INSTANCE VARIABLES
     */
-   private static final Map<InstructionName, ConditionalExit.Op> instructionProperties;
+   private static final Map<InstructionName, ConditionalExit.ZeroCondition> instructionProperties;
    static {
-      Map<InstructionName, ConditionalExit.Op> aMap = new EnumMap<InstructionName, ConditionalExit.Op>(InstructionName.class);
+      Map<InstructionName, ConditionalExit.ZeroCondition> aMap = new EnumMap<InstructionName, ConditionalExit.ZeroCondition>(InstructionName.class);
 
       aMap.put(InstructionName.beq, equal);
       aMap.put(InstructionName.beqd, equal);
