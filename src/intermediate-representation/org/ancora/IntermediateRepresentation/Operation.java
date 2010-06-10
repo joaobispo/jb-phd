@@ -151,6 +151,21 @@ public abstract class Operation {
    }
 
 
+   /**
+    * Default Implementation of the method. Always returns null.
+    * 
+    * @return the resolved outputs of this operation, if it can be resolved, or
+     * null if it can't.
+    */
+   public List<Operand> resolveWhenLiteralInputs() {
+      if(OperationService.hasLiteralInputs(this)) {
+         System.err.println("Possible Resolve when literal inputs:");
+         System.err.println(getFullOperation());
+      }
+
+      return null;
+   }
+
    /*
    public String getType() {
       return type;

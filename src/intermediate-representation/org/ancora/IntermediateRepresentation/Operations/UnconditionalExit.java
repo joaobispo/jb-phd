@@ -17,6 +17,8 @@
 
 package org.ancora.IntermediateRepresentation.Operations;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Operand;
@@ -26,6 +28,10 @@ import org.ancora.IntermediateRepresentation.Operation;
 /**
  * <p><b>Inputs:</b>
  * <br>input1 - offset of the next address.
+/**
+ * <p><b>Outputs:</b>
+ * <br>output1 - if branch performs linking, writes the value of the PC to
+ * the given register.
  *
  * <p><b>Parameters:</b>
  * <br>baseAddress - base address of the next instruction.
@@ -71,8 +77,8 @@ public class UnconditionalExit extends Operation {
 
    @Override
    public boolean hasSideEffects() {
-//      return false;
-      return true;
+      return false;
+      //return true;
    }
 
    public Operand getInput1() {
@@ -105,7 +111,7 @@ public class UnconditionalExit extends Operation {
       return delaySlots;
    }
 
-   public boolean isDeadBranch() {
+   private boolean isDeadBranch() {
       Integer input1Value = Literal.getInteger(getInput1());
 
       if (input1Value == null) {
@@ -137,6 +143,31 @@ public class UnconditionalExit extends Operation {
 
       return true;
    }
+
+   @Override
+   public List<Operand> resolveWhenLiteralInputs() {
+      // Check if dead branch
+      if(!isDeadBranch()) {
+         return null;
+      }
+
+      // Is dead branch - can be resolved.
+      List<Operand> equivalentOutputs = new ArrayList<Operand>();
+      // Check if it performs linking
+      Operand output = getOutput1();
+      if(output == null) {
+         return equivalentOutputs;
+      }
+
+      // Calculate substitute literal
+      int value = getLinkingAddress();
+      int bits = output.getBits();
+      Literal literal = Literal.newIntegerLiteral(value, bits);
+
+      equivalentOutputs.add(literal);
+      return equivalentOutputs;
+   }
+
 
 
 

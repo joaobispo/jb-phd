@@ -17,6 +17,7 @@
 
 package org.ancora.IntermediateRepresentation.Operations;
 
+import java.util.List;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Operand;
 import org.ancora.IntermediateRepresentation.Operation;
@@ -111,4 +112,11 @@ public class MemoryLoad extends Operation {
       return new MemoryLoad(getAddress(), getInput1().copy(), getInput2().copy(),
               getOutput().copy(), bytes);
    }
+
+   @Override
+   public List<Operand> resolveWhenLiteralInputs() {
+      return null;
+   }
+
+
 }

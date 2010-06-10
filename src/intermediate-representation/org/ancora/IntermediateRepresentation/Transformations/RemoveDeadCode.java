@@ -68,7 +68,7 @@ public class RemoveDeadCode extends Transformation {
 
          // Check if it is an operation other than OR
          if (operation.getType() == OperationType.Logic) {
-            if (((Logic) operation).getOperation() != Logic.Op.or) {
+            if (((Logic) operation).getOperation() != Logic.LogicOperation.or) {
                Logger.getLogger(RemoveDeadCode.class.getName()).
                        warning("Removing logic operation which is not OR:"
                        + ((Logic) operation).getOperation());
@@ -83,6 +83,7 @@ public class RemoveDeadCode extends Transformation {
       }
    }
 
+   /*
    private boolean isDeadBranch(Operation operation) {
       switch ((OperationType) operation.getType()) {
          case UnconditionalExit:
@@ -91,6 +92,8 @@ public class RemoveDeadCode extends Transformation {
             return false;
       }
    }
+    * 
+    */
 
    private boolean hasMutableOutputs(Operation operation) {
       // Check if it has no outputs

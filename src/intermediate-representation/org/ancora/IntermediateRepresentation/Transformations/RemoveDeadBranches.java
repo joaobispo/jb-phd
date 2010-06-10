@@ -60,7 +60,8 @@ public class RemoveDeadBranches extends Transformation {
    private boolean isDeadBranch(Operation operation) {
       switch ((OperationType) operation.getType()) {
          case UnconditionalExit:
-            return ((UnconditionalExit)operation).isDeadBranch();
+            System.err.println("Not working now");
+//            return ((UnconditionalExit)operation).isDeadBranch();
          default:
             return false;
       }

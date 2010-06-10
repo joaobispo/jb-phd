@@ -17,9 +17,15 @@
 
 package org.ancora.IntermediateRepresentation.Operations;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Operand;
+import org.ancora.IntermediateRepresentation.Operands.Literal;
 import org.ancora.IntermediateRepresentation.Operation;
+import org.ancora.IntermediateRepresentation.OperationService;
+import org.ancora.SharedLibrary.BitUtils;
 
 /**
  * <p><b>Inputs:</b>
@@ -40,7 +46,7 @@ import org.ancora.IntermediateRepresentation.Operation;
 public class Logic extends Operation {
 
    public Logic(int address, Operand input1, Operand input2, Operand output1,
-           Op operation) {
+           LogicOperation operation) {
 
       super(address);
 
@@ -101,7 +107,7 @@ public class Logic extends Operation {
       return getOutputs().get(0);
    }
 
-   public Op getOperation() {
+   public LogicOperation getOperation() {
       return operation;
    }
 
@@ -114,17 +120,38 @@ public class Logic extends Operation {
    //private Operand input1;
    //private Operand input2;
    //private Operand output1;
-   private Logic.Op operation;
+   private Logic.LogicOperation operation;
 
    @Override
    public Operation copy() {
       return new Logic(getAddress(), getInput1().copy(), getInput2().copy(),
               getOutput1().copy(), operation);
    }
+
+   @Override
+   public List<Operand> resolveWhenLiteralInputs() {
+      // Check if inputs are literals
+      if(!OperationService.hasLiteralInputs(this)) {
+         return null;
+      }
+
+      int input1 = Literal.getInteger(getInput1());
+      int input2 = Literal.getInteger(getInput2());
+
+      int result = operation.resolve(input1, input2);
+
+      // Literals inputs. Prepare return list.
+      List<Operand> resultOperands = new ArrayList<Operand>();
+      resultOperands.add(Literal.newIntegerLiteral(result, getOutput1().getBits()));
+      
+      return resultOperands;
+   }
    //private boolean signed;
 
 
-   public enum Op {
+
+   public enum LogicOperation {
+
       and,
       andn,
       or,
@@ -134,5 +161,47 @@ public class Logic extends Operation {
       barrelShiftRightLogical,
       barrelShiftRightArithmetical,
       barrelShiftLeftLogical;
+
+      private int resolve(int input1, int input2) {
+         switch (this) {
+            case and:
+               return input1 & input2;
+            case andn:
+               return input1 & ~input2;
+            case or:
+               return input1 | input2;
+            case xor:
+               return input1 ^ input2;
+            case mbCompareSigned:
+               int result = input2 + ~input1 + 1;
+               boolean aBiggerThanB = input1 > input2;
+               // Change MSB to reflect relation
+               if (aBiggerThanB) {
+                  return BitUtils.setBit(31, result);
+               } else {
+                  return BitUtils.clearBit(31, result);
+               }
+            case mbCompareUnsigned:
+               result = input2 + ~input1 + 1;
+               aBiggerThanB = BitUtils.unsignedComp(input1, input2);
+               // Change MSB to reflect relation
+               if (aBiggerThanB) {
+                  return BitUtils.setBit(31, result);
+               } else {
+                  return BitUtils.clearBit(31, result);
+               }
+            case barrelShiftLeftLogical:
+               return input1 << input2;
+            case barrelShiftRightArithmetical:
+               return input1 >> input2;
+            case barrelShiftRightLogical:
+               return input1 >>> input2;
+            default:
+               Logger.getLogger(Logic.class.getName()).
+                       warning("Case not defined:" + this);
+               return 0;
+         }
+
+      }
    }
 }

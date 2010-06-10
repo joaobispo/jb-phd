@@ -17,6 +17,7 @@
 
 package org.ancora.IntermediateRepresentation.Operations;
 
+import java.util.List;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Operand;
 import org.ancora.IntermediateRepresentation.Operation;
@@ -110,4 +111,11 @@ public class MemoryStore extends Operation {
       return new MemoryStore(getAddress(), getContentsToStore().copy(),
               getOperand1().copy(), getOperand2().copy(), bytes);
    }
+
+   @Override
+   public List<Operand> resolveWhenLiteralInputs() {
+      return null;
+   }
+
+
 }

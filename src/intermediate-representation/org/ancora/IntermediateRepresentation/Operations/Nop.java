@@ -17,6 +17,8 @@
 
 package org.ancora.IntermediateRepresentation.Operations;
 
+import java.util.List;
+import org.ancora.IntermediateRepresentation.Operand;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Operation;
 
@@ -75,6 +77,13 @@ public class Nop extends Operation {
    public Operation copy() {
       return new Nop(operation);
    }
+
+   @Override
+   public List<Operand> resolveWhenLiteralInputs() {
+      return null;
+   }
    //private String name;
+
+
 
 }

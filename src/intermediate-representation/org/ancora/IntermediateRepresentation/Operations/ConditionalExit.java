@@ -17,8 +17,12 @@
 
 package org.ancora.IntermediateRepresentation.Operations;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Operand;
+import org.ancora.IntermediateRepresentation.Operands.Literal;
 import org.ancora.IntermediateRepresentation.Operation;
 
 /**
@@ -46,7 +50,7 @@ import org.ancora.IntermediateRepresentation.Operation;
 public class ConditionalExit extends Operation {
 
 
-   public ConditionalExit(int address, ConditionalExit.Op op, int nextAddress,
+   public ConditionalExit(int address, ConditionalExit.ZeroCondition op, int nextAddress,
            int delaySlots, int numberOfExit, Operand input1, Operand input2) {
       super(address);
       this.op = op;
@@ -68,8 +72,8 @@ public class ConditionalExit extends Operation {
 
    @Override
    public boolean hasSideEffects() {
-      return true;
-      //return false;
+      //return true;
+      return false;
    }
 
    @Override
@@ -100,7 +104,7 @@ public int getCurrentAddress(){
    return getAddress();
 }
 
-public Op getOperation() {
+public ZeroCondition getOperation() {
    return op;
 }
 
@@ -116,11 +120,71 @@ public int getSupposedJumpAddress() {
       return numberOfExit;
    }
 
+   @Override
+   public List<Operand> resolveWhenLiteralInputs() {
+      Operand testOperand = getInput(Input.valueToBeComparedToZero);
+      Integer testValue = Literal.getInteger(testOperand);
+
+      if(testValue == null) {
+         return null;
+      }
+
+      boolean testResult = op.test(testValue);
+
+      // If test result is true, check if offset is literal
+      Integer offsetValue = null;
+
+      if(testResult) {
+         Operand offset = getInput(Input.offset);
+         //Integer offsetValue = Literal.getInteger(offset);
+         offsetValue = Literal.getInteger(offset);
+         if(offsetValue == null) {
+            return null;
+         }
+
+         /*
+         // Check if supposed jump address is equal to currentPC + offset
+         int branchTarget = getCurrentAddress() + offsetValue;
+         if(getSupposedJumpAddress() != branchTarget) {
+            Logger.getLogger(ConditionalExit.class.getName()).
+                    warning("Jump mismatch: Next trace instruction ("+getSupposedJumpAddress()+
+                    ") different from branch target ("+branchTarget+")");
+         }
+
+         return new ArrayList<Operand>();
+*/
+      }
+      else {
+         offsetValue = 4 + (4*getDelaySlots());
+      }
+
+      // Check if supposed jump address is equal to currentPC + offset
+      int branchTarget = getCurrentAddress() + offsetValue;
+
+      if (getSupposedJumpAddress() != branchTarget) {
+         Logger.getLogger(ConditionalExit.class.getName()).
+                 warning("Jump mismatch: Next trace instruction (" + getSupposedJumpAddress()
+                 + ") different from branch target (" + branchTarget + ")");
+      }
+
+      return new ArrayList<Operand>();
+
+      //System.err.println("Conditional Exit which can be resolved?");
+      //System.err.println(getFullOperation());
+
+      /*
+      boolean testResult = testCondition();
+      return super.resolveWhenLiteralInputs();
+       *
+       */
+   }
+
+
 
    /**
     * INSTANCE VARIABLES
     */
-   private ConditionalExit.Op op;
+   private ConditionalExit.ZeroCondition op;
    //private int nextTraceInstOffset;
    private int supposedJumpAddress;
    private int delaySlots;
@@ -141,12 +205,33 @@ public enum Input {
    offset
 }
 
-   public enum Op {
+   public enum ZeroCondition {
       equal,
       notEqual,
       greater,
       greaterOrEqual,
       less,
-      lessOrEqual,
+      lessOrEqual,;
+
+      private boolean test(Integer testValue) {
+         switch(this) {
+            case equal:
+               return testValue == 0;
+            case notEqual:
+               return testValue != 0;
+            case greater:
+               return testValue > 0;
+            case greaterOrEqual:
+               return testValue >= 0;
+            case less:
+               return testValue < 0;
+            case lessOrEqual:
+               return testValue <= 0;
+            default:
+               Logger.getLogger(ZeroCondition.class.getName()).
+                       warning("Case not defined: "+this);
+               return false;
+         }
+      }
    }
 }

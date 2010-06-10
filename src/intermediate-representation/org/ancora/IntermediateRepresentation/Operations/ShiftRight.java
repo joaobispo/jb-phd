@@ -17,9 +17,15 @@
 
 package org.ancora.IntermediateRepresentation.Operations;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Operand;
+import org.ancora.IntermediateRepresentation.Operands.Literal;
 import org.ancora.IntermediateRepresentation.Operation;
+import org.ancora.IntermediateRepresentation.OperationService;
+import org.ancora.SharedLibrary.BitUtils;
 
 /**
  * <p><b>Inputs:</b>
@@ -41,7 +47,7 @@ import org.ancora.IntermediateRepresentation.Operation;
  */
 public class ShiftRight extends Operation {
 
-   public ShiftRight(int address, ShiftRight.Op operation, Operand input,
+   public ShiftRight(int address, ShiftRight.ShiftRightOp operation, Operand input,
            Operand output, Operand carryIn, Operand carryOut) {
       super(address);
 
@@ -63,6 +69,8 @@ public class ShiftRight extends Operation {
       // Connect Outputs
       connectToOutput(output);
       if(carryOut == null) {
+         Logger.getLogger(ShiftRight.class.getName()).
+                 warning("Carry out == null. This operation should always have a carry out.");
          hasCarryOut = false;
       } else {
          connectToOutput(carryOut);
@@ -102,7 +110,7 @@ public class ShiftRight extends Operation {
        return getOutputs().get(0);
    }
 
-   public Op getOperation() {
+   public ShiftRightOp getOperation() {
       return operation;
    }
 
@@ -138,12 +146,74 @@ public class ShiftRight extends Operation {
               newCarryIn, newCarryOut);
    }
 
-   
+   @Override
+   public List<Operand> resolveWhenLiteralInputs() {
+      // Check if inputs are literals
+      if(!OperationService.hasLiteralInputs(this)) {
+         return null;
+      }
 
-   public enum Op {
+      // Literals inputs. Prepare return list.
+      List<Operand> resultOperands = operation.resolve(getInputs());    
+
+      return resultOperands;
+   }
+
+
+
+
+   public enum ShiftRightOp {
       shiftRightArithmetic,
       shiftRightWithCarry,
       shiftRightLogical;
+
+
+      private List<Operand> resolve(List<Operand> inputs) {
+         int value = Literal.getInteger(inputs.get(0));
+         Integer carryInValue = null;
+         if(inputs.size() > 1) {
+            carryInValue = Literal.getInteger(inputs.get(1));
+         }
+
+         // Get bit 0
+         int msBit = getMsBit(value, carryInValue);
+
+         // Shift value right by 1
+         int newValue = value >> 1;
+         // Set the most significant bit
+         BitUtils.setBit(msBit, newValue);
+
+         // Build value
+         Literal valueOperand = Literal.newIntegerLiteral(newValue, inputs.get(0).getBits());
+         // Build carry-out
+         Literal carryOut = Literal.newIntegerLiteral(BitUtils.getBit(0, value), 1);
+
+         List<Operand> equivalentOperands = new ArrayList<Operand>();
+         equivalentOperands.add(valueOperand);
+         equivalentOperands.add(carryOut);
+
+         return equivalentOperands;
+      }
+
+      private int getMsBit(int value, Integer carryIn) {
+         switch(this) {
+            case shiftRightArithmetic:
+               return BitUtils.getBit(31, value);
+            case shiftRightLogical:
+               return 0;
+            case shiftRightWithCarry:
+               if (carryIn == null) {
+                  Logger.getLogger(ShiftRightOp.class.getName()).
+                          warning("ShiftRightWithCarry without CarryIn!");
+                  return 0;
+               }
+               return carryIn;
+            default:
+               Logger.getLogger(ShiftRightOp.class.getName()).
+                       warning("Case not defined: "+this);
+               return 0;
+         }
+      }
    }
 
    /**
@@ -156,5 +226,5 @@ public class ShiftRight extends Operation {
    private boolean hasCarryIn;
    private boolean hasCarryOut;
 
-   private ShiftRight.Op operation;
+   private ShiftRight.ShiftRightOp operation;
 }

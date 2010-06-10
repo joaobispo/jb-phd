@@ -17,9 +17,14 @@
 
 package org.ancora.IntermediateRepresentation.Operations;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Operand;
+import org.ancora.IntermediateRepresentation.Operands.Literal;
 import org.ancora.IntermediateRepresentation.Operation;
+import org.ancora.IntermediateRepresentation.OperationService;
+import org.ancora.SharedLibrary.BitUtils;
 
 /**
  * <p><b>Inputs:</b>
@@ -69,7 +74,8 @@ public class SignExtension extends Operation {
 
    @Override
    public boolean hasSideEffects() {
-      return true;
+      return false;
+//      return true;
    }
 
    public Operand getInput1() {
@@ -102,4 +108,38 @@ public class SignExtension extends Operation {
       return new SignExtension(getAddress(), getInput1().copy(), getOutput().copy(),
               extensionSizeInBits);
    }
+
+   @Override
+   public List<Operand> resolveWhenLiteralInputs() {
+      // Check if inputs are literals
+      if(!OperationService.hasLiteralInputs(this)) {
+         return null;
+      }
+
+      int input1 = Literal.getInteger(getInput1());
+
+      int newResult = input1;
+      int msbValue = BitUtils.getBit(extensionSizeInBits-1, input1);
+      // Replicate bit on the rest of newResult bits
+      for(int i=extensionSizeInBits; i<31; i++) {
+         if(msbValue == 0) {
+            newResult = BitUtils.clearBit(i, newResult);
+         } else {
+            newResult = BitUtils.setBit(i, newResult);
+         }
+         
+      }
+
+      //System.err.println("Operation "+getAddress()+": Sign Extension "+extensionSizeInBits);
+      //System.err.println("Original: "+input1+"("+Integer.toBinaryString(input1)+")");
+      //System.err.println("New: "+newResult+"("+Integer.toBinaryString(newResult)+")");
+
+      // Literals inputs. Prepare return list.
+      List<Operand> resultOperands = new ArrayList<Operand>();
+      resultOperands.add(Literal.newIntegerLiteral(newResult, getOutput().getBits()));
+
+      return resultOperands;
+   }
+
+
 }

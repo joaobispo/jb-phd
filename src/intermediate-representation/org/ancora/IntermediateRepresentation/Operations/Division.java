@@ -17,9 +17,11 @@
 
 package org.ancora.IntermediateRepresentation.Operations;
 
+import java.util.List;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Operand;
 import org.ancora.IntermediateRepresentation.Operation;
+import org.ancora.IntermediateRepresentation.OperationService;
 
 /**
  * <p><b>Inputs:</b>
@@ -107,7 +109,13 @@ public class Division extends Operation {
       return new Division(getAddress(), getInput1().copy(), getInput2().copy(),
               getOutput().copy(), operation);
    }
+
+   @Override
+   public List<Operand> resolveWhenLiteralInputs() {
+      return super.resolveWhenLiteralInputs();
+   }
    //private boolean signed;
+
 
 
    public enum Op {

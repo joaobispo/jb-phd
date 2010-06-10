@@ -77,7 +77,7 @@ public class ResolveLiteralInputs extends Transformation {
    private List<Operand> resolveOperation(Operation operation) {
       switch((OperationType)operation.getType()) {
          case IntegerArithmeticWithCarry:
-            return ((ArithmeticWithCarry)operation).resolveLiterals();
+            return ((ArithmeticWithCarry)operation).resolveWhenLiteralInputs();
             //return resolveIntegerArithmeticWithCarry((ArithmeticWithCarry)operation);
             //return ArithmeticWithCarry.resolve((ArithmeticWithCarry)operation);
             //return ArithmeticWithCarry.resolveNeutral((ArithmeticWithCarry)operation);

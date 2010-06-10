@@ -17,9 +17,13 @@
 
 package org.ancora.IntermediateRepresentation.Operations;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Operand;
+import org.ancora.IntermediateRepresentation.Operands.Literal;
 import org.ancora.IntermediateRepresentation.Operation;
+import org.ancora.IntermediateRepresentation.OperationService;
 
 /**
  * <p><b>Inputs:</b>
@@ -92,6 +96,25 @@ public class Mutiplication extends Operation {
    public Operation copy() {
       return new Mutiplication(getAddress(), getInput1().copy(), getInput2().copy(),
               getOutput().copy());
+   }
+
+   @Override
+   public List<Operand> resolveWhenLiteralInputs() {
+      // Check if inputs are literals
+      if(!OperationService.hasLiteralInputs(this)) {
+         return null;
+      }
+
+      int input1 = Literal.getInteger(getInput1());
+      int input2 = Literal.getInteger(getInput2());
+
+      int result = input1 * input2;
+
+      // Literals inputs. Prepare return list.
+      List<Operand> resultOperands = new ArrayList<Operand>();
+      resultOperands.add(Literal.newIntegerLiteral(result, getOutput().getBits()));
+
+      return resultOperands;
    }
    
 

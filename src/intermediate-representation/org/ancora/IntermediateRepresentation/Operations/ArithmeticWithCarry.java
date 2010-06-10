@@ -25,6 +25,7 @@ import org.ancora.IntermediateRepresentation.Operand;
 import org.ancora.IntermediateRepresentation.OperandType;
 import org.ancora.IntermediateRepresentation.Operands.Literal;
 import org.ancora.IntermediateRepresentation.Operation;
+import org.ancora.IntermediateRepresentation.OperationService;
 
 /**
  *
@@ -33,17 +34,10 @@ import org.ancora.IntermediateRepresentation.Operation;
 public class ArithmeticWithCarry extends Operation {
 
 
-
-
-
    public ArithmeticWithCarry(int address, ArithmeticWithCarry.Op operation, Operand input1, Operand input2, Operand output1, Operand carryIn, Operand carryOut) {
       super(address);
       this.operation = operation;
-//      this.input1 = input1;
-//      this.input2 = input2;
-//      this.output1 = output1;
-//      this.carryIn = carryIn;
-//      this.carryOut = carryOut;
+
 
       // Connect Inputs
       connectToInput(input1);
@@ -74,7 +68,6 @@ public class ArithmeticWithCarry extends Operation {
 
    @Override
    public String getName() {
-      //return "ir-"+operation.name();
       return operation.name();
    }
 
@@ -84,33 +77,29 @@ public class ArithmeticWithCarry extends Operation {
    }
 
 
-
    @Override
    public boolean hasSideEffects() {
       return false;
    }
 
+   /**
+    *
+    * @return
+    */
+   /*
    public Integer resolveInput1() {
       return Literal.getInteger(getInput1());
-      /*
-      if(getInput1().getType() != OperandType.literal) {
-         return null;
-      }
-
-      return Literal.getInteger((Literal)getInput1());
-       */
    }
+    * 
+    */
 
+   /*
    public Integer resolveInput2() {
-      /*
-      if(getInput2().getType() != OperandType.literal) {
-         return null;
-      }
 
-      return Literal.getInteger((Literal)getInput2());
-       */
       return Literal.getInteger(getInput2());
    }
+    *
+    */
    
    public Operand getInput1() {
       return getInputs().get(0);
@@ -149,20 +138,33 @@ public class ArithmeticWithCarry extends Operation {
       return operation;
    }
 
-   public Integer resolveOutput() {
-      // Get first operand
-      Integer firstOperand = resolveInput1();
+   /**
+    * It assumes the inputs are literals.
+    *
+    * @return
+    */
+   private Integer resolveOutput() {
+      // Get first operand integer
+//      Integer firstOperand = resolveInput1();
+      Integer firstOperand = Literal.getInteger(getInput1());
+      /*
       if(firstOperand == null) {
          return null;
       }
+       *
+       */
 
       // Get second operand
-      Integer secondOperand = resolveInput2();
+      //Integer secondOperand = resolveInput2();
+      Integer secondOperand = Literal.getInteger(getInput2());
+      /*
       if(secondOperand == null) {
          return null;
       }
+       *
+       */
 
-      // Get carry
+      // Atributte default value to carry
       Integer carryInValue = null;
       if (operation == Op.add) {
          carryInValue = 0;
@@ -170,33 +172,22 @@ public class ArithmeticWithCarry extends Operation {
          carryInValue = 1;
       }
       
-      //if(carryIn != null) {
+      // Update value if there is a carry in
       if(hasCarryIn) {
-         /*
-         boolean isLiteral = getCarryIn().getType() == OperandType.literal;
-         if(!isLiteral) {
-            return null;
-         }
-          */
-        //Literal lit = TransformUtils.transformOperandToLiteral(getCarryIn());
-        //if(lit == null) {
-        //   return null;
-        //}
-        //else {
-        //   carryInValue = Literal.getInteger(lit);
-        //}
-
-         //carryInValue = Literal.getInteger((Literal)getCarryIn());
          carryInValue = Literal.getInteger(getCarryIn());
+         /*
          if(carryInValue == null) {
             return null;
          }
+          * 
+          */
       }
 
       if(operation == Op.add) {
          return firstOperand + secondOperand + carryInValue;
       } else if(operation == Op.rsub) {
-         return secondOperand - firstOperand + carryInValue;
+         //return secondOperand - firstOperand + carryInValue;
+         return secondOperand + ~firstOperand + carryInValue;
       }
       
       Logger.getLogger(ArithmeticWithCarry.class.getName()).
@@ -205,20 +196,26 @@ public class ArithmeticWithCarry extends Operation {
       return null;
    }
 
-   public Integer resolveCarryOut() {
-      //if(carryOut == null) {
+   /**
+    * Assumes that the inputs are literals and that there is a carry out.
+    * 
+    * @return
+    */
+   private Integer resolveCarryOut() {
       if(!hasCarryOut) {
          return null;
       }
 
       // Get first operand
-      Integer firstOperand = resolveInput1();
+      //Integer firstOperand = resolveInput1();
+      Integer firstOperand = Literal.getInteger(getInput1());
       if(firstOperand == null) {
          return null;
       }
 
       // Get second operand
-      Integer secondOperand = resolveInput2();
+      //Integer secondOperand = resolveInput2();
+      Integer secondOperand = Literal.getInteger(getInput2());
       if(secondOperand == null) {
          return null;
       }
@@ -233,16 +230,6 @@ public class ArithmeticWithCarry extends Operation {
 
       //if(carryIn != null) {
       if(hasCarryIn) {
-        //Literal lit = TransformUtils.transformOperandToLiteral(carryIn);
-        /*
-         Literal lit = TransformUtils.transformOperandToLiteral(getCarryIn());
-        if(lit == null) {
-           return null;
-        }
-        else {
-           carryInValue = Literal.getInteger(lit);
-        }
-         */
          carryInValue = Literal.getInteger(getCarryIn());
          if(carryInValue == null) {
             return null;
@@ -250,9 +237,9 @@ public class ArithmeticWithCarry extends Operation {
       }
 
       if(operation == Op.add) {
-         return getCarryOutAdd(firstOperand, secondOperand, carryInValue);
+         return OperationService.getCarryOutAdd(firstOperand, secondOperand, carryInValue);
       } else if(operation == Op.rsub) {
-         return getCarryOutRsub(firstOperand, secondOperand, carryInValue);
+         return OperationService.getCarryOutRsub(firstOperand, secondOperand, carryInValue);
       }
 
       Logger.getLogger(ArithmeticWithCarry.class.getName()).
@@ -288,93 +275,12 @@ public class ArithmeticWithCarry extends Operation {
    /**
     * INSTANCE VARIABLES
     */
-   //private Operand input1;
-   //private Operand input2;
-   //private Operand output1;
-   //private Operand carryIn;
-   //private Operand carryOut;
    private boolean hasCarryIn;
    private boolean hasCarryOut;
 
    private ArithmeticWithCarry.Op operation;
 
-      /**
-     * Calculates the carryOut of the sum of rA with rB and carry.
-     * Operation is rA + rB + carry.
-     *
-     * @param rA
-     * @param rB
-     * @param carry the carry from the previous operation. Should be 0 or 1.
-     * @return 1 if there is carry out, or 0 if not.
-     */
-    public static int getCarryOutAdd(int rA, int rB, int carry) {
-        if(carry != 0 && carry != 1) {
-            Logger.getLogger(ArithmeticWithCarry.class.getName()).
-                    warning("Carry is different than 0 or 1 ("+
-                    carry+")");
-        }
 
-        //System.out.println("rA:"+Integer.toBinaryString(rA));
-        //System.out.println("rB:"+Integer.toBinaryString(rB));
-
-        // Extend operands to long and mask them
-        long lRa = rA & MASK_32_BITS;
-        long lRb = rB & MASK_32_BITS;
-        // Carry must be 0 or 1, it shouldn't need to be masked.
-        long lCarry = carry;
-
-
-        //System.out.println("lRa:"+Long.toBinaryString(lRa));
-        //System.out.println("lRb:"+Long.toBinaryString(lRb));
-
-        // Do the summation
-        long result = lRa + lRb + lCarry;
-
-        //System.out.println("Result:"+Long.toBinaryString(result));
-
-        // Get the carry bit
-        int carryOut = (int) ((result & MASK_BIT_33) >>> 32);
-        return carryOut;
-    }
-
-    /**
-     * Calculates the carryOut of the reverse subtraction of rA with rB and
-     * carry. Operation is rB + ~rA + carry.
-     *
-     * @param rA
-     * @param rB
-     * @param carry the carry from the previous operation. Should be 0 or 1.
-     * @return 1 if there is carry out, or 0 if not.
-     */
-    public static int getCarryOutRsub(int rA, int rB, int carry) {
-        if(carry != 0 && carry != 1) {
-            Logger.getLogger(ArithmeticWithCarry.class.getName()).
-                    warning("Carry is different than 0 or 1 ("+
-                    carry+")");
-        }
-
-        //System.out.println("rA:"+Integer.toBinaryString(rA));
-        //System.out.println("rB:"+Integer.toBinaryString(rB));
-
-        // Extend operands to long and mask them
-        long lRa = rA & MASK_32_BITS;
-        long lRb = rB & MASK_32_BITS;
-        // Carry must be 0 or 1, it shouldn't need to be masked.
-        long lCarry = carry;
-
-
-        //System.out.println("lRa:"+Long.toBinaryString(lRa));
-        //System.out.println("lRb:"+Long.toBinaryString(lRb));
-
-        // Do the summation
-        long result = lRb + ~lRa + lCarry;
-
-        //System.out.println("Result:"+Long.toBinaryString(result));
-
-        // Get the carry bit
-        int carryOut = (int) ((result & MASK_BIT_33) >>> 32);
-        return carryOut;
-    }
 
     /*
     public static List<Operand> resolve(ArithmeticWithCarry arithmeticWithCarry) {
@@ -400,31 +306,52 @@ public class ArithmeticWithCarry extends Operation {
 */
   
     /**
-     * 
+     * Resolves Arithmetic Operations with carry
+     *
      * @param arithmeticWithCarry
      * @return the resolved outputs of this operation, if it can be resolved, or
      * null if it can't.
      */
-    public List<Operand> resolveLiterals() {
-      // Calculate value
-      Integer resultValue = resolveOutput();
-      if (resultValue == null) {
+   @Override
+    public List<Operand> resolveWhenLiteralInputs() {
+      // Check if inputs are literals
+      if(!OperationService.hasLiteralInputs(this)) {
          return null;
       }
 
+      // Literals inputs. Prepare return list.
       List<Operand> resultOperands = new ArrayList<Operand>();
 
+      // Calculate value
+      Integer resultValue = resolveOutput();
+      /*
+      if (resultValue == null) {
+         return null;
+      }
+       *
+       */
+/*
       Literal resultLiteral = new Literal(Literal.LiteralType.integer,
               resultValue.toString(), getOutput().getBits());
+ *
+ */
+      Literal resultLiteral = Literal.newIntegerLiteral(resultValue, getOutput().getBits());
 
       resultOperands.add(resultLiteral);
 
 
-      // Check if it has carry out
+      // If there is no carry out, return list as is.
+      if(!hasCarryOut) {
+         return resultOperands;
+      }
+
       Integer carryOutValue = resolveCarryOut();
+      /*
       if (carryOutValue == null) {
          return resultOperands;
       }
+       *
+       */
 
       Literal resultCarry = new Literal(Literal.LiteralType.integer,
               carryOutValue.toString(), getCarryOut().getBits());
