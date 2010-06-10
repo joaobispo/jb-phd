@@ -27,8 +27,6 @@ import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Settings.Settings;
 import org.ancora.DMTool.Stats.BlockSize.BlockSizeCounter;
-import org.ancora.DMTool.Stats.DataProcess;
-import org.ancora.DMTool.Stats.DataProcessDouble;
 import org.ancora.DMTool.Stats.LongTransformDataTotal;
 import org.ancora.Partitioning.Blocks.BlockStream;
 import org.ancora.DMTool.System.Services.DmBlockUtils;
@@ -47,11 +45,12 @@ import org.ancora.FuMatrix.Architecture.Signal;
 import org.ancora.FuMatrix.Architecture.Signal.SignalType;
 import org.ancora.FuMatrix.Mapper.GeneralMapper;
 import org.ancora.DMTool.Dispensers.DmStreamTransformDispenser;
-import org.ancora.DMTool.Stats.LongTransformDataSingle;
-import org.ancora.IntermediateRepresentation.Operations.Nop;
+import org.ancora.FuMatrix.Stats.IterationData;
+import org.ancora.FuMatrix.Stats.MapperData;
+import org.ancora.FuMatrix.Stats.NopData;
+import org.ancora.StreamTransform.RemoveR0Or;
 import org.ancora.StreamTransform.SingleStaticAssignment;
 import org.ancora.StreamTransform.Stats.TransformationChanges;
-import org.ancora.StreamTransform.StreamTransformation;
 
 /**
  *
@@ -109,6 +108,10 @@ public class StreamTransform implements Executable {
 
       long totalProcessedOperations = 0l;
       long totalNops = 0l;
+      NopData nopsBefore = new NopData();
+      NopData nopsAfter = new NopData();
+      //long totalNopsBefore = 0l;
+      //long totalNopsAfter = 0l;
 
       BlockSizeCounter blockSizeCounterAfter = new BlockSizeCounter();
       BlockSizeCounter blockSizeCounterBefore = new BlockSizeCounter();
@@ -116,6 +119,8 @@ public class StreamTransform implements Executable {
 
       // Stats
       TransformationChanges totalFrequencies = new TransformationChanges();
+      IterationData totalIterationDataBefore = new IterationData();
+      IterationData totalIterationDataAfter = new IterationData();
 
       for(File file : inputFiles) {
          logger.warning("Processing file '"+file.getName()+"'...");
@@ -129,11 +134,8 @@ public class StreamTransform implements Executable {
          while(block != null) {
 
              String blockName = baseFilename+"-"+counter;
-             logger.warning("Processing Block '"+blockName+"'");
-             if(blockName.equals("fir_original-O0-1")) {
-                //System.err.println("Showing Block:");
-                //System.err.println(block.toString());
-             }
+//             logger.warning("Processing Block '"+blockName+"'");
+//            System.err.println(block.toString());
 //            logger.info("Block "+counter+", "+block.getRepetitions()+" repetitions.");
 
             // Transform Instruction Block into PureIR
@@ -146,7 +148,8 @@ public class StreamTransform implements Executable {
 
             // Transform to SSA
             SingleStaticAssignment.transform(operations);
-          
+            RemoveR0Or.transform(operations);
+
             // Get stats before transformations
             // Map
             GeneralMapper beforeMapper = DmStreamMapperDispenser.applyCurrentMapper(operations);
@@ -154,33 +157,35 @@ public class StreamTransform implements Executable {
                Logger.getLogger(StreamTransform.class.getName()).
                        warning("Could not map block '" + blockName + "' before "
                        + "transformations.");
-               break;
-            }
 
-           //mapper.reset();
+            counter++;
+            block = blockStream.nextBlock();
+            continue;
+            }
+            // Get stats before transformation
+            IterationData localBefore = IterationData.build(MapperData.build(beforeMapper), block.getRepetitions());
+            totalIterationDataBefore.addIterationData(localBefore);
+
+            // Count nops before transformation
+            nopsBefore.addMapping(operations, block.getRepetitions());
             /*
-            GeneralMapper beforeMapper = DmStreamMapperDispenser.getCurrentMapper();
-            boolean beforeMapperSucess;
-            for(Operation operation : operations) {
-               beforeMapperSucess = beforeMapper.accept(operation);
-               if(!beforeMapperSucess) {
-                  Logger.getLogger(StreamTransform.class.getName()).
-                          warning("Could not map block '"+blockName+"' before " +
-                          "transformations.");
-                  break;
+            long localNops = 0l;
+            for (Operation operation : operations) {
+               if (operation.getType() == OperationType.Nop) {
+                  localNops++;
                }
             }
-             * 
+            localNops = localNops * block.getRepetitions();
+            totalNopsBefore += localNops;
+             *
              */
+ 
+       
 
             // Show Mapping
-            //showFus(beforeMapper.getMappedOps());
-            //System.err.println("Testing Mapping Before Transformations:");
             testMapping(beforeMapper.getMappedOps());
 
-            // Get stats before transformation
-           //LongTransformDataSingle beforeData = DataProcess.collectTransformData(beforeMapper, block.getRepetitions());
-
+            
             blockSizeCounterBefore.processBlock(operations);
 
             // Write DOT Before
@@ -194,20 +199,7 @@ public class StreamTransform implements Executable {
             TransformationChanges blockTotalFrequencies = DmStreamTransformDispenser.applyCurrentTransformations(operations);
             totalFrequencies.addOperationFrequency(blockTotalFrequencies);
 
-            //System.err.println("Added:");
-            //System.err.println(blockTotalFrequencies.buildStatsString());
-            //System.err.println("Totals:");
-            //System.err.println(totalFrequencies.buildStatsString());
-            /*
-            List<StreamTransformation> transf = DmStreamTransformDispenser.getCurrentTransformations();
-            for (StreamTransformation t : transf) {
-               for(Operation operation : operations) {
-                  t.transform(operation);
-               }
-               totalFrequencies.addOperationFrequency(t.getName(), t.getOperationFrequency());
-            }
-             *
-             */
+            
 
             // Operation Stats
             totalProcessedOperations += operations.size();
@@ -217,6 +209,17 @@ public class StreamTransform implements Executable {
                   totalNops++;
                }
             }
+            // Count nops after transformation
+            /*
+            localNops = 0l;
+            for (Operation operation : operations) {
+               if (operation.getType() == OperationType.Nop) {
+                  localNops++;
+               }
+            }
+            totalNopsAfter += localNops * block.getRepetitions();
+*/
+            nopsAfter.addMapping(operations, block.getRepetitions());
 
             // Map
             GeneralMapper afterMapper = DmStreamMapperDispenser.applyCurrentMapper(operations);
@@ -224,38 +227,21 @@ public class StreamTransform implements Executable {
                Logger.getLogger(StreamTransform.class.getName()).
                        warning("Could not map block '" + blockName + "' after "
                        + "transformations.");
-               break;
+                           // Increment counter
+            counter++;
+            block = blockStream.nextBlock();
+               continue;
             }
-            /*
-            GeneralMapper afterMapper = DmStreamMapperDispenser.getCurrentMapper();
-            boolean afterMapperSucess = true;
-            for(Operation operation : operations) {
-               afterMapperSucess = afterMapper.accept(operation);
-               if (!afterMapperSucess) {
-                  Logger.getLogger(StreamTransform.class.getName()).
-                          warning("Could not map block '"+blockName+"' after " +
-                          "transformations.");
-                  break;
-               }
-            }
-             *
-             */
+            // Get stats after transformation
+            IterationData localAfter = IterationData.build(MapperData.build(afterMapper), block.getRepetitions());
+            totalIterationDataAfter.addIterationData(localAfter);
+
+           
 
             //System.err.println("Testing Mapping After Transformations:");
             testMapping(afterMapper.getMappedOps());
             //testMapping(beforeMapper.getMappedOps());
 
-            /*
-            mapper.reset();
-            mapper.processOperations(operations);
-             *
-             */
-
-            // Get stats after transformation
-//            LongTransformDataSingle afterData = DataProcess.collectTransformData(mapper, block.getRepetitions());
-
-//            totalBefore.addValues(beforeData);
-//            totalAfter.addValues(afterData);
 
 
             blockSizeCounterAfter.processBlock(operations);
@@ -265,6 +251,7 @@ public class StreamTransform implements Executable {
                File dotFile = DmDottyUtils.getDottyFile(baseFilename, blockName+"-after");
                DmDottyUtils.writeBlockDot(operations, dotFile);
             }
+
             // Increment counter
             counter++;
             block = blockStream.nextBlock();
@@ -281,18 +268,44 @@ public class StreamTransform implements Executable {
        *
        */
 
-      System.err.println("\nTotals, analysed "+totalAfter.getDataCounter()+" blocks.");
-      DataProcess.showTransformDataChanges(totalBefore.getTotalData(), totalAfter.getTotalData());
-      System.err.println("\nAverage per block:");
-      DataProcessDouble.showTransformDataChanges(totalBefore.getAverageData(), totalAfter.getAverageData());
+      //System.err.println("\nTotals, analysed "+totalAfter.getDataCounter()+" blocks.");
+      //DataProcess.showTransformDataChanges(totalBefore.getTotalData(), totalAfter.getTotalData());
+      //System.err.println("\nAverage per block:");
+      //DataProcessDouble.showTransformDataChanges(totalBefore.getAverageData(), totalAfter.getAverageData());
 
       System.err.println("\nInserted NOPs:"+totalNops +"("+(double)totalNops/(double)totalProcessedOperations+")");
+      long transfNopsMapped = nopsAfter.getMappedNops() - nopsBefore.getMappedNops();
+      long transfNopsExecuted = nopsAfter.getExecutedNops() - nopsBefore.getExecutedNops();
+      //totalNopsAfter - totalNopsBefore;
+      System.err.println("Mapped NOPs:"+transfNopsMapped+"("+(double)transfNopsMapped/(double)totalIterationDataBefore.getTotalMappedOps()+")");
+      System.err.println("Executed NOPs:"+transfNopsExecuted+"("+(double)transfNopsExecuted/(double)totalIterationDataBefore.getTotalExecutedOps()+")");
 
-      System.err.println("Before Average Block Size:"+blockSizeCounterBefore.getAverageSize());
-      System.err.println("Before Max Block Size:"+blockSizeCounterBefore.getMaxBlockSize());
+/*
+      System.err.println("NOPs Before:"+totalNopsBefore);
+      System.err.println("NOPs After:"+totalNopsAfter);
+      System.err.println("Transformation NOPs:"+nopsByTransformations);
+      System.err.println("Executed Ops Before:"+totalIterationDataBefore.getTotalExecutedOps());
+      System.err.println("Executed Ops After:"+totalIterationDataAfter.getTotalExecutedOps());
+      System.err.println("Executed Ops Difference:"+(totalIterationDataBefore.getTotalExecutedOps()-totalIterationDataAfter.getTotalExecutedOps()));
+*/
 
-      System.err.println("After Average Block Size:"+blockSizeCounterAfter.getAverageSize());
-      System.err.println("After Max Block Size:"+blockSizeCounterAfter.getMaxBlockSize());
+      System.err.println("Block Size Before:");
+      System.err.println(blockSizeCounterBefore.toString());
+
+      System.err.println("Block Size After:");
+      System.err.println(blockSizeCounterAfter.toString());
+
+
+      //System.err.println("Before Average Block Size:"+blockSizeCounterBefore.getAverageSize());
+      //System.err.println("Before Max Block Size:"+blockSizeCounterBefore.getMaxBlockSize());
+
+      //System.err.println("After Average Block Size:"+blockSizeCounterAfter.getAverageSize());
+      //System.err.println("After Max Block Size:"+blockSizeCounterAfter.getMaxBlockSize());
+
+      System.err.println("Iteration Before:");
+      System.err.println(totalIterationDataBefore.averagesString());
+      System.err.println("Iteration After:");
+      System.err.println(totalIterationDataAfter.averagesString());
    }
 
 

@@ -25,9 +25,11 @@ import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.System.Services.ShellUtils;
 import org.ancora.IntermediateRepresentation.Operation;
+import org.ancora.IntermediateRepresentation.Transformations.SingleStaticAssignment;
 import org.ancora.SharedLibrary.EnumUtils;
 import org.ancora.StreamTransform.RemoveR0Or;
-import org.ancora.StreamTransform.SingleStaticAssignment;
+import org.ancora.StreamTransform.ResolveLiteralInputs;
+//import org.ancora.StreamTransform.SingleStaticAssignment;
 import org.ancora.StreamTransform.Stats.TransformationChanges;
 import org.ancora.StreamTransform.StreamTransformation;
 
@@ -89,7 +91,8 @@ public class DmStreamTransformDispenser {
     * TRANSFORMATIONS
     */
    public static enum TransformationName {
-      removeR0Or("remove-or");
+      removeR0Or("remove-or"),
+      resolveWhenInputLiterals("resolve-inputs");
 /*
       ResolveLiteralInputs("resolve-inputs-lit"),
       ResolveNeutralInputs("resolve-inputs-neutral"),
@@ -110,13 +113,21 @@ public class DmStreamTransformDispenser {
          return transformationName;
       }
 
+      /*
       public static StreamTransformation getParseTransformation() {
          return new SingleStaticAssignment();
       }
+       *
+       */
+       
+       
+      
       public StreamTransformation getTransformation() {
          switch (this) {
             case removeR0Or:
                return new RemoveR0Or();
+            case resolveWhenInputLiterals:
+               return new ResolveLiteralInputs();
             /*
             case ResolveLiteralInputs:
                return new ResolveLiteralInputs();

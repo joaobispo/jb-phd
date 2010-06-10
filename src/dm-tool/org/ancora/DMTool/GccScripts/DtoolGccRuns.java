@@ -131,9 +131,9 @@ public class DtoolGccRuns {
 
 
    public static final String DEFAULT_FLAGS = "-Wall -g -mxl-barrel-shift -mno-xl-soft-div -mno-xl-soft-mul -xl-mode-executable";
-   public static final String DEFAULT_OPTIMIZATIONS = "-O0 -O1 -O2 -O3";
+   public static final String DEFAULT_OPTIMIZATIONS = "-O0 -O1 -O2 -O3 -Os";
    //public static final String DEFAULT_OPTIMIZATIONS = "-Os";
-   public static final String DEFAULT_INPUT_FOLDER = "I:\\Workspace\\Resources\\MicroBlaze Benchmarks\\07 - Test Battery 3 (Dtool) (C and Elf)\\c";
+   public static final String DEFAULT_INPUT_FOLDER = "I:\\Workspace\\Resources\\MicroBlaze Benchmarks\\07 - Test Battery 3 (Dtool) (C and Elf)\\c\\";
 
    public static final String C_EXTENSION = "c";
    public static final String HEADER_EXTENSION = "h";

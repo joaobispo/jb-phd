@@ -17,15 +17,6 @@
 
 package org.ancora.DMTool.GccScripts;
 
-import org.ancora.DMTool.GccScripts.MenottiGccRuns;
-import org.ancora.DMTool.GccScripts.DtoolGccRuns;
-import org.ancora.DMTool.GccScripts.AdhocGccRuns;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.List;
-import java.util.logging.Logger;
 import org.ancora.SharedLibrary.DataStructures.MbGccRun;
 
 /**
@@ -39,9 +30,9 @@ public class MbGcc {
      */
     public static void main(String[] args) {
 
-      buildMenottiElfs();
+      //buildMenottiElfs();
       //buildAdhocElfs();
-      //buildDtooElfs();
+      buildDtooElfs();
    }
 /*
    public static int runProcess(List<String> command, String workingDir) {

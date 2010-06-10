@@ -27,12 +27,13 @@ import org.ancora.DMTool.Settings.Options;
 import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.DMTool.Settings.Settings;
 import org.ancora.DMTool.Dispensers.DmStreamMapperDispenser;
+import org.ancora.DMTool.Dispensers.DmStreamTransformDispenser;
 import org.ancora.FuMatrix.Mapper.GeneralMapper;
 import org.ancora.FuMatrix.Stats.MapperData;
 import org.ancora.DMTool.System.DataStructures.DmBlockPack;
 import org.ancora.DMTool.System.Services.DmBlockUtils;
 import org.ancora.InstructionBlock.InstructionBlock;
-import org.ancora.DMTool.Dispensers.DmTransformDispenser;
+//import org.ancora.DMTool.Dispensers.DmTransformDispenser;
 import org.ancora.DMTool.Simulation.DmSimulateFile;
 import org.ancora.DMTool.Simulation.SimulationCalcs;
 import org.ancora.DMTool.Simulation.SimulationData;
@@ -51,7 +52,8 @@ public class StreamSimulate implements Executable {
       input = Options.optionsTable.get(OptionName.general_input);
             elfExtension = Options.optionsTable.get(OptionName.extension_elf);
       traceExtension = Options.optionsTable.get(OptionName.extension_trace);
-      transf = DmTransformDispenser.getCurrentTransformations();
+//      transf = DmTransformDispenser.getCurrentTransformations();
+//      transf = DmStreamTransformDispenser.getCurrentTransformations();
       //mapper = DmStreamMapperDispenser.getCurrentMapper();
       mapper = null;
    }
@@ -88,7 +90,8 @@ public class StreamSimulate implements Executable {
       // Optimization
       String optimizationLevel = Options.optionsTable.get(OptionName.general_optimizationstring);
       String transformations = "NoTrans";
-      if(DmTransformDispenser.getCurrentTransformations().size() > 0) {
+//      if(DmTransformDispenser.getCurrentTransformations().size() > 0) {
+      if(DmStreamTransformDispenser.getCurrentTransformations().size() > 0) {
          transformations = "WithTransf";
       }
 
@@ -136,7 +139,8 @@ public class StreamSimulate implements Executable {
       // Optimization
       String optimizationLevel = Options.optionsTable.get(OptionName.general_optimizationstring);
       String transformations = "NoTrans";
-      if(DmTransformDispenser.getCurrentTransformations().size() > 0) {
+//      if(DmTransformDispenser.getCurrentTransformations().size() > 0) {
+      if(DmStreamTransformDispenser.getCurrentTransformations().size() > 0) {
          transformations = "WithTransf";
       }
 
@@ -181,9 +185,12 @@ public class StreamSimulate implements Executable {
 
 
                // Transform
+               /*
                for (Transformation t : transf) {
                   t.transform(operations);
                }
+                *
+                */
 
                // Map
                mapper = DmStreamMapperDispenser.getCurrentMapper();
@@ -279,7 +286,7 @@ public class StreamSimulate implements Executable {
    private String input;
       private String traceExtension;
    private String elfExtension;
-   private List<Transformation> transf;
+//   private List<Transformation> transf;
    private GeneralMapper mapper;
 
    private void writeToCsv(String runName, List<Double> speedups, List<File> inputFiles) {

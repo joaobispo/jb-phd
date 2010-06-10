@@ -20,13 +20,15 @@ package org.ancora.DMTool.Simulation;
 import java.util.List;
 import java.util.logging.Logger;
 import org.ancora.DMTool.Dispensers.DmStreamMapperDispenser;
-import org.ancora.DMTool.Dispensers.DmTransformDispenser;
+import org.ancora.DMTool.Dispensers.DmStreamTransformDispenser;
+//import org.ancora.DMTool.Dispensers.DmTransformDispenser;
 import org.ancora.FuMatrix.Mapper.GeneralMapper;
 import org.ancora.FuMatrix.Stats.MapperData;
 import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.IntermediateRepresentation.MbParser;
 import org.ancora.IntermediateRepresentation.Operation;
 import org.ancora.Partitioning.Blocks.BlockStream;
+import org.ancora.StreamTransform.SingleStaticAssignment;
 
 /**
  *
@@ -67,7 +69,10 @@ public class DmSimulateFile {
    private void hwPath(InstructionBlock block) {
       // Hw path
       // Transform Instruction Block into PureIR
-      List<Operation> operations = MbParser.mbToIrBlock(block).getOperations();
+      //List<Operation> operations = MbParser.mbToIrBlock(block).getOperations();
+      List<Operation> operations = MbParser.mbToOperations(block);
+      // Put in SSA
+      SingleStaticAssignment.transform(operations);
 
       if (operations == null) {
          Logger.getLogger(DmSimulateFile.class.getName()).
@@ -78,7 +83,8 @@ public class DmSimulateFile {
 
 
       // Transform
-      DmTransformDispenser.applyCurrentTransformations(operations);
+      //DmTransformDispenser.applyCurrentTransformations(operations);
+      DmStreamTransformDispenser.applyCurrentTransformations(operations);
 
       // Map
       GeneralMapper mapper = DmStreamMapperDispenser.applyCurrentMapper(operations);

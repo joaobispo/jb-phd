@@ -32,6 +32,7 @@ public class BlockSizeCounter {
 
    public BlockSizeCounter() {
       maxBlockSize = 0;
+      minBlockSize = Integer.MAX_VALUE;
       blockSizeAcc = 0l;
       numberOfBlocks = 0l;
    }
@@ -51,8 +52,28 @@ public class BlockSizeCounter {
       }
 
       maxBlockSize = Math.max(maxBlockSize, numberOfInstructions);
+      minBlockSize = Math.min(minBlockSize, numberOfInstructions);
       blockSizeAcc += numberOfInstructions;
       numberOfBlocks++;
+   }
+
+   @Override
+   public String toString() {
+      StringBuilder builder = new StringBuilder();
+
+      builder.append("Before Average Block Size:");
+      builder.append(getAverageSize());
+      builder.append("\n");
+
+      builder.append("Before Max Block Size:");
+      builder.append(getMaxBlockSize());
+      builder.append("\n");
+
+      builder.append("Before Min Block Size:");
+      builder.append(getMinBlockSize());
+      builder.append("\n");
+
+      return builder.toString();
    }
 
    public double getAverageSize() {
@@ -63,6 +84,10 @@ public class BlockSizeCounter {
       return maxBlockSize;
    }
 
+   public int getMinBlockSize() {
+      return minBlockSize;
+   }
+
    public long getNumberOfBlocks() {
       return numberOfBlocks;
    }
@@ -70,6 +95,7 @@ public class BlockSizeCounter {
    
 
    private int maxBlockSize;
+   private int minBlockSize;
    private long blockSizeAcc;
    private long numberOfBlocks;
 
