@@ -29,6 +29,7 @@ import org.ancora.FuMatrix.Mapper.GeneralMapper;
 import org.ancora.IntermediateRepresentation.OperationType;
 
 /**
+ * Contains data about mapping.
  *
  * @author Joao Bispo
  */
@@ -172,6 +173,9 @@ public static MapperData build(GeneralMapper mapper) {
 
 
 
+   /**
+    * INSTANCE VARIABLES
+    */
    private int liveIns;
    private int liveOuts;
    private int lines;
