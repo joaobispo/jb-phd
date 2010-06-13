@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.ancora.Partitioning.Partitioner;
 import org.ancora.SharedLibrary.IoUtils;
 
 /**
@@ -145,6 +146,23 @@ public class TcProcess {
       return returnList;
    }
 
+
+   public static List<Integer> getMasterLine(Map<String, List<TcData>> mainTable, int maxRepetitions) {
+      Set<Integer> setRepetitions = new HashSet<Integer>();
+
+      for(List<TcData> data : mainTable.values()) {
+         setRepetitions.addAll(getMasterLine(data, maxRepetitions));
+      }
+
+      // Add limits
+      setRepetitions.add(0);
+      setRepetitions.add(maxRepetitions);
+      List<Integer> returnList = new ArrayList<Integer>(setRepetitions);
+      Collections.sort(returnList);
+
+      return returnList;
+   }
+
     public static List<Long> getAbsReduxLine(TcData stat, int maxRepetitions, List<Integer> masterLine) {
       // Create array
        List<Long> results = new ArrayList<Long>();
@@ -162,8 +180,7 @@ public class TcProcess {
       long instructions = stat.getTotalInstructions();
       int masterLineIndex = 0;
       for(Integer key : keys) {
-         int masterNumber;
-         while((masterNumber = masterLine.get(masterLineIndex)) < key) {
+         while(masterLine.get(masterLineIndex) < key) {
             results.add(instructions);
             masterLineIndex++;
          }
@@ -214,8 +231,8 @@ public class TcProcess {
       System.err.println(Arrays.toString(results));
        *
        */
-       System.err.println("Masterline Size:"+masterLine.size());
-       System.err.println("Results Size:"+results.size());
+       //System.err.println("Masterline Size:"+masterLine.size());
+       //System.err.println("Results Size:"+results.size());
       return results;
    }
 
@@ -235,5 +252,6 @@ public class TcProcess {
       // Create file
       return IoUtils.write(csvFile, builder.toString());
    }
+
 
 }

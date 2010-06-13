@@ -32,6 +32,7 @@ import org.specs.DMTool2.Settings.Option;
 import org.specs.DMTool2.Settings.OptionTable;
 import org.specs.DMTool2.Settings.ProgramName;
 import org.specs.DMTool2.Settings.Settings;
+import org.specs.DMTool2.TraceCoverage.TraceCoverageOption;
 
 /**
  *
@@ -45,6 +46,7 @@ public class Set implements Program {
       options = new HashMap<String, Option>();
       options.putAll(EnumUtils.buildMap(GeneralOption.values()));
       options.putAll(EnumUtils.buildMap(PartitionerOption.values()));
+      options.putAll(EnumUtils.buildMap(TraceCoverageOption.values()));
       
    }
 

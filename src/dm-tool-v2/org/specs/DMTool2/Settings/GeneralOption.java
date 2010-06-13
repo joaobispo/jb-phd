@@ -29,8 +29,10 @@ public enum GeneralOption implements Option{
    csv_filename_prefix("csv-filename-prefix",""),
    elf_extension("elf-extention","elf"),
    trace_extension("trace-extention","trace"),
+   block_extension("block-extention","block"),
    csv_extension("csv-extention","csv"),
    logger_level("logger-level","ALL");
+   
 
    
    private GeneralOption(String optionName, String defaultValue) {
