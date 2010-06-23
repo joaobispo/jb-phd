@@ -60,7 +60,7 @@ public class BlockDispenser {
       int separatorIndex = filename.lastIndexOf(IoUtils.DEFAULT_EXTENSION_SEPARATOR);
       String extension = filename.substring(separatorIndex+1);
 
-      String blockExtension = Settings.optionsTable.getOption(GeneralOption.block_extension);
+      String blockExtension = Settings.optionsTable.get(GeneralOption.block_extension);
       if(extension.equals(blockExtension)) {
          InstructionBlock block = BlockIO.fromFile(file);
          return new SingleBlockStream(block);
@@ -68,13 +68,13 @@ public class BlockDispenser {
 
       InstructionBusReader busReader = null;
 
-      String elfExtension = Settings.optionsTable.getOption(GeneralOption.elf_extension);
+      String elfExtension = Settings.optionsTable.get(GeneralOption.elf_extension);
       if(extension.equals(elfExtension)) {
          String systemConfig = "./Configuration Files/systemconfig.xml";
          busReader = ElfBusReader.createElfReader(systemConfig, file.getAbsolutePath());
       }
 
-      String traceExtension = Settings.optionsTable.getOption(GeneralOption.trace_extension);
+      String traceExtension = Settings.optionsTable.get(GeneralOption.trace_extension);
       if(extension.equals(traceExtension)) {
          busReader = DtoolTraceBusReader.createTraceReader(file);
       }
@@ -106,13 +106,13 @@ public class BlockDispenser {
 
       InstructionBusReader busReader = null;
 
-      String elfExtension = Settings.optionsTable.getOption(GeneralOption.elf_extension);
+      String elfExtension = Settings.optionsTable.get(GeneralOption.elf_extension);
       if(extension.equals(elfExtension)) {
          String systemConfig = "./Configuration Files/systemconfig.xml";
          busReader = ElfBusReader.createElfReader(systemConfig, file.getAbsolutePath());
       }
 
-      String traceExtension = Settings.optionsTable.getOption(GeneralOption.trace_extension);
+      String traceExtension = Settings.optionsTable.get(GeneralOption.trace_extension);
       if(extension.equals(traceExtension)) {
          busReader = DtoolTraceBusReader.createTraceReader(file);
       }
@@ -140,6 +140,7 @@ public class BlockDispenser {
 
    public enum Context {
       currentSettings,
-      traceCoverage;
+      traceCoverage,
+      blockSize;
    }
 }

@@ -44,8 +44,8 @@ public class Settings {
     * @return all the ELF and TRACE files found in the input path
     */
    public static List<File> getExecutableInputFiles() {
-      String elfExtension = Settings.optionsTable.getOption(GeneralOption.elf_extension);
-      String traceExtension = Settings.optionsTable.getOption(GeneralOption.trace_extension);
+      String elfExtension = Settings.optionsTable.get(GeneralOption.elf_extension);
+      String traceExtension = Settings.optionsTable.get(GeneralOption.trace_extension);
       
       Set<String> supportedExtensions = new HashSet<String>();
       supportedExtensions.add(elfExtension);
@@ -57,7 +57,7 @@ public class Settings {
 
    public static List<File> getInputFiles(Set<String> supportedExtensions) {
       // Get input path
-      String input = Settings.optionsTable.getOption(GeneralOption.input_path);
+      String input = Settings.optionsTable.get(GeneralOption.input_path);
       File file = new File(input);
 
       if(!file.exists()) {
@@ -83,8 +83,8 @@ public class Settings {
    }
 
    public static File getCsvFile(String filename) {
-      String outputFoldername = Settings.optionsTable.getOption(GeneralOption.output_path);
-      String csvFoldername = Settings.optionsTable.getOption(GeneralOption.csv_foldername);
+      String outputFoldername = Settings.optionsTable.get(GeneralOption.output_path);
+      String csvFoldername = Settings.optionsTable.get(GeneralOption.csv_foldername);
       File outputFolder = new File(outputFoldername, csvFoldername);
 
       // Check if it exists
@@ -97,11 +97,11 @@ public class Settings {
          }
       }
 
-      String csvFilenamePrefix = Settings.optionsTable.getOption(GeneralOption.csv_filename_prefix);
+      String csvFilenamePrefix = Settings.optionsTable.get(GeneralOption.csv_filename_prefix);
       if(csvFilenamePrefix.length() > 0) {
          csvFilenamePrefix = csvFilenamePrefix + "-";
       }
-      String csvExtension = Settings.optionsTable.getOption(GeneralOption.csv_extension);
+      String csvExtension = Settings.optionsTable.get(GeneralOption.csv_extension);
 
       String csvFilename = csvFilenamePrefix+filename+IoUtils.DEFAULT_EXTENSION_SEPARATOR+csvExtension;
       return new File(outputFolder, csvFilename);
@@ -110,10 +110,10 @@ public class Settings {
    public static void setupBlockWorker(BlockWorker worker, Context context) {
       // Default
       // Setup worker
-      boolean useGatherer = Boolean.parseBoolean(Settings.optionsTable.getOption(PartitionerOption.group_blocks));
-      boolean useSelector = Boolean.parseBoolean(Settings.optionsTable.getOption(PartitionerOption.filter_by_repetitions));
-      boolean useUniqueFilter = Boolean.parseBoolean(Settings.optionsTable.getOption(PartitionerOption.filter_identical));
-      int selectorThreshold = ParseUtils.parseInt(Settings.optionsTable.getOption(PartitionerOption.repetition_threshold));
+      boolean useGatherer = Boolean.parseBoolean(Settings.optionsTable.get(PartitionerOption.group_blocks));
+      boolean useSelector = Boolean.parseBoolean(Settings.optionsTable.get(PartitionerOption.filter_by_repetitions));
+      boolean useUniqueFilter = Boolean.parseBoolean(Settings.optionsTable.get(PartitionerOption.filter_identical));
+      int selectorThreshold = ParseUtils.parseInt(Settings.optionsTable.get(PartitionerOption.repetition_threshold));
 
 
       switch(context) {
@@ -122,6 +122,13 @@ public class Settings {
             useSelector = false;
             useUniqueFilter = false;
             selectorThreshold = 0;
+            break;
+         case blockSize:
+            useGatherer = true;
+            useSelector = true;
+            useUniqueFilter = false;
+            selectorThreshold = ParseUtils.parseInt(Settings.optionsTable.get(PartitionerOption.repetition_threshold));
+            break;
          default:
             // Do nothing
             break;
@@ -137,7 +144,7 @@ public class Settings {
    }
 
     public static Level getLoggerLevel() {
-      String loggerLevel = Settings.optionsTable.getOption(GeneralOption.logger_level).toUpperCase();
+      String loggerLevel = Settings.optionsTable.get(GeneralOption.logger_level).toUpperCase();
       Level defaultLevel = Level.ALL;
       Level level = defaultLevel;
       // Parse Logger Level

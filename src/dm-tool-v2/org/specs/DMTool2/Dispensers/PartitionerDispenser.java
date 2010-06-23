@@ -37,7 +37,7 @@ public class PartitionerDispenser {
    
    public static Partitioner getCurrentPartitioner() {
       //Get name of the current partitioner
-      String partitionerName = Settings.optionsTable.getOption(PartitionerOption.current_partitioner);
+      String partitionerName = Settings.optionsTable.get(PartitionerOption.current_partitioner);
       
       return getPartitioner(partitionerName);
    }
@@ -104,7 +104,7 @@ public class PartitionerDispenser {
 
       private Partitioner getWarp() {
          MbWarp warp = new MbWarp();
-         Boolean useLimit = Boolean.parseBoolean(Settings.optionsTable.getOption(PartitionerOption.use_warp_branch_limit));
+         Boolean useLimit = Boolean.parseBoolean(Settings.optionsTable.get(PartitionerOption.use_warp_branch_limit));
          warp.setUseBranchLimit(useLimit);
          //Boolean useOriginalIdMethod = Boolean.parseBoolean(Options.optionsTable.get(OptionName.partition_daprofuseoriginalidmethod));
          //daprof.setUseDaprofId(useOriginalIdMethod);
@@ -115,7 +115,7 @@ public class PartitionerDispenser {
       private Partitioner getMegablock() {
          MegaBlock mb = MbPartitionerDispenser.getMbMegaBlock();
          // Get max pattern size
-         String maxPatternString = Settings.optionsTable.getOption(PartitionerOption.megablock_max_pattern_size);
+         String maxPatternString = Settings.optionsTable.get(PartitionerOption.megablock_max_pattern_size);
          int maxPatternSize = ParseUtils.parseInt(maxPatternString);
          mb.setMaxPatternSize(maxPatternSize);
          return mb;

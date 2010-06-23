@@ -18,10 +18,12 @@
 package org.specs.DMTool2.Settings;
 
 import java.util.logging.Logger;
+import org.specs.DMTool2.BlockSize.BlockSize;
 import org.specs.DMTool2.Program;
 import org.specs.DMTool2.RootPrograms.Exit;
 import org.specs.DMTool2.RootPrograms.RunScript;
 import org.specs.DMTool2.RootPrograms.Set;
+import org.specs.DMTool2.Simulator.Simulator;
 import org.specs.DMTool2.TraceCoverage.TraceCoverage;
 
 /**
@@ -33,7 +35,9 @@ public enum ProgramName {
    exit("exit"),
    runScript("runscript"),
    traceCoverage("trace-coverage"),
-   set("set");
+   set("set"),
+   blockSize("block-size"),
+   simulator("simulator");
 
    private ProgramName(String programName) {
       this.programName = programName;
@@ -49,6 +53,10 @@ public enum ProgramName {
             return new TraceCoverage();
          case set:
             return new Set();
+         case blockSize:
+            return new BlockSize();
+         case simulator:
+            return new Simulator();
          default:
             Logger.getLogger(ProgramName.class.getName()).
                     warning("Case not defined: "+this.name());

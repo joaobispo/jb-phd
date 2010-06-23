@@ -31,7 +31,7 @@ public class OptionTable {
    }
 
 
-   public String getOption(Option option) {
+   public String get(Option option) {
       // Build option name
       String optionName = buildOptionName(option);
 

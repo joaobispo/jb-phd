@@ -25,13 +25,16 @@ import java.util.logging.Logger;
 import org.ancora.SharedLibrary.EnumUtils;
 import org.ancora.SharedLibrary.LoggingUtils;
 import org.specs.DMTool2.CommandParser;
+import org.specs.DMTool2.Dispensers.MapperOption;
 import org.specs.DMTool2.Dispensers.PartitionerOption;
+import org.specs.DMTool2.Dispensers.TransformOption;
 import org.specs.DMTool2.Program;
 import org.specs.DMTool2.Settings.GeneralOption;
 import org.specs.DMTool2.Settings.Option;
 import org.specs.DMTool2.Settings.OptionTable;
 import org.specs.DMTool2.Settings.ProgramName;
 import org.specs.DMTool2.Settings.Settings;
+import org.specs.DMTool2.Simulator.SimulatorOption;
 import org.specs.DMTool2.TraceCoverage.TraceCoverageOption;
 
 /**
@@ -47,6 +50,9 @@ public class Set implements Program {
       options.putAll(EnumUtils.buildMap(GeneralOption.values()));
       options.putAll(EnumUtils.buildMap(PartitionerOption.values()));
       options.putAll(EnumUtils.buildMap(TraceCoverageOption.values()));
+      options.putAll(EnumUtils.buildMap(MapperOption.values()));
+      options.putAll(EnumUtils.buildMap(TransformOption.values()));
+      options.putAll(EnumUtils.buildMap(SimulatorOption.values()));
       
    }
 

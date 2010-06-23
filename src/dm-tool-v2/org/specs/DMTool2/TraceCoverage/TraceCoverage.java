@@ -325,12 +325,12 @@ public class TraceCoverage implements Program {
     * @param maxRepetitions
     */
    private void writeCsvAverage(List<String> partitionerNames, Map<String, List<TcData>> mainTable, int maxRepetitions) {
-               String csvSuffix = Settings.optionsTable.getOption(TraceCoverageOption.csv_suffix);
+               String csvSuffix = Settings.optionsTable.get(TraceCoverageOption.csv_suffix);
          if(csvSuffix.length() > 0) {
             csvSuffix = "-"+csvSuffix;
          }
    
-      String csvFilename = CSV_PREFIX + "-partitioners-average"+csvSuffix;;
+      String csvFilename = CSV_PREFIX + "-partitioners-average"+csvSuffix;
          // Build csv file object
          File ratioFile = Settings.getCsvFile(csvFilename);
          System.err.println("Writing file '"+ratioFile.getName()+"'");
@@ -397,7 +397,7 @@ public class TraceCoverage implements Program {
     */
       private void writeCsvIndividual(List<Partitioner> partitioners, Map<Partitioner, List<TcData>> mainTable, int maxRepetitions) {
       for(Partitioner partitioner : partitioners) {
-         String csvSuffix = Settings.optionsTable.getOption(TraceCoverageOption.csv_suffix);
+         String csvSuffix = Settings.optionsTable.get(TraceCoverageOption.csv_suffix);
          if(csvSuffix.length() > 0) {
             csvSuffix = "-"+csvSuffix;
          }

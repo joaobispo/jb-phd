@@ -155,7 +155,8 @@ public class TcProcess {
       }
 
       // Add limits
-      setRepetitions.add(0);
+//      setRepetitions.add(0);
+      setRepetitions.add(1);
       setRepetitions.add(maxRepetitions);
       List<Integer> returnList = new ArrayList<Integer>(setRepetitions);
       Collections.sort(returnList);
@@ -180,7 +181,8 @@ public class TcProcess {
       long instructions = stat.getTotalInstructions();
       int masterLineIndex = 0;
       for(Integer key : keys) {
-         while(masterLine.get(masterLineIndex) < key) {
+         while(masterLine.get(masterLineIndex) <= key) {
+//         while(masterLine.get(masterLineIndex) < key) {
             results.add(instructions);
             masterLineIndex++;
          }
