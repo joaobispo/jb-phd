@@ -55,6 +55,7 @@ public class SuperBlock extends Partitioner {
    @Override
    public void flush() {
       bbPartitioner.flush();
+      this.sbBuilder = new SuperBlockBuilder();
    }
 
 

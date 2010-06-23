@@ -17,16 +17,15 @@
 package org.ancora.Partitioning;
 
 //import org.ancora.Partitioning.Tools.InstructionFilter;
-import org.ancora.Partitioning.Partitioner;
 import java.util.ArrayList;
 import java.util.List;
 import org.ancora.InstructionBlock.GenericInstruction;
 import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.InstructionBlock.InstructionBlockListener;
-import org.ancora.Partitioning.Tools.InstructionFilter;
 import org.ancora.Partitioning.Tools.PatternFinder;
 import org.ancora.Partitioning.Tools.PatternFinderInfo;
 import org.ancora.SharedLibrary.BitUtils;
+import org.ancora.SharedLibrary.ParseUtils;
 
 /**
  *
@@ -49,7 +48,10 @@ public class MegaBlock extends Partitioner {
 
    @Override
    public String getName() {
-      return NAME;
+      String value = Integer.toString(this.mbBuilder.maxPatternSize);
+      value = ParseUtils.padLeft(value, 3, '0');
+//      return NAME+"-"+this.mbBuilder.maxPatternSize;
+      return NAME+"-"+value;
    }
 
    @Override
@@ -60,6 +62,7 @@ public class MegaBlock extends Partitioner {
    @Override
    public void flush() {
       sbPartitioner.flush();
+      this.mbBuilder = new MegaBlockBuilder(mbBuilder.maxPatternSize);
    }
    /**
     * INSTANCE VARIABLES
@@ -72,6 +75,18 @@ public class MegaBlock extends Partitioner {
    class MegaBlockBuilder implements InstructionBlockListener {
 
       public MegaBlockBuilder(int maxPatternSize) {
+         this.maxPatternSize = maxPatternSize;
+
+         initCurrentMegaBlock();
+         initPreviousMegaBlock();
+
+         // Init object state
+         lastPatternSize = 0;
+         state = BuilderState.LOOKING_FOR_PATTERN;
+         patternFinder = new PatternFinder(maxPatternSize);
+      }
+
+      private void reset() {
          initCurrentMegaBlock();
          initPreviousMegaBlock();
 
@@ -83,6 +98,7 @@ public class MegaBlock extends Partitioner {
 
       public void setMaxPatternSize(int maxPatternSize) {
          patternFinder = new PatternFinder(maxPatternSize);
+         this.maxPatternSize = maxPatternSize;
       }
 
       private void initCurrentMegaBlock() {
@@ -109,6 +125,7 @@ public class MegaBlock extends Partitioner {
       public void flush() {
          flushCurrentMegaBlock();
          flushListeners();
+         reset();
       }
 
       private void parseInstructionBlock(InstructionBlock instructionBlock, PatternFinderInfo patternInfo) {
@@ -144,7 +161,9 @@ public class MegaBlock extends Partitioner {
             return;
          }
 
+         // If there is no pattern, flush instructionBlock
          addInstructionsToCurrentBlock(instructionBlock);
+//         flushCurrentMegaBlock();
       }
 
       private void stateBuildingPattern(InstructionBlock instructionBlock, PatternFinderInfo patternInfo) {
@@ -278,8 +297,11 @@ public class MegaBlock extends Partitioner {
       private BuilderState state;
       private int lastPatternSize;
       private PatternFinder patternFinder;
+      private int maxPatternSize;
       
       private static final int HASH_INITIAL_VALUE = 4;
+
+
    }
 
    enum BuilderState {
