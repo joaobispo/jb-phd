@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import org.ancora.IntermediateRepresentation.Operand;
 import org.ancora.IntermediateRepresentation.Operation;
+import org.ancora.IntermediateRepresentation.OperationType;
 import org.ancora.IntermediateRepresentation.Operations.Nop;
 import org.ancora.StreamTransform.DataStructures.SubstituteTable;
 
@@ -112,6 +113,10 @@ public class ResolveLiteralInputs extends StreamTransformation  {
 
    @Override
    public Operation transform(Operation operation) {
+      if(operation.getType() == OperationType.Nop) {
+         return operation;
+      }
+
       // Substitute current inputs for possible already found literals
       resolvedOperandsMap.substituteInputs(operation);
       // Unregister outputs of current operation
