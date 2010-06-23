@@ -41,6 +41,7 @@ public interface GeneralMapper {
    public void setMaxCommDistance(int maxCommDistance);
    public void setMaxColGeneral(int maxColumns);
    public void setMaxColMemory(int maxColumns);
+   public void setUseConditionalExitLimit(boolean useConditionalExitLimit);
    //int getNumberOfOps();
    //int getNumberOfLines();
    //int getLiveIns();

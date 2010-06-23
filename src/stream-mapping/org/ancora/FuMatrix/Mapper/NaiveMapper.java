@@ -61,7 +61,10 @@ public class NaiveMapper implements GeneralMapper {
       definitions = new RegDefinitionsTable();
 
       lastLineWithStore = -1;
+      lastLineWithConditional = -1;
       maxCommDistance = DEFAULT_MAX_COMM_DISTANCE;
+
+      useConditionalExitLimit = true;
 
 //      replacedInputs = new HashMap<Integer, Operand>();
    }
@@ -164,15 +167,17 @@ public class NaiveMapper implements GeneralMapper {
       int lineIfInputs = getLineAccordingToInputs(operation);
       // Store has to be put after store
       int lineIfLastStore = lastLineWithStore + 1;
+      int lineIfLastConditional = lastLineWithConditional + 1;
       // Check which is bigger: line or lastStoreLine + 1
       int possibleLine = Math.max(lineIfInputs, lineIfLastStore);
+      possibleLine = Math.max(possibleLine, lineIfLastConditional);
 
       // Get first avaliable line
       //int firstAvaliableLine = memoryLines.getFirstAvaliableFrom(possibleLine);
       int firstAvaliableLine = avaliabilityTables.get(Area.memory).
               getFirstAvaliableFrom(possibleLine);
       // Update last store line
-      lastLineWithStore = firstAvaliableLine;
+      updateLastLineWithStore(firstAvaliableLine);
 
       return firstAvaliableLine;
    }
@@ -180,12 +185,17 @@ public class NaiveMapper implements GeneralMapper {
 
    private int getLineConditionalExit(Operation operation) {
       int lineIfInputs = getLineAccordingToInputs(operation);
-      // Conditional has to be put in line with store
+      // Conditional has to be put in line with store or last conditional
       int lineIfLastStore = lastLineWithStore;
+      int lineIfLastConditional = lastLineWithConditional;
       // Check which is bigger: line or lastStoreLine
       int possibleLine = Math.max(lineIfInputs, lineIfLastStore);
+      possibleLine = Math.max(lineIfInputs, lineIfLastConditional);
       // Get first avaliable line
       //return generalLines.getFirstAvaliableFrom(possibleLine);
+      updateLastLineWithConditional(possibleLine);
+
+      
       return avaliabilityTables.get(Area.general).
               getFirstAvaliableFrom(possibleLine);
    }
@@ -427,6 +437,29 @@ public class NaiveMapper implements GeneralMapper {
 
 
 
+   public void setMaxColGeneral(int maxColumns) {
+      setAvaliabilityTableSize(maxColumns, Area.general);
+   }
+
+   public void setMaxColMemory(int maxColumns) {
+      setAvaliabilityTableSize(maxColumns, Area.memory);
+   }
+
+   private void updateLastLineWithConditional(int possibleLine) {
+      if(useConditionalExitLimit) {
+         lastLineWithConditional = possibleLine;
+      }
+   }
+
+   public void setUseConditionalExitLimit(boolean useConditionalExitLimit) {
+      this.useConditionalExitLimit = useConditionalExitLimit;
+   }
+
+   private void updateLastLineWithStore(int firstAvaliableLine) {
+      lastLineWithStore = firstAvaliableLine;
+   }
+   
+
    /**
     * INSTANCE VARIABLES
     */
@@ -443,18 +476,8 @@ public class NaiveMapper implements GeneralMapper {
    private int maxCommDistance;
 
    private int lastLineWithStore;
+   private int lastLineWithConditional;
 
-   public void setMaxColGeneral(int maxColumns) {
-      setAvaliabilityTableSize(maxColumns, Area.general);
-   }
+   private boolean useConditionalExitLimit;
 
-   public void setMaxColMemory(int maxColumns) {
-      setAvaliabilityTableSize(maxColumns, Area.memory);
-   }
-
-   //private Map<Integer, Operand> replacedInputs;
-
-
-
-   
 }

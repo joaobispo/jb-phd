@@ -171,6 +171,10 @@ public static MapperData build(GeneralMapper mapper) {
       return ops;
    }
 
+   public int getLineSizeMax() {
+      return lineSizeMax;
+   }
+
 
 
    /**
