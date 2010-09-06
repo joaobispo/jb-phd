@@ -22,6 +22,7 @@ import org.ancora.InstructionBlock.GenericInstruction;
 import org.ancora.InstructionBlock.MbBlockUtils;
 import org.ancora.MicroBlaze.InstructionName;
 import org.ancora.MicroBlaze.InstructionProperties;
+import org.ancora.Partitioning.Partitioners.BasicBlock;
 
 /**
  * Implements a BasicBlock partitioner for MicroBlaze instructions.

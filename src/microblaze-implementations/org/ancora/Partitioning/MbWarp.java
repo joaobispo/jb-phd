@@ -17,13 +17,12 @@
 
 package org.ancora.Partitioning;
 
-import org.ancora.Partitioning.deprecated.DaprofSuperBlock;
 import java.util.logging.Logger;
 import org.ancora.InstructionBlock.GenericInstruction;
 import org.ancora.InstructionBlock.MbBlockUtils;
 import org.ancora.MicroBlaze.InstructionName;
 import org.ancora.MicroBlaze.InstructionProperties;
-import org.ancora.SharedLibrary.DataStructures.PushingQueue;
+import org.ancora.Partitioning.Partitioners.Warp;
 
 /**
  *

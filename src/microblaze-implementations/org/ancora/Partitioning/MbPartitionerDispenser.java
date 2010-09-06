@@ -17,6 +17,9 @@
 
 package org.ancora.Partitioning;
 
+import org.ancora.Partitioning.Partitioners.MegaBlock;
+import org.ancora.Partitioning.Partitioners.SuperBlock;
+
 /**
  * Returns partitioners for MicroBlaze instructions.
  *
