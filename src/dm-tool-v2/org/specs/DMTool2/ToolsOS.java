@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Logger;
 import org.ancora.SharedLibrary.IoUtils;
-import org.ancora.SharedLibrary.LineReader;
+import org.ancora.SharedLibrary.Files.LineReader;
 import org.specs.DMTool2.Settings.ProgramName;
 
 /**

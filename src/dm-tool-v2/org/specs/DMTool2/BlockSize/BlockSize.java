@@ -28,10 +28,11 @@ import java.util.logging.Logger;
 import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.Partitioning.Blocks.BlockStream;
 import org.ancora.Partitioning.Partitioner;
+import org.ancora.Partitioning.PartitioningService;
 import org.specs.DMTool2.Dispensers.BlockDispenser;
-import org.specs.DMTool2.Dispensers.BlockDispenser.Context;
 import org.specs.DMTool2.Dispensers.PartitionerDispenser;
 import org.specs.DMTool2.Program;
+import org.specs.DMTool2.Settings.PartConf;
 import org.specs.DMTool2.Settings.ProgramName;
 import org.specs.DMTool2.Settings.Settings;
 
@@ -143,7 +144,9 @@ public class BlockSize implements Program {
                     warning("Processing file '" + file.getName() + "'...");
 
             // Get BlockStream
-            BlockStream blockStream = BlockDispenser.getBlockStream(file, partitioner, Context.blockSize);
+            PartitioningService pService = new PartitioningService(partitioner, PartConf.blockSize.getConfig());
+            BlockStream blockStream = BlockDispenser.getBlockStream(file, pService);
+            //BlockStream blockStream = BlockDispenser.getBlockStream(file, partitioner, Context.blockSize);
 
             // Get first block and partitioner
             InstructionBlock currentBlock;
@@ -153,7 +156,8 @@ public class BlockSize implements Program {
             }
 
             // Check if instruction totals are the same
-            long totalInsts = blockStream.getTotalInstructions();
+            //long totalInsts = blockStream.getTotalInstructions();
+            long totalInsts = blockStream.getBusReaderInstructions();
             long statsInst = localStats.getTotalInstructions();
             if (statsInst != totalInsts) {
                Logger.getLogger(BlockSize.class.getName()).

@@ -23,8 +23,9 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Logger;
 import org.ancora.SharedLibrary.IoUtils;
-import org.ancora.SharedLibrary.LineReader;
+import org.ancora.SharedLibrary.Files.LineReader;
 import org.ancora.SharedLibrary.LoggingUtils;
+import org.ancora.SharedLibrary.Processes.HeapWindow;
 
 /**
  *
@@ -36,6 +37,9 @@ public class Main {
     * @param args the command line arguments
     */
    public static void main(String[] args) {
+      //HeapWindow heapWindow = new HeapWindow();
+      //heapWindow.run();
+
       // Configure Logger to capture all output to console
       LoggingUtils.setupConsoleOnly();
 
@@ -50,6 +54,8 @@ public class Main {
          // Run the shell
          toolsOS.runShell();
       }
+
+      //heapWindow.close();
    }
 /*
    private static void runScript(ToolsOS toolsOS, String[] args) {

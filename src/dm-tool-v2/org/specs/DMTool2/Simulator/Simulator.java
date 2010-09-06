@@ -22,12 +22,13 @@ import java.util.List;
 import java.util.logging.Logger;
 import org.ancora.Partitioning.Blocks.BlockStream;
 import org.ancora.Partitioning.Partitioner;
+import org.ancora.Partitioning.PartitioningService;
 import org.ancora.SharedLibrary.IoUtils;
 import org.specs.DMTool2.Dispensers.BlockDispenser;
-import org.specs.DMTool2.Dispensers.BlockDispenser.Context;
 import org.specs.DMTool2.Dispensers.PartitionerDispenser;
 import org.specs.DMTool2.Dispensers.TransformDispenser;
 import org.specs.DMTool2.Program;
+import org.specs.DMTool2.Settings.PartConf;
 import org.specs.DMTool2.Settings.ProgramName;
 import org.specs.DMTool2.Settings.Settings;
 
@@ -78,10 +79,12 @@ public class Simulator implements Program {
    private void processFiles2(List<File> inputFiles) {
       // Optimization
       String optimizationLevel = Settings.optionsTable.get(SimulatorOption.string_o_level);
-      String transformations = "NoTrans";
+      //String transformations = "NoTrans";
+      String transformations = "NoConstantPropagation";
 //      if(DmTransformDispenser.getCurrentTransformations().size() > 0) {
       if (TransformDispenser.getCurrentTransformations().size() > 0) {
-         transformations = "WithTransf";
+//         transformations = "WithTransf";
+         transformations = "WithConstantPropagation";
       }
 
       String runName = optimizationLevel + "-" + transformations;
@@ -94,12 +97,20 @@ public class Simulator implements Program {
       int maxLineSizeCounter = 0;
 
       int maxNumberOfLines = 0;
+
+      //long hwBranches = 0l;
+      //long totalBranches = 0l;
+      //List<Long> hwBranches = new ArrayList<Long>();
+      //List<Long> totalBranches = new ArrayList<Long>();
+      List<Double> branchPredicions = new ArrayList<Double>();
       for (File file : inputFiles) {
-         logger.warning("Processing file '" + file.getName() + "'...");
+//         logger.warning("Processing file '" + file.getName() + "'...");
 
          // Get BlockStream and BusReader
          Partitioner partitioner = PartitionerDispenser.getCurrentPartitioner();
-         BlockStream blockStream = BlockDispenser.getBlockStream(file, partitioner, Context.traceCoverage);
+         PartitioningService pService = new PartitioningService(partitioner, PartConf.traceCoverage.getConfig());
+         BlockStream blockStream = BlockDispenser.getBlockStream(file, pService);
+         //BlockStream blockStream = BlockDispenser.getBlockStream(file, partitioner, Context.traceCoverage);
 
 
          //DmSimulateFile simulator = new DmSimulateFile(blockStream);
@@ -109,11 +120,17 @@ public class Simulator implements Program {
          SimulationData simData = simulator.getSimulationData();
          SimulationCalcs simCalcs = new SimulationCalcs(simData, blockStream.getInstructionBusReader());
 
+         Double bPrediction = (double) simData.getHwBranchInstructions() / (double) simData.getTotalBranchInstructions();
+         branchPredicions.add(bPrediction);
+         //hwBranches.add(simData.getHwBranchInstructions());
+         //totalBranches.add(simData.getTotalBranchInstructions());
+         //hwBranches += simData.getHwBranchInstructions();
+         //totalBranches += simData.getTotalBranchInstructions();
 
          int maxLine = simData.getMaxMappedLineSize();
          maxNumberOfLines = Math.max(maxNumberOfLines, simData.getMaxMappedLines());
-         System.err.println("Max # Lines:"+simData.getMaxMappedLines());
-         System.err.println("Max Line Size:"+maxLine);
+//         System.err.println("Max # Lines:"+simData.getMaxMappedLines());
+//         System.err.println("Max Line Size:"+maxLine);
          maxLineSize = Math.max(maxLineSize, maxLine);
          maxLineSizeAcc += maxLine;
          maxLineSizeCounter++;
@@ -131,15 +148,23 @@ public class Simulator implements Program {
          speedups.add(speedup);
       }
 
-      System.err.println("Run:" + runName);
-      System.err.println("\nAverage Speed-up:" + (speedupAcc / inputFiles.size()));
-      System.err.println("Global Normal Cycles:" + globalNormalCycles);
+//      System.err.println("Run:" + runName);
+      System.err.println(runName+":");
+      System.err.println("Average Speed-up:" + (speedupAcc / inputFiles.size()));
+//      System.err.println("Global Normal Cycles:" + globalNormalCycles);
       double avgSpeedup = speedupAcc / inputFiles.size();
       speedups.add(avgSpeedup);
 
-      System.err.println("Global Max Line Size:"+maxLineSize);
-      System.err.println("Global Max Line Avg:"+((double)maxLineSizeAcc/(double)maxLineSizeCounter));
-      System.err.println("Global Max # Line:"+maxNumberOfLines);
+//      System.err.println("Global Max Line Size:"+maxLineSize);
+      System.err.println("Max Cols:"+maxLineSize);
+//      System.err.println("Global Max Line Avg:"+((double)maxLineSizeAcc/(double)maxLineSizeCounter));
+//      System.err.println("Global Max # Line:"+maxNumberOfLines);
+      System.err.println("Max Lines:"+maxNumberOfLines);
+
+      Double result = harmonicMean(branchPredicions);
+      //double result = (double) hwBranches / (double) totalBranches;
+      //System.err.println("HW:"+hwBranchInstructions+"; Total:"+totalBranchInstructions);
+      System.err.println("BRANCH PREDICTION (Harmonic Mean):"+result);
 
       writeToCsv(runName, speedups, inputFiles);
    }
@@ -183,6 +208,16 @@ public class Simulator implements Program {
       }
       builder.append("\n");
       IoUtils.append(csvFile, builder.toString());
+   }
+
+   private Double harmonicMean(List<Double> branchPredicions) {
+      int size = branchPredicions.size();
+      double sum = 0d;
+      for(int i=0; i<size; i++) {
+         sum += 1/branchPredicions.get(i);
+      }
+
+      return (double)size / sum;
    }
 
 

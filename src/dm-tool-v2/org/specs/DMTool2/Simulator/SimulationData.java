@@ -134,6 +134,21 @@ public class SimulationData {
       maxMappedLines = Math.max(maxMappedLines, mapperData.getLines());
    }
 
+   public long getHwBranchInstructions() {
+      return hwBranchInstructions;
+   }
+
+   public long getTotalBranchInstructions() {
+      return totalBranchInstructions;
+   }
+
+   public void addHwBranchInstructions(long numInstructions) {
+      hwBranchInstructions += numInstructions;
+   }
+
+   public void addTotalBranchInstructions(long numInstructions) {
+      totalBranchInstructions += numInstructions;
+   }
 
    /**
     * INSTANCE VARIABLES
@@ -150,6 +165,9 @@ public class SimulationData {
    private long totalMappedMoves;
    private int maxMappedLineSize;
    private int maxMappedLines;
+
+   private long totalBranchInstructions = 0l;
+   private long hwBranchInstructions = 0l;
 
    //private int maxLineSize;
    //private int maxLineOps;

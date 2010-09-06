@@ -21,10 +21,14 @@ import java.util.List;
 import java.util.logging.Logger;
 import org.ancora.FuMatrix.Mapper.GeneralMapper;
 import org.ancora.FuMatrix.Stats.MapperData;
+import org.ancora.InstructionBlock.GenericInstruction;
 import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.IntermediateRepresentation.MbParser;
 import org.ancora.IntermediateRepresentation.Operation;
+import org.ancora.MicroBlaze.InstructionName;
+import org.ancora.MicroBlaze.InstructionProperties;
 import org.ancora.Partitioning.Blocks.BlockStream;
+import org.ancora.SharedLibrary.EnumUtils;
 import org.ancora.SharedLibrary.ParseUtils;
 import org.ancora.StreamTransform.SingleStaticAssignment;
 import org.specs.DMTool2.Dispensers.MapperDispenser;
@@ -58,6 +62,8 @@ public class SimulateSingleFile {
    }
 
    public void runSimulation() {
+      //long totalBranchInstructions = 0l;
+      //long hwBranchInstructions = 0l;
       InstructionBlock block = blockStream.nextBlock();
       while (block != null) {
 
@@ -67,10 +73,18 @@ public class SimulateSingleFile {
             processorPath(block);
          } else {
             hwPath(block);
+            simData.addHwBranchInstructions(getBranchInstructions(block) - 1);
+            //hwBranchInstructions += (getBranchInstructions(block) - 1);
          }
 
+         simData.addTotalBranchInstructions(getBranchInstructions(block));
+         //totalBranchInstructions += getBranchInstructions(block);
          block = blockStream.nextBlock();
       }
+
+      //double result = (double) hwBranchInstructions / (double) totalBranchInstructions;
+      //System.err.println("HW:"+hwBranchInstructions+"; Total:"+totalBranchInstructions);
+      //System.err.println("BRANCH PREDICTION:"+result);
    }
 
    private void processorPath(InstructionBlock block) {
@@ -126,7 +140,25 @@ public class SimulateSingleFile {
       return simData;
    }
 
+   private long getBranchInstructions(InstructionBlock block) {
+      // Count branch instructions in block
+      long counter = 0l;
+      for(GenericInstruction instruction : block.getInstructions()) {
+         String instructionName = instruction.getInstruction();
+         instructionName = instructionName.substring(0, instructionName.indexOf(" "));
+         InstructionName instEnum = EnumUtils.valueOf(InstructionName.class, instructionName);
+     //       System.err.println("inst name:"+instructionName);
+     //       System.err.println("inst enum:"+instEnum);
+         boolean isJump =  InstructionProperties.JUMP_INSTRUCTIONS.contains(instEnum);
+         if(isJump) {
+            counter++;
 
+         }
+
+      }
+
+      return counter * block.getRepetitions();
+   }
 
    /**
     * INSTANCE VARIABLES
@@ -136,6 +168,8 @@ public class SimulateSingleFile {
    private int repetitionsThreshold;
 
    public final static int DEFAULT_REPETITIONS_THRESHOLD = 2;
+
+
 
    
 }

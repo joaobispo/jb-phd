@@ -62,7 +62,7 @@
                 <id>jar</id>
             </reference>
             <reference>
-                <foreign-project>Partitioning</foreign-project>
+                <foreign-project>Partitioning-V2</foreign-project>
                 <artifact-type>jar</artifact-type>
                 <script>build.xml</script>
                 <target>jar</target>

@@ -19,8 +19,6 @@ package org.specs.DMTool2.Dispensers;
 
 import org.ancora.Partitioning.Blocks.BlockStream;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 import org.ancora.InstructionBlock.BlockIO;
 import org.ancora.InstructionBlock.DtoolTraceBusReader;
@@ -28,10 +26,8 @@ import org.ancora.InstructionBlock.ElfBusReader;
 import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.InstructionBlock.InstructionBusReader;
 import org.ancora.Partitioning.Blocks.SingleBlockStream;
-import org.ancora.Partitioning.Partitioner;
-import org.ancora.Partitioning.Tools.BlockWorker;
-import org.ancora.Partitioning.Tools.BlockWorkerStream;
-import org.ancora.Partitioning.Tools.MultiBlockStream;
+import org.ancora.Partitioning.Blocks.TraceBlockStream;
+import org.ancora.Partitioning.PartitioningService;
 import org.ancora.SharedLibrary.IoUtils;
 import org.specs.DMTool2.Settings.GeneralOption;
 import org.specs.DMTool2.Settings.Settings;
@@ -54,7 +50,9 @@ public class BlockDispenser {
     * @return
     */
    
-   public static BlockStream getBlockStream(File file, Partitioner partitioner, Context context) {
+   public static BlockStream getBlockStream(File file, PartitioningService partitioningService) {
+   //public static BlockStream getBlockStream(File file, Partitioner partitioner, PartitioningConfig config) {
+   //public static BlockStream getBlockStream(File file, Partitioner partitioner, Context context) {
        // Determine file extension and determine type of file
       String filename = file.getName();
       int separatorIndex = filename.lastIndexOf(IoUtils.DEFAULT_EXTENSION_SEPARATOR);
@@ -81,8 +79,8 @@ public class BlockDispenser {
 
       // If we got a BusReader, setup BlockWorker.
       if (busReader != null) {
-         BlockWorkerStream worker = new BlockWorkerStream(partitioner, busReader);
-         Settings.setupBlockWorker(worker, context);
+         BlockStream worker = new TraceBlockStream(partitioningService, busReader);
+         //Settings.setupBlockWorker(worker, context);
          return worker;
       }
 
@@ -98,6 +96,7 @@ public class BlockDispenser {
     * @param file
     * @return
     */
+   /*
    public static BlockStream getMultiBlockStream(File file, List<Partitioner> partitioners, Context context) {
        // Determine file extension and determine type of file
       String filename = file.getName();
@@ -137,7 +136,7 @@ public class BlockDispenser {
               warning("Could not process file with extension '"+extension+"'. Only supports elf and trace.");
       return null;
    }
-
+*/
    public enum Context {
       currentSettings,
       traceCoverage,

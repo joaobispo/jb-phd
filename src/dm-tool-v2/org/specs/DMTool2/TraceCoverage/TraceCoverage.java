@@ -27,10 +27,11 @@ import java.util.logging.Logger;
 import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.Partitioning.Blocks.BlockStream;
 import org.ancora.Partitioning.Partitioner;
+import org.ancora.Partitioning.PartitioningService;
 import org.specs.DMTool2.Dispensers.BlockDispenser;
-import org.specs.DMTool2.Dispensers.BlockDispenser.Context;
 import org.specs.DMTool2.Dispensers.PartitionerDispenser;
 import org.specs.DMTool2.Program;
+import org.specs.DMTool2.Settings.PartConf;
 import org.specs.DMTool2.Settings.ProgramName;
 import org.specs.DMTool2.Settings.Settings;
 
@@ -151,7 +152,9 @@ public class TraceCoverage implements Program {
                     warning("Processing file '" + file.getName() + "'...");
 
             // Get BlockStream
-            BlockStream blockStream = BlockDispenser.getBlockStream(file, partitioner, Context.traceCoverage);
+            //BlockStream blockStream = BlockDispenser.getBlockStream(file, partitioner, Context.traceCoverage);
+            PartitioningService pService = new PartitioningService(partitioner, PartConf.traceCoverage.getConfig());
+            BlockStream blockStream = BlockDispenser.getBlockStream(file, pService);
 
             // Initialize stats gatherer
             TcData stats = new TcData(file.getName());
@@ -179,7 +182,8 @@ public class TraceCoverage implements Program {
             }
 
             // Check if instruction totals are the same
-            long totalInsts = blockStream.getTotalInstructions();
+            //long totalInsts = blockStream.getTotalInstructions();
+            long totalInsts = blockStream.getBusReaderInstructions();
             long statsInst = stats.getTotalInstructions();
             if (statsInst != totalInsts) {
                Logger.getLogger(TraceCoverage.class.getName()).
@@ -198,7 +202,7 @@ public class TraceCoverage implements Program {
 //      maxBlockSize++;
 //      processBlocksizeStats(partitioners, mainTable, maxBlockSize);
    }
-
+/*
    private void processPartitioners(List<Partitioner> partitioners, List<File> inputFiles) {
       // Initialize main table
       Map<Partitioner, List<TcData>> mainTable =
@@ -265,7 +269,8 @@ public class TraceCoverage implements Program {
 //      maxBlockSize++;
 //      processBlocksizeStats(partitioners, mainTable, maxBlockSize);
    }
-
+*/
+   /*
    private void processStats(List<Partitioner> partitioners, Map<Partitioner, List<TcData>> mainTable, int maxRepetitions) {
       for(Partitioner partitioner : partitioners) {
          String csvFilename = CSV_PREFIX + "-" + partitioner.getName();
@@ -316,7 +321,7 @@ public class TraceCoverage implements Program {
 
       }
    }
-
+*/
    /**
     * Writes one CSV for the entire run, with the averages for each partitioner.
     *

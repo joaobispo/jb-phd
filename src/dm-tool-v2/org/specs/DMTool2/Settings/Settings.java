@@ -24,11 +24,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.ancora.Partitioning.Tools.BlockWorker;
 import org.ancora.SharedLibrary.IoUtils;
-import org.ancora.SharedLibrary.ParseUtils;
-import org.specs.DMTool2.Dispensers.BlockDispenser.Context;
-import org.specs.DMTool2.Dispensers.PartitionerOption;
 
 /**
  *
@@ -107,6 +103,7 @@ public class Settings {
       return new File(outputFolder, csvFilename);
    }
 
+   /*
    public static void setupBlockWorker(BlockWorker worker, Context context) {
       // Default
       // Setup worker
@@ -142,7 +139,7 @@ public class Settings {
 
       worker.init();
    }
-
+*/
     public static Level getLoggerLevel() {
       String loggerLevel = Settings.optionsTable.get(GeneralOption.logger_level).toUpperCase();
       Level defaultLevel = Level.ALL;
