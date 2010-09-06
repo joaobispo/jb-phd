@@ -17,8 +17,6 @@
 
 package org.ancora.Partitioning;
 
-import org.ancora.Partitioning.Partitioner;
-import org.ancora.Partitioning.Tools.InstructionFilter;
 import java.util.ArrayList;
 import java.util.List;
 import org.ancora.InstructionBlock.GenericInstruction;

@@ -85,6 +85,7 @@ public class ManualBlockWorker implements BlockWorker {
          return blocks;
       }
 
+      // Return a new list, discard current and create new
       List<InstructionBlock> temp = blocks;
       blocks = new ArrayList<InstructionBlock>();
       return temp;
