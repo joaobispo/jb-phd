@@ -51,7 +51,7 @@ public class DmTransformDispenser {
          TransformationName transformation = transformations.get(transf);
          if(transformation == null) {
             Logger.getLogger(DmTransformDispenser.class.getName()).
-                    info("Could not find transformation '"+transf+"'.");
+                    warning("Could not find transformation '"+transf+"'.");
             continue;
          }
 

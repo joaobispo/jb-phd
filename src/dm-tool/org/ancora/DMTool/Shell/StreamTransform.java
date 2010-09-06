@@ -148,7 +148,9 @@ public class StreamTransform implements Executable {
 
             // Transform to SSA
             SingleStaticAssignment.transform(operations);
-            RemoveR0Or.transform(operations);
+            // Apply pre-transformations, before collecting data
+            DmStreamTransformDispenser.applyPreTransformations(operations);
+            //RemoveR0Or.transform(operations);
 
             // Get stats before transformations
             // Map

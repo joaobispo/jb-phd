@@ -14,7 +14,6 @@
  *  limitations under the License.
  *  under the License.
  */
-
 package org.ancora.DMTool.Shell;
 
 import org.ancora.DMTool.System.Interfaces.Executable;
@@ -48,9 +47,10 @@ import org.ancora.SharedLibrary.IoUtils;
  * @author Joao Bispo
  */
 public class StreamSimulate implements Executable {
+
    private void setup() {
       input = Options.optionsTable.get(OptionName.general_input);
-            elfExtension = Options.optionsTable.get(OptionName.extension_elf);
+      elfExtension = Options.optionsTable.get(OptionName.extension_elf);
       traceExtension = Options.optionsTable.get(OptionName.extension_trace);
 //      transf = DmTransformDispenser.getCurrentTransformations();
 //      transf = DmStreamTransformDispenser.getCurrentTransformations();
@@ -62,8 +62,8 @@ public class StreamSimulate implements Executable {
       setup();
 
       File file = new File(input);
-      if(!file.exists()) {
-         logger.warning("Input '"+input+"' does not exist.");
+      if (!file.exists()) {
+         logger.warning("Input '" + input + "' does not exist.");
          return false;
       }
 
@@ -77,7 +77,7 @@ public class StreamSimulate implements Executable {
 
       //logger.info("Found "+inputFiles.size()+" files.");
 //      logger.warning("Found "+inputFiles.size()+" files.");
-      logger.warning("Found "+inputFiles.size()+" files. Using partitioner "+Settings.getPartitioner().getName());
+      logger.warning("Found " + inputFiles.size() + " files. Using partitioner " + Settings.getPartitioner().getName());
 
       //processFiles(inputFiles);
       processFiles2(inputFiles);
@@ -91,15 +91,18 @@ public class StreamSimulate implements Executable {
       String optimizationLevel = Options.optionsTable.get(OptionName.general_optimizationstring);
       String transformations = "NoTrans";
 //      if(DmTransformDispenser.getCurrentTransformations().size() > 0) {
-      if(DmStreamTransformDispenser.getCurrentTransformations().size() > 0) {
+      if (DmStreamTransformDispenser.getCurrentTransformations().size() > 0) {
          transformations = "WithTransf";
       }
 
-      String runName = optimizationLevel+"-"+transformations;
+      String runName = optimizationLevel + "-" + transformations;
       List<Double> speedups = new ArrayList<Double>();
 
       double speedupAcc = 0d;
       long globalNormalCycles = 0l;
+      int maxLineSize = 0;
+      int maxLineSizeAcc = 0;
+      int maxLineSizeCounter = 0;
       for (File file : inputFiles) {
          logger.warning("Processing file '" + file.getName() + "'...");
 
@@ -107,32 +110,43 @@ public class StreamSimulate implements Executable {
          DmBlockPack blockPack = DmBlockUtils.getBlockPack(file);
          BlockStream blockStream = blockPack.getBlockStream();
 
-         DmSimulateFile simulator = new DmSimulateFile(blockStream);
+         //DmSimulateFile simulator = new DmSimulateFile(blockStream);
+         DmSimulateFile simulator = DmSimulateFile.getCurrentSimulator(blockStream);
+
          simulator.runSimulation();
          SimulationData simData = simulator.getSimulationData();
          SimulationCalcs simCalcs = new SimulationCalcs(simData, blockStream.getInstructionBusReader());
 
 
+         int maxLine = simData.getMaxMappedLineSize();
+         System.err.println("Max Line Size:"+maxLine);
+         maxLineSize = Math.max(maxLineSize, maxLine);
+         maxLineSizeAcc += maxLine;
+         maxLineSizeCounter++;
+
          double speedup = simCalcs.getSpeedUp();
          //System.err.println("Speed-up:"+speedup);
          speedupAcc += speedup;
 
-         globalNormalCycles+=blockStream.getInstructionBusReader().getCycles();
+         globalNormalCycles += blockStream.getInstructionBusReader().getCycles();
          int failedMappings = simData.getFailedMappings();
-         if(failedMappings > 0) {
-            System.err.println("Failed "+failedMappings+" mappings.");
+         if (failedMappings > 0) {
+            System.err.println("Failed " + failedMappings + " mappings.");
          }
 
          speedups.add(speedup);
       }
 
-      System.err.println("Run:"+runName);
+      System.err.println("Run:" + runName);
       System.err.println("\nAverage Speed-up:" + (speedupAcc / inputFiles.size()));
       System.err.println("Global Normal Cycles:" + globalNormalCycles);
       double avgSpeedup = speedupAcc / inputFiles.size();
       speedups.add(avgSpeedup);
 
-      //writeToCsv(runName, speedups, inputFiles);
+      System.err.println("Global Max Line Size:"+maxLineSize);
+      System.err.println("Global Max Line Avg:"+((double)maxLineSizeAcc/(double)maxLineSizeCounter));
+
+      writeToCsv(runName, speedups, inputFiles);
    }
 
    private void processFiles(List<File> inputFiles) {
@@ -140,11 +154,11 @@ public class StreamSimulate implements Executable {
       String optimizationLevel = Options.optionsTable.get(OptionName.general_optimizationstring);
       String transformations = "NoTrans";
 //      if(DmTransformDispenser.getCurrentTransformations().size() > 0) {
-      if(DmStreamTransformDispenser.getCurrentTransformations().size() > 0) {
+      if (DmStreamTransformDispenser.getCurrentTransformations().size() > 0) {
          transformations = "WithTransf";
       }
 
-      String runName = optimizationLevel+"-"+transformations;
+      String runName = optimizationLevel + "-" + transformations;
       List<Double> speedups = new ArrayList<Double>();
 
       double speedupAcc = 0d;
@@ -187,7 +201,7 @@ public class StreamSimulate implements Executable {
                // Transform
                /*
                for (Transformation t : transf) {
-                  t.transform(operations);
+               t.transform(operations);
                }
                 *
                 */
@@ -222,8 +236,8 @@ public class StreamSimulate implements Executable {
                   int ops = mapperData.getOps();
                   int moves = mapperData.getMoves();
 
-                  double ilpWithoutMoves = (double)ops / (double)lines;
-                  double ilpWithMoves = (double)(ops+moves) / (double)lines;
+                  double ilpWithoutMoves = (double) ops / (double) lines;
+                  double ilpWithMoves = (double) (ops + moves) / (double) lines;
                   //System.err.println("ILP sem Moves:"+ilpWithoutMoves);
                   //System.err.println("ILP com Moves:"+ilpWithMoves);
                } else {
@@ -239,52 +253,51 @@ public class StreamSimulate implements Executable {
          // Calculate speed-up of program
          long traceCycles = blockPack.getInstructionBusReader().getCycles();
          long traceInstructions = blockPack.getInstructionBusReader().getInstructions();
-         double cpi = (double)traceCycles / (double)traceInstructions;
+         double cpi = (double) traceCycles / (double) traceInstructions;
 
-         if(traceInstructions != totalProcessedInstructions) {
+         if (traceInstructions != totalProcessedInstructions) {
             Logger.getLogger(StreamSimulate.class.getName()).
-                    warning("DTool simulation instructions ("+traceInstructions+") different " +
-                    "from instructions fed to dynamic mapping simulation ("+totalProcessedInstructions+")");
+                    warning("DTool simulation instructions (" + traceInstructions + ") different "
+                    + "from instructions fed to dynamic mapping simulation (" + totalProcessedInstructions + ")");
          }
 
-         long processorCycles = (long) Math.ceil((double)processorInstructions * cpi);
+         long processorCycles = (long) Math.ceil((double) processorInstructions * cpi);
          long totalSimCycles = processorCycles + hwCycles;
 
          double speedup = (double) traceCycles / (double) totalSimCycles;
- /*
+         /*
          System.err.println("Normal Instructions:"+traceInstructions);
          System.err.println("Normal Cycles:"+traceCycles);
          System.err.println("Normal CPI:"+cpi);
          System.err.println("MB Instructions:"+processorInstructions);
          System.err.println("MB Cycles:"+processorCycles);
          System.err.println("HW Cycles:"+hwCycles);
-  * 
-  */
-         System.err.println("Speed-up:"+speedup);
+          *
+          */
+         System.err.println("Speed-up:" + speedup);
          speedupAcc += speedup;
 
-         globalNormalCycles+=traceCycles;
-         if(failedMappings > 0) {
-            System.err.println("Failed "+failedMappings+" mappings.");
+         globalNormalCycles += traceCycles;
+         if (failedMappings > 0) {
+            System.err.println("Failed " + failedMappings + " mappings.");
          }
 
          speedups.add(speedup);
       }
 
-      System.err.println("\nAverage Speed-up:"+(speedupAcc/inputFiles.size()));
-      System.err.println("Global Normal Cycles:"+globalNormalCycles);
-      double avgSpeedup = speedupAcc/inputFiles.size();
+      System.err.println("\nAverage Speed-up:" + (speedupAcc / inputFiles.size()));
+      System.err.println("Global Normal Cycles:" + globalNormalCycles);
+      double avgSpeedup = speedupAcc / inputFiles.size();
       speedups.add(avgSpeedup);
 
-      writeToCsv(runName,speedups, inputFiles);
+      writeToCsv(runName, speedups, inputFiles);
    }
-
    /**
     * INSTANCE VARIABLES
     */
    private static final Logger logger = Logger.getLogger(StreamSimulate.class.getName());
    private String input;
-      private String traceExtension;
+   private String traceExtension;
    private String elfExtension;
 //   private List<Transformation> transf;
    private GeneralMapper mapper;
@@ -294,9 +307,9 @@ public class StreamSimulate implements Executable {
       File csvFile = Settings.getCsvFile("speeups");
 
       // Check if it exits
-      if(!csvFile.exists()) {
+      if (!csvFile.exists()) {
          StringBuilder builder = new StringBuilder();
-         for(File file : inputFiles) {
+         for (File file : inputFiles) {
             String filename = file.getName();
             // Remove extension and optimization level
             filename = org.ancora.SharedLibrary.ParseUtils.removeSuffix(filename, ".");
@@ -313,14 +326,11 @@ public class StreamSimulate implements Executable {
       // Write name of the run
       builder.append(runName);
       // Write results
-      for(Double speedup : speedups) {
+      for (Double speedup : speedups) {
          builder.append("\t");
          builder.append(speedup);
       }
       builder.append("\n");
       IoUtils.append(csvFile, builder.toString());
    }
-
-
-
 }

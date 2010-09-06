@@ -22,12 +22,15 @@ import java.util.logging.Logger;
 import org.ancora.DMTool.Dispensers.DmStreamMapperDispenser;
 import org.ancora.DMTool.Dispensers.DmStreamTransformDispenser;
 //import org.ancora.DMTool.Dispensers.DmTransformDispenser;
+import org.ancora.DMTool.Settings.Options;
+import org.ancora.DMTool.Settings.Options.OptionName;
 import org.ancora.FuMatrix.Mapper.GeneralMapper;
 import org.ancora.FuMatrix.Stats.MapperData;
 import org.ancora.InstructionBlock.InstructionBlock;
 import org.ancora.IntermediateRepresentation.MbParser;
 import org.ancora.IntermediateRepresentation.Operation;
 import org.ancora.Partitioning.Blocks.BlockStream;
+import org.ancora.SharedLibrary.ParseUtils;
 import org.ancora.StreamTransform.SingleStaticAssignment;
 
 /**
@@ -44,6 +47,16 @@ public class DmSimulateFile {
       this.blockStream = blockStream;
       simData = new SimulationData();
       repetitionsThreshold = DEFAULT_REPETITIONS_THRESHOLD;
+   }
+
+   public static DmSimulateFile getCurrentSimulator(BlockStream blockStream) {
+      String repetitionsString = Options.optionsTable.get(OptionName.simulation_repetitions);
+      int repetitions = ParseUtils.parseInt(repetitionsString);
+
+      DmSimulateFile simulator = new DmSimulateFile(blockStream);
+      simulator.setRepetitionsThreshold(repetitions);
+
+      return simulator;
    }
 
    public void runSimulation() {
@@ -84,6 +97,8 @@ public class DmSimulateFile {
 
       // Transform
       //DmTransformDispenser.applyCurrentTransformations(operations);
+      // Apply all transformations
+      DmStreamTransformDispenser.applyPreTransformations(operations);
       DmStreamTransformDispenser.applyCurrentTransformations(operations);
 
       // Map

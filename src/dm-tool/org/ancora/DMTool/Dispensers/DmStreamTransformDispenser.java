@@ -40,9 +40,19 @@ import org.ancora.StreamTransform.StreamTransformation;
 public class DmStreamTransformDispenser {
 
    public static List<StreamTransformation> getCurrentTransformations() {
+      return getTransformations(TransformationSet.set_current);
+   }
+/*
+   public static List<StreamTransformation> getPreTransformations() {
+      return getTransformations(TransformationSet.set_pre);
+   }
+ */
+
+   public static List<StreamTransformation> getTransformations(TransformationSet transfSet) {
       
       // Get transformations
-      String transformationString = Options.optionsTable.get(OptionName.ir_options);
+      String transformationString = Options.optionsTable.get(transfSet.getOption());
+      //String transformationString = Options.optionsTable.get(OptionName.stream_transformations);
       List<String> transformationList = ShellUtils.splitCommand(transformationString);
 
       List<StreamTransformation> transfs = new ArrayList<StreamTransformation>();
@@ -68,9 +78,18 @@ public class DmStreamTransformDispenser {
    }
 
    public static TransformationChanges applyCurrentTransformations(List<Operation> operations) {
+      return applyTransformations(operations, TransformationSet.set_current);
+   }
+
+   public static TransformationChanges applyPreTransformations(List<Operation> operations) {
+      return applyTransformations(operations, TransformationSet.set_pre);
+   }
+   
+   private static TransformationChanges applyTransformations(List<Operation> operations, TransformationSet transSet) {
       TransformationChanges totalFrequencies = new TransformationChanges();
 
-      List<StreamTransformation> transf = DmStreamTransformDispenser.getCurrentTransformations();
+      //List<StreamTransformation> transf = DmStreamTransformDispenser.getCurrentTransformations();
+      List<StreamTransformation> transf = DmStreamTransformDispenser.getTransformations(transSet);
       for (StreamTransformation t : transf) {
          for (int i = 0; i < operations.size(); i++) {
             operations.set(i, t.transform(operations.get(i)));
@@ -149,5 +168,20 @@ public class DmStreamTransformDispenser {
          }
       }
       private String transformationName;
+   }
+
+      public static enum TransformationSet {
+      set_pre(OptionName.stream_transformations_pre),
+      set_current(OptionName.stream_transformations);
+
+      private TransformationSet(OptionName option) {
+         this.option = option;
+      }
+
+      public OptionName getOption() {
+         return option;
+      }
+
+      private final OptionName option;
    }
 }

@@ -64,6 +64,10 @@ public class SimulationData {
       return failedMappings;
    }
 
+   public int getMaxMappedLineSize() {
+      return maxMappedLineSize;
+   }
+
 
 /*
    public int getMaxLineOps() {
@@ -76,6 +80,8 @@ public class SimulationData {
    }
     * 
     */
+
+
 
    public long getProcessorExecutedInstructions() {
       return processorExecutedInstructions;
@@ -119,6 +125,8 @@ public class SimulationData {
       totalMappedOps += mapperData.getOps();
       totalMappedMoves += mapperData.getMoves();
 
+      maxMappedLineSize = Math.max(maxMappedLineSize, mapperData.getLineSizeMax());
+
    }
 
 
@@ -135,6 +143,7 @@ public class SimulationData {
    private long totalMappedLines;
    private long totalMappedOps;
    private long totalMappedMoves;
+   private int maxMappedLineSize;
 
    //private int maxLineSize;
    //private int maxLineOps;

@@ -46,7 +46,7 @@ public class DmMapperDispenser {
       if(mapper == null) {
 //      if(mapperOption == null) {
          Logger.getLogger(DmMapperDispenser.class.getName()).
-                 info("Mapper '" + mapperName + "' not found.");
+                 warning("Mapper '" + mapperName + "' not found.");
          /*
          info("Mapper '" + mapperName + "' not found. Avaliable options:");
          for (MapperOption option : MapperOption.values()) {

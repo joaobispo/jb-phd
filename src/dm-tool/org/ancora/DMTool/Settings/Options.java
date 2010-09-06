@@ -61,7 +61,12 @@ public class Options {
       mapping_max_col_memory("mapping.maxcolmemory","1"),
 
       ir_writedot("ir.writedot","false"),
-      ir_options("ir.options","");
+      ir_options("ir.options",""),
+
+       stream_transformations_pre("stream.transformations.pre",""),
+       stream_transformations("stream.transformations",""),
+
+       simulation_repetitions("simulation.repetitions","2");
 
 //      blocks_writeblocks("blocks.writeblock", "true");
 
