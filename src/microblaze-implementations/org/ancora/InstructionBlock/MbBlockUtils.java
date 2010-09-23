@@ -36,7 +36,7 @@ public class MbBlockUtils {
       int whiteSpaceIndex = instruction.indexOf(whitespace);
       if(whiteSpaceIndex == -1) {
          Logger.getLogger(MbBlockUtils.class.getName()).
-                 warning("Could not find name separator '"+whitespace+"' in MicroBlaze Instruction.");
+                 warning("Could not find name separator '"+whitespace+"' in MicroBlaze Instruction: '"+instruction+"'.");
          return null;
       }
       String instNameString = instruction.substring(0, whiteSpaceIndex);
