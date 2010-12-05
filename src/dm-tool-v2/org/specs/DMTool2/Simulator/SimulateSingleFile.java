@@ -34,6 +34,7 @@ import org.ancora.StreamTransform.SingleStaticAssignment;
 import org.specs.DMTool2.Dispensers.MapperDispenser;
 import org.specs.DMTool2.Dispensers.TransformDispenser;
 import org.specs.DMTool2.Settings.Settings;
+import org.specs.DMTool2.experimental.ConstantRegisters;
 
 /**
  *
@@ -127,7 +128,7 @@ public class SimulateSingleFile {
       // Show block
       MapperData mapperData = MapperData.build(mapper);
       simData.updateHwPath(mapperData, block);
-
+      ConstantRegisters.testBlock(block, mapperData);
    }
 
 

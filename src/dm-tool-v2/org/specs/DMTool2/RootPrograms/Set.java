@@ -125,7 +125,7 @@ public class Set implements Program {
       String loggerOpName = OptionTable.buildOptionName(GeneralOption.logger_level);
       if(optionName.equals(loggerOpName)) {
          Level level = Settings.getLoggerLevel();
-         LoggingUtils.setLevel(level);
+         LoggingUtils.getRootLogger().setLevel(level);
       }
    }
 
